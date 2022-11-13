@@ -1,0 +1,44 @@
+<?php
+
+namespace Outhebox\LaravelTranslations\Models;
+
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Outhebox\LaravelTranslations\Models\Concerns\HasDatabaseConnection;
+
+class Translation extends Model
+{
+    use HasFactory;
+    use HasDatabaseConnection;
+
+    protected $guarded = [];
+
+    protected $table = 'ltu_translations';
+
+    protected $casts = [
+        'source' => 'boolean',
+    ];
+
+    public function phrases(): HasMany
+    {
+        return $this->hasMany(Phrase::class);
+    }
+
+    public function language(): BelongsTo
+    {
+        return $this->belongsTo(Language::class);
+    }
+
+    public function progress(): Attribute
+    {
+        return Attribute::get(function () {
+            $total = $this->phrases()->count();
+            $translated = $this->phrases()->whereNotNull('value')->count();
+
+            return round($translated / $total * 100, 2).'%';
+        });
+    }
+}

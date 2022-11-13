@@ -1,0 +1,77 @@
+{
+    "name": "outhebox/laravel-translations",
+    "description": "Laravel Translations UI provides a simple way to manage your translations in your Laravel application. It allows you to add, edit, delete and export translations, and it also provides a search functionality to find translations.",
+    "keywords": [
+        "laravel",
+        "laravel-translations",
+        "translations",
+        "localization",
+        "livewire",
+        "translation-manager"
+    ],
+    "homepage": "https://github.com/MohmmedAshraf/laravel-translations",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mohamed Ashraf",
+            "email": "cupo.ashraf@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.0",
+        "brick/varexporter": "^0.3.7",
+        "illuminate/contracts": "^9.0",
+        "livewire/livewire": "^2.10",
+        "outhebox/blade-flags": "^1.0",
+        "saade/blade-iconsax": "^1.0",
+        "wire-elements/modal": "^1.0",
+        "wireui/wireui": "^1.17"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.0",
+        "nunomaduro/collision": "^6.0",
+        "orchestra/testbench": "^7.0",
+        "pestphp/pest": "^1.21",
+        "pestphp/pest-plugin-laravel": "^1.1",
+        "pestphp/pest-plugin-livewire": "^1.0",
+        "phpunit/phpunit": "^9.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Outhebox\\LaravelTranslations\\": "src",
+            "Outhebox\\LaravelTranslations\\Database\\Factories\\": "database/factories"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Outhebox\\LaravelTranslations\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": "@php ./vendor/bin/testbench package:discover --ansi",
+        "analyse": "vendor/bin/phpstan analyse",
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage",
+        "format": "vendor/bin/pint"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Outhebox\\LaravelTranslations\\LaravelTranslationsServiceProvider"
+            ],
+            "aliases": {
+                "LaravelTranslations": "Outhebox\\LaravelTranslations\\Facades\\LaravelTranslations"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
