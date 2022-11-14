@@ -1,5 +1,4 @@
 <div class="rounded-lg bg-white px-5 py-6 shadow sm:px-6">
-
     <div class="sm:flex sm:items-center">
         <div class="flex items-center sm:flex-auto space-x-3">
             <h1 class="text-xl font-semibold text-gray-900">Translations</h1>
@@ -15,8 +14,6 @@
             </button>
         </div>
     </div>
-
-
 
     <div class="mt-6 flex flex-col">
         <div class="inline-block min-w-full align-middle">
@@ -41,7 +38,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="w-full flex items-center">
+                                {{--TODO: <div class="w-full flex items-center">
                                     @if(! $translation->source)
                                         <div class="flex justify-center mx-auto w-full max-w-xs px-0 sm:px-6">
                                             <div class="translation-progress w-full rounded-full overflow-hidden bg-gray-200">
@@ -49,7 +46,7 @@
                                             </div>
                                         </div>
                                     @endif
-                                </div>
+                                </div>--}}
                                 <div class="w-full relative py-4 pl-3 pr-4 text-sm font-medium sm:pr-6">
                                     <div class="flex gap-3 items-center">
                                         <a href="{{ route('translations_ui.phrases.index', $translation) }}" class="text-gray-400 hover:text-violet-700 ml-auto relative z-50">

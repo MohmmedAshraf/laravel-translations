@@ -22,6 +22,10 @@ class Translation extends Model
         'source' => 'boolean',
     ];
 
+    protected $with = [
+        'language',
+    ];
+
     public function phrases(): HasMany
     {
         return $this->hasMany(Phrase::class);
@@ -35,10 +39,7 @@ class Translation extends Model
     public function progress(): Attribute
     {
         return Attribute::get(function () {
-            $total = $this->phrases()->count();
-            $translated = $this->phrases()->whereNotNull('value')->count();
-
-            return round($translated / $total * 100, 2).'%';
+            return 0;
         });
     }
 }

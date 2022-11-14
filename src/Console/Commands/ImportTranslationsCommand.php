@@ -81,6 +81,10 @@ class ImportTranslationsCommand extends Command
 
     public function syncPhrases(Translation $source, $key, $value, $locale, $file)
     {
+        if (is_array($value) && empty($value)) {
+            return;
+        }
+
         $language = Language::where('code', $locale)->first();
 
         if (! $language) {
@@ -104,8 +108,8 @@ class ImportTranslationsCommand extends Command
             'group' => $translationFile->name,
             'translation_file_id' => $translationFile->id,
         ], [
-            'value' => is_array($value) && empty($value) ? null : $value,
-            'parameters' => is_array($value) ? null : $this->manager->getPhraseParameters($value),
+            'value' => $value,
+            'parameters' => $this->manager->getPhraseParameters($value),
             'phrase_id' => $translation->source ? null : $source->phrases()->where('key', $key)->first()?->id,
         ]);
     }

@@ -45,7 +45,7 @@ class CreateTranslation extends ModalComponent
 
         $sourceTranslation = Translation::where('source', true)->first();
 
-        foreach ($sourceTranslation->phrases()->get() as $sourcePhrase) {
+        foreach ($sourceTranslation->phrases()->with('file')->get() as $sourcePhrase) {
             $translation->phrases()->create([
                 'value' => null,
                 'key' => $sourcePhrase->key,

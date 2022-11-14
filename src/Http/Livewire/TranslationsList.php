@@ -23,8 +23,7 @@ class TranslationsList extends Component
 
     public function getTranslations(): LengthAwarePaginator
     {
-        return Translation::with('language')
-            ->orderByDesc('source')
+        return Translation::orderByDesc('source')
             ->when($this->search, function ($query) {
                 $query->whereHas('language', function ($query) {
                     $query->where('name', 'like', "%{$this->search}%")
