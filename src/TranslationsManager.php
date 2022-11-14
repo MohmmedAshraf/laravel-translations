@@ -69,7 +69,7 @@ class TranslationsManager
         $translations = Translation::with('phrases')->get();
 
         foreach ($translations as $translation) {
-            $phrasesTree = $this->buildPhrasesTree($translation->phrases()->whereNotNull('value')->get(), $translation->language->code);
+            $phrasesTree = $this->buildPhrasesTree($translation->phrases()->with('file')->whereNotNull('value')->get(), $translation->language->code);
 
             foreach ($phrasesTree as $locale => $groups) {
                 foreach ($groups as $file => $phrases) {

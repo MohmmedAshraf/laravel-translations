@@ -12,6 +12,7 @@ use Outhebox\LaravelTranslations\Http\Livewire\PhraseForm;
 use Outhebox\LaravelTranslations\Http\Livewire\PhraseList;
 use Outhebox\LaravelTranslations\Http\Livewire\SourcePhrase;
 use Outhebox\LaravelTranslations\Http\Livewire\TranslationsList;
+use Outhebox\LaravelTranslations\Http\Livewire\Widgets\ExportTranslations;
 
 class LaravelTranslationsServiceProvider extends ServiceProvider
 {
@@ -88,6 +89,7 @@ class LaravelTranslationsServiceProvider extends ServiceProvider
         Livewire::component('translations-ui::phrase-form', PhraseForm::class);
         Livewire::component('translations-ui::source-phrase', SourcePhrase::class);
         Livewire::component('translations-ui::translations-list', TranslationsList::class);
+        Livewire::component('translations-ui::export-translations', ExportTranslations::class);
         Livewire::component('translations-ui::create-source-key-modal', CreateSourceKey::class);
         Livewire::component('translations-ui::create-translation-modal', CreateTranslation::class);
     }
