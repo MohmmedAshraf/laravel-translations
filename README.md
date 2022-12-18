@@ -23,30 +23,32 @@
 
 ### Introduction
 
-Laravel Translations UI provides a simple way to manage your app translations using a friendly UI, It allows you to add, edit, delete and export translations, and it also provides a search functionality to find translations.
+Laravel Translations UI is a package that provides a simple and friendly user interface for managing translations in a Laravel app. With this package, you can easily add, edit, delete, and export translations, and use the search function to find specific translations.
 
 #### Features
 
-- **View & Create & Delete Translations**.
-- **Manage** your translations keys.
-- **Filter** by translation keys or values,
+- View, create, and delete translations
+- Manage translation keys
+- Filter by translation keys or values
+- Import and export translations
+- Search function to find specific translations
 - and more...
 
 ### Installation
 
-You may use the Composer package manager to install Laravel Translations UI into your Laravel project:
+To install Laravel Translations UI in your Laravel project, run the following command:
 
 ```bash
 composer require outhebox/laravel-translations
 ```
 
-After installing Laravel Translations UI, publish its assets using the following commands.
+After installing the package, you'll need to publish its assets by running the following command:
 
 ```bash
 php artisan translations:install
 ```
 
-Migrate your database before importing translations, you can use the following command.
+Before you can import translations, you'll need to migrate your database. Run the following command to do so:
 
 ```bash
 php artisan migrate
@@ -54,24 +56,25 @@ php artisan migrate
 
 ### Usage
 
-Import your translations using the following command.
+To import your translations, run the following command:
 
 ```bash
 php artisan translations:import
 ```
 
-If you want to import & overwrite all your previous translations, use the following command.
+To import and overwrite all previous translations, use the following command:
 
 ```bash
 php artisan translations:import --fresh
 ```
 
-Then you can access the translations UI, you can visit the `/translations` in your browser, but first you need to login to your application if it's a production environment,
-and you can define who can access the translations UI in the configuration file, see for more details [Authorization](#authorization).
+To access the translations UI, visit /translations in your browser. If you are using a production environment, you will need to login to your application before accessing the translations UI. 
+
+You can customize the authorization gate in the configuration file to control access to the translations UI in non-local environments. For more information, see for more details [Authorization](#authorization).
 
 #### Exporting Translations
 
-You can export your translations using the following command.
+To export your translations, run the following command:
 
 ```bash
 php artisan translations:export
@@ -79,15 +82,16 @@ php artisan translations:export
 
 ### Authorization
 
-The Translations UI dashboard may be accessed at the /translations route. By default, you will only be able to access this dashboard in the local environment. Within your app/Providers/TranslationsServiceProvider.php file, there is an authorization gate definition. 
-This authorization gate controls access to Translations UI Dashboard in non-local environments. You are free to modify this gate as needed to restrict access to your Translations UI installation:
+By default, the Translations UI dashboard can only be accessed in the local environment. The authorization gate in the `app/Providers/TranslationsServiceProvider.php` file controls access to the Translations UI dashboard in non-local environments. You can modify this gate as needed to restrict access to your Translations UI installation.
+
+To customize the authorization gate, you can define a closure in the gate method of the TranslationsServiceProvider class:
 
 ```php
 protected function gate()
 {
     Gate::define('viewLaravelTranslationsUI', function ($user) {
         return in_array($user->email, [
-            //
+            // return true or false based on your authorization logic
         ]);
     });
 }
@@ -132,11 +136,15 @@ Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed re
 
 Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
+---
 ### Support
 
-Hey 👋 My name is Mohamed Ashraf, I'm a full-stack web developer, if you like my work, you can buy me a coffee to keep me awake and coding, or sponsoring me, at least make sure you're supporting me by starring ⭐ the repository.
+Thank you for considering supporting the development of this package! If you'd like to contribute, you can buy me a coffee or sponsor me to help keep me motivated to continue improving this package. You can also support the project by starring ⭐ the repository.
+
+To buy me a coffee, click the button below:
 
 <a href="https://www.buymeacoffee.com/outhebox" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" style="height: 51px !important;width: 217px !important;" ></a>
+
 
 ## Credits
 
