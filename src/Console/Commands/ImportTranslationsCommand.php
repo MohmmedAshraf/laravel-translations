@@ -645,8 +645,10 @@ class ImportTranslationsCommand extends Command
             ],
         ];
 
-        collect($languages)->each(function ($language) {
-            Language::create($language);
-        });
+        $DBLanguages = Language::all();
+        $languages = collect($languages)->reject(function ($language) use ($DBLanguages) {
+            return $DBLanguages->contains('code', $language['code']);
+        })->toArray();
+        Language::insert($languages);
     }
 }
