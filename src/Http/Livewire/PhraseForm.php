@@ -69,9 +69,11 @@ class PhraseForm extends Component
 
     public function missingParameters(): bool
     {
-        foreach ($this->phrase->source->parameters as $parameter) {
-            if (! str_contains($this->phrase->value, ":$parameter")) {
-                return true;
+        if (is_array($this->phrase->source->parameters)) {
+            foreach ($this->phrase->source->parameters as $parameter) {
+                if (! str_contains($this->phrase->value, ":$parameter")) {
+                    return true;
+                }
             }
         }
 
