@@ -6,14 +6,14 @@ trait AuthorizesRequests
 {
     public static $authUsing;
 
-    public static function auth($callback): static
+    public static function auth($callback): self
     {
         static::$authUsing = $callback;
 
         return new static;
     }
 
-    public static function check($request): bool|string
+    public static function check($request)
     {
         return (static::$authUsing ?: function () {
             return app()->environment('local');

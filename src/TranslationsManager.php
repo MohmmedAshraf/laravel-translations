@@ -14,9 +14,11 @@ class TranslationsManager
 {
     private array $translations = [];
 
-    public function __construct(protected Filesystem $filesystem)
+    protected Filesystem $filesystem;
+
+    public function __construct(Filesystem $filesystem)
     {
-        //
+        $this->filesystem = $filesystem;
     }
 
     public function getLocales(): array
