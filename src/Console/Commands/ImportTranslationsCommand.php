@@ -13,13 +13,17 @@ use Outhebox\LaravelTranslations\TranslationsManager;
 
 class ImportTranslationsCommand extends Command
 {
+    public TranslationsManager $manager;
+
     protected $signature = 'translations:import {--F|fresh : Truncate all translations and phrases before importing}';
 
     protected $description = 'Sync translation all keys from the translation files to the database';
 
-    public function __construct(public  TranslationsManager $manager)
+    public function __construct(TranslationsManager $manager)
     {
         parent::__construct();
+
+        $this->manager = $manager;
     }
 
     protected function truncateTables()
