@@ -25,6 +25,10 @@
 
 Laravel Translations UI is a package that provides a simple and friendly user interface for managing translations in a Laravel app. With this package, you can easily add, edit, delete, and export translations, and use the search function to find specific translations.
 
+### Requirements
+- PHP 7.4 or higher
+- Laravel 8.x or 9.x
+
 #### Features
 
 - View, create, and delete translations
