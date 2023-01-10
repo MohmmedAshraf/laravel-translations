@@ -20,7 +20,6 @@ it('returns the correct list of locales', function () {
     expect($locales)->toBe(['en']);
 });
 
-// Test getting the translations for a specific locale
 it('returns the correct translations for a given locale', function () {
     Config::set('translations.exclude_files', ['en']);
     $filesystem = new FilesystemMock();
@@ -36,10 +35,19 @@ it('returns the correct translations for a given locale', function () {
 test('export creates a new translation file with the correct content', function () {
     $filesystem = new FilesystemMock();
 
-    $translation = Translation::factory()
-        ->has(Phrase::factory()->state([
-            'phrase_id' => null,
-        ]))->create();
+    $translation = Translation::factory([
+        'source' => true,
+        'language_id' => Language::factory([
+            'code' => 'en',
+            'name' => 'English',
+        ]),
+    ])->has(Phrase::factory()->state([
+        'phrase_id' => null,
+        'translation_file_id' => TranslationFile::factory([
+            'name' => 'auth',
+            'extension' => 'php',
+        ]),
+    ]))->create();
 
     $translationsManager = new TranslationsManager($filesystem);
     $translationsManager->export();
@@ -49,7 +57,7 @@ test('export creates a new translation file with the correct content', function 
 
     expect($fileName)->toBe($fileNameInDisk)
         ->and(File::get(lang_path($translation->language->code.DIRECTORY_SEPARATOR.$fileName)))
-        ->toBe("<?php\n\nreturn [\n\n]; ".PHP_EOL);
+        ->toBe("<?php\n\nreturn ".VarExporter::export($translation->phrases->pluck('value', 'key')->toArray(), VarExporter::TRAILING_COMMA_IN_ARRAY).';'.PHP_EOL);
 
     File::deleteDirectory(lang_path());
 });
@@ -61,6 +69,7 @@ test('export can handle PHP translation files', function () {
         File::makeDirectory(lang_path('en'), 0755, true);
         File::put(lang_path('en'.DIRECTORY_SEPARATOR.'test.php'), "<?php\n\nreturn ".VarExporter::export(['accepted' => 'The :attribute must be accepted.'], VarExporter::TRAILING_COMMA_IN_ARRAY).';'.PHP_EOL);
     }
+
     $filesystem = new FilesystemMock();
 
     $translation = Translation::factory()

@@ -12,8 +12,8 @@ class TranslationFileFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->word(),
-            'extension' => $this->faker->fileExtension(),
+            'name' => $this->faker->randomElement(['app', 'auth', 'pagination', 'passwords', 'validation']),
+            'extension' => $this->faker->randomElement(['json', 'php']),
         ];
     }
 }
