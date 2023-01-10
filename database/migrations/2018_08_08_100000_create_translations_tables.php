@@ -30,7 +30,7 @@ return new class extends Migration
 
         Schema::create('ltu_phrases', function (Blueprint $table) {
             $table->id();
-            $table->uuid();
+            $table->uuid('uuid');
             $table->foreignId('translation_id')->constrained('ltu_translations')->cascadeOnDelete();
             $table->foreignId('translation_file_id')->constrained('ltu_translation_files')->cascadeOnDelete();
             $table->foreignId('phrase_id')->nullable()->constrained('ltu_phrases')->cascadeOnDelete();
