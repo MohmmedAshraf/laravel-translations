@@ -498,6 +498,11 @@ class ImportTranslationsCommand extends Command
                 'rtl' => false,
             ],
             [
+                'code' => 'pt-br',
+                'name' => 'Portuguese (Brazil)',
+                'rtl' => false,
+            ],
+            [
                 'code' => 'pa',
                 'name' => 'Punjabi',
                 'rtl' => false,
