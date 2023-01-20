@@ -2,6 +2,11 @@
 
 All notable changes to `laravel-translations` will be documented in this file.
 
+## v0.0.5 - 2023-01-20
+
+Added language: Portuguese (Brazil) by @A2ronLil
+Improve Livewire Components by @Ronildo-Sousa
+
 ## v0.0.4 - 2023-01-10
 
 Add Laravel 8 Support, Thanks to @thinkverse
