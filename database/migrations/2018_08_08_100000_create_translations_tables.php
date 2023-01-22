@@ -6,6 +6,11 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
     public function up()
     {
         Schema::create('ltu_languages', function (Blueprint $table) {
@@ -40,5 +45,18 @@ return new class extends Migration
             $table->json('parameters')->nullable();
             $table->timestamps();
         });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('ltu_phrases');
+        Schema::dropIfExists('ltu_translation_files');
+        Schema::dropIfExists('ltu_translations');
+        Schema::dropIfExists('ltu_languages');
     }
 };
