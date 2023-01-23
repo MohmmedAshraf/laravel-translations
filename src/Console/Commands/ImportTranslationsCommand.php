@@ -28,13 +28,11 @@ class ImportTranslationsCommand extends Command
 
     protected function truncateTables()
     {
-        Schema::disableForeignKeyConstraints();
-
-        Phrase::truncate();
-        Translation::truncate();
-        TranslationFile::truncate();
-
-        Schema::enableForeignKeyConstraints();
+        Schema::withoutForeignKeyConstraints(function () {
+            Phrase::truncate();
+            Translation::truncate();
+            TranslationFile::truncate();
+        });
     }
 
     public function handle()
