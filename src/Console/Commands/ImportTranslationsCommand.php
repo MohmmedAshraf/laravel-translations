@@ -480,7 +480,7 @@ class ImportTranslationsCommand extends Command
             [
                 'code' => 'ps',
                 'name' => 'Pashto',
-                'rtl' => false,
+                'rtl' => true,
             ],
             [
                 'code' => 'fa',
