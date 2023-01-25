@@ -23,14 +23,14 @@ class TranslationController extends BaseController
         ]);
     }
 
-    public function phrases(Translation $translation)
+    public function phrases(Translation $translation): View
     {
         return view('translations::phrases', [
             'translation' => $translation,
         ]);
     }
 
-    public function phrase(Translation $translation, Phrase $phrase)
+    public function phrase(Translation $translation, Phrase $phrase): View
     {
         return view('translations::phrase', [
             'phrase' => $phrase,
