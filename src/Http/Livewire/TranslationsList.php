@@ -26,8 +26,10 @@ class TranslationsList extends Component
         return Translation::orderByDesc('source')
             ->when($this->search, function ($query) {
                 $query->whereHas('language', function ($query) {
-                    $query->where('name', 'like', "%{$this->search}%")
-                        ->orWhere('code', 'like', "%{$this->search}%");
+                    $query->where(function ($query) {
+                        $query->where('name', 'like', "%{$this->search}%")
+                            ->orWhere('code', 'like', "%{$this->search}%");
+                    });
                 });
             })
             ->paginate(12)->onEachSide(0);
