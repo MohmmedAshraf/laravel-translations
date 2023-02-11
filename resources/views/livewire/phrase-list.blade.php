@@ -26,6 +26,7 @@
                 <div class="min-w-full divide-y divide-gray-300">
                     <div class="bg-gray-50 flex items-center">
                         <div class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 w-full max-w-24 md:max-w-xs">Key</div>
+                        <div class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 w-full">File Name</div>
                         <div class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 w-full">Translation</div>
                     </div>
                     <div class="divide-y divide-gray-200 bg-white">
@@ -35,6 +36,13 @@
                                     <div class="flex items-center">
                                         <div class="text-sm text-gray-600 border rounded-md px-1.5 py-0.5 truncate">
                                             {{ $phrase->key }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="py-4 pl-4 pr-3 text-sm sm:pl-6 w-full max-w-24 md:max-w-xs">
+                                    <div class="flex items-center">
+                                        <div class="font-normal text-gray-900">
+                                            {{ $phrase->group }}
                                         </div>
                                     </div>
                                 </div>
