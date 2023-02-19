@@ -2,6 +2,15 @@
 
 All notable changes to `laravel-translations` will be documented in this file.
 
+## v0.0.6 - 2023-02-19
+
+Add Laravel 10 Support
+RTL support for Pashto language by @shahghasiadil
+Routes enhancement by @shahghasiadil
+Translation List Query Logic Fix @shahghasiadil
+Added the function to reverse the migration by @Goatform
+Add the file name to phrase list by @kmaking
+
 ## v0.0.5 - 2023-01-20
 
 Added language: Portuguese (Brazil) by @A2ronLil
