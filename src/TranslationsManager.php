@@ -43,6 +43,7 @@ class TranslationsManager
         }
 
         collect($this->filesystem->allFiles(lang_path($local)))
+        ->merge(collect($this->filesystem->glob(lang_path() . "/{$local}.*"))->map(fn ($file) => new \SplFileInfo($file)))
             ->filter(function ($file) {
                 return ! in_array($file->getFilename(), config('translations.exclude_files'));
             })
