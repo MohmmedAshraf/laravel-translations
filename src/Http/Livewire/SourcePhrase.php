@@ -10,7 +10,7 @@ class SourcePhrase extends Component
 {
     public Phrase $phrase;
 
-    public function mount(Phrase $phrase)
+    public function mount(Phrase $phrase): void
     {
         $this->phrase = $phrase;
     }

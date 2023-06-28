@@ -1,5 +1,5 @@
 <x-translations::layouts.app>
-    @if($languages_installed > 1)
+    @if($installed)
         @livewire('translations-ui::translations-list')
     @else
         <div class="w-full bg-white rounded-md shadow flex min-h-36 py-12 px-6">

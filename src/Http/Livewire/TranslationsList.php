@@ -35,7 +35,18 @@ class TranslationsList extends Component
             ->paginate(12)->onEachSide(0);
     }
 
-    public function confirmDelete(Translation $translation)
+    public function getTranslationProgressPercentage(Translation $translation): float
+    {
+        $phrases = $translation->phrases()->toBase()
+            ->selectRaw('COUNT(CASE WHEN value IS NOT NULL THEN 1 END) AS translated')
+            ->selectRaw('COUNT(CASE WHEN value IS NULL THEN 1 END) AS untranslated')
+            ->selectRaw('COUNT(*) AS total')
+            ->first();
+
+        return round(($phrases->translated / $phrases->total) * 100, 2);
+    }
+
+    public function confirmDelete(Translation $translation): void
     {
         $this->dialog()->confirm([
             'title' => 'Are you Sure?',
@@ -48,7 +59,7 @@ class TranslationsList extends Component
         ]);
     }
 
-    public function delete(Translation $translation)
+    public function delete(Translation $translation): void
     {
         DB::transaction(function () use ($translation) {
             $translation->phrases()->delete();

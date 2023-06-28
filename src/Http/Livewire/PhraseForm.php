@@ -16,7 +16,7 @@ class PhraseForm extends Component
 
     public Translation $translation;
 
-    public function mount(Translation $translation, Phrase $phrase)
+    public function mount(Translation $translation, Phrase $phrase): void
     {
         $this->phrase = $phrase;
         $this->translation = $translation;
@@ -36,7 +36,7 @@ class PhraseForm extends Component
         ];
     }
 
-    public function save()
+    public function save(): void
     {
         $this->validate();
 

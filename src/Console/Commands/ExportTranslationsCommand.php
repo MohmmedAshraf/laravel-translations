@@ -20,7 +20,7 @@ class ExportTranslationsCommand extends Command
         $this->manager = $manager;
     }
 
-    public function handle()
+    public function handle(): void
     {
         $this->info('Exporting translations...'.PHP_EOL);
 

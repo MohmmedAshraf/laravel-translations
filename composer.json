@@ -38,7 +38,8 @@
     "autoload": {
         "psr-4": {
             "Outhebox\\LaravelTranslations\\": "src",
-            "Outhebox\\LaravelTranslations\\Database\\Factories\\": "database/factories"
+            "Outhebox\\LaravelTranslations\\Database\\Factories\\": "database/factories",
+            "Outhebox\\LaravelTranslations\\Database\\Seeders\\": "database/seeders"
         }
     },
     "autoload-dev": {

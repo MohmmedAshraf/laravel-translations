@@ -10,7 +10,7 @@ class PublishCommand extends Command
 
     public $description = 'Publish all of the Translations UI resources';
 
-    public function handle()
+    public function handle(): void
     {
         $this->call('vendor:publish', [
             '--tag' => 'translations-config',

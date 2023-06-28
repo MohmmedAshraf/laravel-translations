@@ -12,7 +12,16 @@
 
         <div class="mt-4 sm:mt-0 sm:ml-16 flex flex-col md:flex-row space-y-4 md:space-y-0 gap-4 w-full max-w-2xl">
             <div class="relative mt-4 sm:mt-0 w-full">
-                <x-input wire:model="search" icon="search" type="search" placeholder="Search translations by key or value" />
+                <x-input wire:model="search" icon="search" type="search" placeholder="Search translations by key or value" shadowless />
+            </div>
+            <div class="relative mt-4 sm:mt-0 min-w-max">
+                <x-native-select
+                    placeholder="Status"
+                    :options="$statuses"
+                    wire:model="status"
+                    option-label="label"
+                    option-value="value"
+                />
             </div>
             <button wire:click="$emit('openModal', 'translations-ui::create-source-key-modal')" type="button" class="flex-shrink-0 inline-flex space-x-2 items-center justify-center rounded-md border border-transparent bg-violet-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-violet-700 focus:outline-none sm:w-auto">
                 <span class="text-sm">New Source Key</span>
@@ -30,7 +39,7 @@
                         <div class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 w-full">Translation</div>
                     </div>
                     <div class="divide-y divide-gray-200 bg-white">
-                        @foreach($phrases as $phrase)
+                        @forelse($phrases as $phrase)
                             <div class="flex items-center hover:bg-gray-50 cursor-pointer relative group">
                                 <div class="py-4 pl-4 pr-3 text-sm sm:pl-6 w-full max-w-24 md:max-w-xs">
                                     <div class="flex items-center">
@@ -68,7 +77,11 @@
                                 </div>
                                 <a href="{{ route('translations_ui.phrases.show', ['translation' => $phrase->translation, 'phrase' => $phrase]) }}" class="absolute inset-0 z-10"></a>
                             </div>
-                        @endforeach
+                        @empty
+                            <div class="text-center py-12 text-gray-500">
+                                There are no records matching the current criteria.
+                            </div>
+                        @endforelse
                     </div>
                 </div>
 

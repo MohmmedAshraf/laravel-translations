@@ -11,7 +11,7 @@ class ExportTranslations extends Component
 {
     use Actions;
 
-    public function export()
+    public function export(): void
     {
         app(TranslationsManager::class)->export();
 

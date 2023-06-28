@@ -41,7 +41,7 @@ class CreateSourceKey extends ModalComponent
         ];
     }
 
-    public function create()
+    public function create(): void
     {
         $this->validate();
 

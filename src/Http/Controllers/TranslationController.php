@@ -19,7 +19,7 @@ class TranslationController extends BaseController
     public function index(): View
     {
         return view('translations::index', [
-            'languages_installed' => Language::count(),
+            'installed' => Language::count() > 0 && Translation::count() > 0,
         ]);
     }
 

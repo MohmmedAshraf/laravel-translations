@@ -2,6 +2,7 @@
 
 namespace Outhebox\LaravelTranslations\Http\Livewire;
 
+use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Contracts\View\View;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Livewire\Component;
@@ -17,6 +18,8 @@ class PhraseList extends Component
 
     public $search;
 
+    public $status;
+
     public $perPage = 12;
 
     public Translation $translation;
@@ -25,12 +28,12 @@ class PhraseList extends Component
         'sourceKeyCreated' => '$refresh',
     ];
 
-    public function mount(Translation $translation)
+    public function mount(Translation $translation): void
     {
         $this->translation = $translation;
     }
 
-    public function confirmDelete(Phrase $phrase)
+    public function confirmDelete(Phrase $phrase): void
     {
         $this->dialog()->confirm([
             'title' => 'Are you Sure?',
@@ -43,7 +46,7 @@ class PhraseList extends Component
         ]);
     }
 
-    public function delete(Phrase $phrase)
+    public function delete(Phrase $phrase): void
     {
         if (! $phrase->translation->source) {
             return;
@@ -63,6 +66,13 @@ class PhraseList extends Component
                 $query->where('key', 'like', "%$this->search%")
                     ->orWhere('value', 'like', "%$this->search%");
             })
+            ->when($this->status, function (Builder $query) {
+                if ($this->status == 1) {
+                    $query->whereNotNull('value');
+                } elseif ($this->status == 2) {
+                    $query->whereNull('value');
+                }
+            })
             ->paginate($this->perPage)->onEachSide(0);
     }
 
@@ -70,6 +80,20 @@ class PhraseList extends Component
     {
         return view('translations::livewire.phrase-list', [
             'phrases' => $this->getPhrases(),
+            'statuses' => [
+                [
+                    'label' => 'All',
+                    'value' => 0,
+                ],
+                [
+                    'label' => 'Translated',
+                    'value' => 1,
+                ],
+                [
+                    'label' => 'Untranslated',
+                    'value' => 2,
+                ],
+            ],
         ]);
     }
 }

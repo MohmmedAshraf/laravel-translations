@@ -16,7 +16,7 @@ use Outhebox\LaravelTranslations\Http\Livewire\Widgets\ExportTranslations;
 
 class LaravelTranslationsServiceProvider extends ServiceProvider
 {
-    public function boot()
+    public function boot(): void
     {
         $this->registerCommands();
         $this->registerPublishing();
@@ -26,7 +26,7 @@ class LaravelTranslationsServiceProvider extends ServiceProvider
         $this->registerLivewireComponents();
     }
 
-    protected function registerRoutes()
+    protected function registerRoutes(): void
     {
         Route::group([
             'domain' => config('translations.domain', null),
@@ -38,19 +38,19 @@ class LaravelTranslationsServiceProvider extends ServiceProvider
         });
     }
 
-    protected function registerResources()
+    protected function registerResources(): void
     {
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'translations');
     }
 
-    protected function registerMigrations()
+    protected function registerMigrations(): void
     {
         if ($this->app->runningInConsole()) {
             $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         }
     }
 
-    protected function registerPublishing()
+    protected function registerPublishing(): void
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
@@ -71,7 +71,7 @@ class LaravelTranslationsServiceProvider extends ServiceProvider
         }
     }
 
-    protected function registerCommands()
+    protected function registerCommands(): void
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
@@ -83,7 +83,7 @@ class LaravelTranslationsServiceProvider extends ServiceProvider
         }
     }
 
-    protected function registerLivewireComponents()
+    protected function registerLivewireComponents(): void
     {
         Livewire::component('translations-ui::phrase-list', PhraseList::class);
         Livewire::component('translations-ui::phrase-form', PhraseForm::class);

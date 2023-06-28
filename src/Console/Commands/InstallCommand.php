@@ -4,6 +4,7 @@ namespace Outhebox\LaravelTranslations\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
+use Outhebox\LaravelTranslations\Database\Seeders\LanguagesTableSeeder;
 
 class InstallCommand extends Command
 {
@@ -11,7 +12,7 @@ class InstallCommand extends Command
 
     public $description = 'Install Laravel Translations UI package and publish its assets';
 
-    public function handle()
+    public function handle(): void
     {
         $this->comment('Publishing Laravel Translations UI Service Provider...');
         $this->callSilent('vendor:publish', ['--tag' => 'translations-provider']);
@@ -22,12 +23,15 @@ class InstallCommand extends Command
         $this->comment('Publishing Laravel Translations UI Configuration...');
         $this->callSilent('vendor:publish', ['--tag' => 'translations-config']);
 
+        $this->comment('Installing Laravel Translations UI Default Languages...');
+        $this->callSilent('db:seed', ['--class' => LanguagesTableSeeder::class]);
+
         $this->registerServiceProvider();
 
         $this->info('Laravel Translations UI scaffolding installed successfully.');
     }
 
-    protected function registerServiceProvider()
+    protected function registerServiceProvider(): void
     {
         $namespace = Str::replaceLast('\\', '', $this->laravel->getNamespace());
 
