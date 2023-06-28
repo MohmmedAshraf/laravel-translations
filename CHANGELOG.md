@@ -2,6 +2,16 @@
 
 All notable changes to `laravel-translations` will be documented in this file.
 
+## 0.0.7 - 2023-06-28
+
+Enhanced Installation Command. (Closes #36 & #37)
+Enhanced Import Translation Command.
+Enhanced UI/UX for improved user experience.
+Introduced Filter Phrases feature, allowing users to easily switch between translated and untranslated phrases. (See #28)
+Added Progress Bar indicator to track translation progress for each new language.
+Included Empty states when no languages or phrases are found.
+Various other improvements and bug fixes.
+
 ## v0.0.6 - 2023-02-19
 
 Add Laravel 10 Support
