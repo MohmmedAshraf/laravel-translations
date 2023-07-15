@@ -9,14 +9,21 @@
         </div>
     </div>
     <div class="w-full p-3">
-        <textarea id="textArea" dir="auto" wire:model.defer="phrase.value" class="w-full min-h-36 without-ring resize-none border-0 m-0 p-0"></textarea>
+        <textarea id="textArea" dir="auto" wire:model.defer="phrase.value"
+            class="w-full min-h-36 without-ring resize-none border-0 m-0 p-0"></textarea>
     </div>
     <div class="w-full grid grid-cols-2 border-t gap-6 px-4 py-3">
-        <a href="{{ route('translations_ui.phrases.index', $translation) }}" class="text-sm font-medium text-center w-full border border-violet-400 text-violet-700 hover:bg-violet-50 py-3 rounded-md uppercase">
+        <a href="{{ route('translations_ui.phrases.index', $translation) }}"
+            class="text-sm font-medium text-center w-full border border-violet-400 text-violet-700 hover:bg-violet-50 py-3 rounded-md uppercase">
             Cancel
         </a>
-        <button wire:click="save" class="text-sm font-medium w-full bg-violet-700 hover:bg-violet-500 text-white py-3 rounded-md uppercase">
+        <button wire:click="save" wire:loading.attr="disabled"
+            class="text-sm font-medium w-full bg-violet-700 hover:bg-violet-500 text-white py-3 rounded-md uppercase">
             Save Changes
+            <span wire:loading wire:target="save" class="ml-2">
+                loading...
+            </span>
         </button>
+
     </div>
 </div>
