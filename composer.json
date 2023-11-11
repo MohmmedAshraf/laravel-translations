@@ -25,7 +25,7 @@
         "outhebox/blade-flags": "^1.0",
         "saade/blade-iconsax": "^1.0",
         "wire-elements/modal": "^2.0",
-        "wireui/wireui": "^1.17"
+        "wireui/wireui": "^1.18"
     },
     "require-dev": {
         "laravel/pint": "^1.0",
@@ -71,6 +71,6 @@
             }
         }
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true
 }
