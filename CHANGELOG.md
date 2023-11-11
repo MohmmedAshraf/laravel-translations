@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-translations` will be documented in this file.
 
+## 0.1.1 - 2023-11-11
+
+Updated to support **Livewire v3**. Please note, we've discontinued support for older PHP versions. This package is now compatible exclusively with **PHP v8.1** or higher.
+
 ## 0.0.7 - 2023-06-28
 
 Enhanced Installation Command. (Closes #36 & #37)
