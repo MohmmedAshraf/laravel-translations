@@ -29,8 +29,8 @@ Laravel Translations UI is a package that provides a simple and friendly user in
 
 ### Requirements
 
-- PHP 7.4 or higher
-- Laravel 8.x or higher
+- PHP 9.1 or higher
+- Laravel 10.x or higher
 
 #### Features
 
@@ -49,16 +49,16 @@ To install Laravel Translations UI in your Laravel project, run the following co
 composer require outhebox/laravel-translations
 ```
 
-After installing the package, you'll need to publish its assets by running the following command:
-
-```bash
-php artisan translations:install
-```
-
 Before you can import translations, you'll need to migrate your database. Run the following command to do so:
 
 ```bash
 php artisan migrate
+```
+
+After installing the package, you'll need to publish its assets by running the following command:
+
+```bash
+php artisan translations:install
 ```
 
 ### Usage
