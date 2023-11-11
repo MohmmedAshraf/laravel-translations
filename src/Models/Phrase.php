@@ -10,9 +10,9 @@ use Outhebox\LaravelTranslations\Models\Concerns\HasUuid;
 
 class Phrase extends Model
 {
-    use HasUuid;
-    use HasFactory;
     use HasDatabaseConnection;
+    use HasFactory;
+    use HasUuid;
 
     protected $guarded = [];
 

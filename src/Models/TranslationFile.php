@@ -10,8 +10,8 @@ use Outhebox\LaravelTranslations\Models\Concerns\HasDatabaseConnection;
 
 class TranslationFile extends Model
 {
-    use HasFactory;
     use HasDatabaseConnection;
+    use HasFactory;
 
     protected $guarded = [];
 

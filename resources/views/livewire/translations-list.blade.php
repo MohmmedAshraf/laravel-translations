@@ -6,9 +6,9 @@
 
         <div class="mt-4 sm:mt-0 sm:ml-16 flex flex-col md:flex-row space-y-4 md:space-y-0 gap-4 w-full max-w-2xl">
             <div class="relative mt-4 sm:mt-0 w-full">
-                <x-input wire:model="search" icon="search" type="search" placeholder="Search languages by name or code" shadowless />
+                <x-input wire:model.live="search" icon="search" type="search" placeholder="Search languages by name or code" shadowless />
             </div>
-            <button wire:click="$emit('openModal', 'translations-ui::create-translation-modal')" type="button" class="flex-shrink-0 inline-flex space-x-2 items-center justify-center rounded-md border border-transparent bg-violet-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-violet-700 focus:outline-none sm:w-auto">
+            <button wire:click="$dispatch('openModal', {component: 'translations-ui::create-translation-modal'})" type="button" class="flex-shrink-0 inline-flex space-x-2 items-center justify-center rounded-md border border-transparent bg-violet-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-violet-700 focus:outline-none sm:w-auto">
                 <span class="text-sm">New Language</span>
                 <x-iconsax-lin-add class="h-5 w-5" aria-hidden="true" />
             </button>

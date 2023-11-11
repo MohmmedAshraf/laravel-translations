@@ -1,6 +1,6 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Http\Livewire\Widgets;
+namespace Outhebox\LaravelTranslations\Livewire\Widgets;
 
 use Illuminate\Contracts\View\View;
 use Livewire\Component;

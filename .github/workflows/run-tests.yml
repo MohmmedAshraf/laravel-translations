@@ -1,6 +1,8 @@
 name: run-tests
 
-on: [push, pull_request]
+
+
+on: [pull_request]
 
 jobs:
   build:
@@ -8,21 +10,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [8.2, 8.1, 8.0]
-        laravel: [8.*, 9.*, 10.*]
+        php: [8.2, 8.1]
+        laravel: [10.*]
         dependency-version: [ prefer-lowest, prefer-stable ]
         include:
-          - laravel: 8.*
-            testbench: ^6.23
-          - laravel: 9.*
-            testbench: 7.*
           - laravel: 10.*
             testbench: 8.*
-        exclude:
-          - laravel: 9.*
-            php: 8.0
-          - laravel: 10.*
-            php: 8.0
 
     name: PHP:${{ matrix.php }} / Laravel:${{ matrix.laravel }}
 

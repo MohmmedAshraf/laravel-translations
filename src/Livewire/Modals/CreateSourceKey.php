@@ -1,6 +1,6 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Http\Livewire\Modals;
+namespace Outhebox\LaravelTranslations\Livewire\Modals;
 
 use Illuminate\Contracts\View\View;
 use LivewireUI\Modal\ModalComponent;
@@ -67,7 +67,7 @@ class CreateSourceKey extends ModalComponent
             ]);
         }
 
-        $this->emit('sourceKeyCreated');
+        $this->dispatch('sourceKeyCreated');
 
         $this->notification()->success('Source key created successfully.');
 

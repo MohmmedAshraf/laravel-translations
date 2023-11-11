@@ -6,13 +6,13 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 use Outhebox\LaravelTranslations\Console\Commands;
-use Outhebox\LaravelTranslations\Http\Livewire\Modals\CreateSourceKey;
-use Outhebox\LaravelTranslations\Http\Livewire\Modals\CreateTranslation;
-use Outhebox\LaravelTranslations\Http\Livewire\PhraseForm;
-use Outhebox\LaravelTranslations\Http\Livewire\PhraseList;
-use Outhebox\LaravelTranslations\Http\Livewire\SourcePhrase;
-use Outhebox\LaravelTranslations\Http\Livewire\TranslationsList;
-use Outhebox\LaravelTranslations\Http\Livewire\Widgets\ExportTranslations;
+use Outhebox\LaravelTranslations\Livewire\Modals\CreateSourceKey;
+use Outhebox\LaravelTranslations\Livewire\Modals\CreateTranslation;
+use Outhebox\LaravelTranslations\Livewire\PhraseForm;
+use Outhebox\LaravelTranslations\Livewire\PhraseList;
+use Outhebox\LaravelTranslations\Livewire\SourcePhrase;
+use Outhebox\LaravelTranslations\Livewire\TranslationsList;
+use Outhebox\LaravelTranslations\Livewire\Widgets\ExportTranslations;
 
 class LaravelTranslationsServiceProvider extends ServiceProvider
 {

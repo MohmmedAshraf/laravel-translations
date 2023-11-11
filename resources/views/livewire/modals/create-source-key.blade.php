@@ -7,7 +7,7 @@
     </div>
     <x-input
         class="w-full"
-        wire:model.defer="key"
+        wire:model="key"
         placeholder="Enter the key"
         hint="You can use dot notation (.) to create nested keys."
         shadowless
@@ -15,12 +15,12 @@
 
     <x-textarea
         placeholder="Please enter a translation for this key."
-        wire:model.defer="key_translation"
+        wire:model="key_translation"
         class="w-full"
         shadowless
     />
 
-    <x-native-select placeholder="Select a file" :options="$files" wire:model.defer="file" option-label="file_name" option-value="id" />
+    <x-native-select placeholder="Select a file" :options="$files" wire:model="file" option-label="file_name" option-value="id" />
 
     <div class="flex items-center space-x-4 rtl:space-x-reverse mt-6">
         <button type="button" wire:click="create" wire:loading.attr="disabled" class="flex-grow inline-flex items-center justify-center px-4 py-2 font-semibold leading-6 text-sm rounded-md text-white bg-violet-600 hover:bg-violet-700 transition ease-in-out duration-150 disabled:cursor-not-allowed">
@@ -30,7 +30,7 @@
             </svg>
             <span wire:target="create" wire:loading.remove>Add a key</span>
         </button>
-        <button wire:click="$emit('closeModal')" type="button" class="items-center justify-center px-4 py-2 font-semibold leading-6 text-sm rounded-md text-gray-600 bg-gray-200 hover:bg-gray-300">
+        <button wire:click="$dispatch('closeModal')" type="button" class="items-center justify-center px-4 py-2 font-semibold leading-6 text-sm rounded-md text-gray-600 bg-gray-200 hover:bg-gray-300">
             Cancel
         </button>
     </div>
