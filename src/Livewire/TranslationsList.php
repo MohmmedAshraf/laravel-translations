@@ -1,6 +1,6 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Http\Livewire;
+namespace Outhebox\LaravelTranslations\Livewire;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\View\View;

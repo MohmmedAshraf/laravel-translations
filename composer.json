@@ -21,18 +21,18 @@
     "require": {
         "php": "^8.0|^8.1|^8.2",
         "brick/varexporter": "^0.3.7",
-        "livewire/livewire": "^2.10",
+        "livewire/livewire": "^3.0",
         "outhebox/blade-flags": "^1.0",
         "saade/blade-iconsax": "^1.0",
-        "wire-elements/modal": "^1.0",
+        "wire-elements/modal": "^2.0",
         "wireui/wireui": "^1.17"
     },
     "require-dev": {
         "laravel/pint": "^1.0",
         "orchestra/testbench": "^6.0|^7.6|^8.0",
-        "pestphp/pest": "^1.21",
-        "pestphp/pest-plugin-laravel": "^1.1",
-        "pestphp/pest-plugin-livewire": "^1.0",
+        "pestphp/pest": "^2.18",
+        "pestphp/pest-plugin-laravel": "^2.2",
+        "pestphp/pest-plugin-livewire": "^2.1",
         "phpunit/phpunit": "^9.5|^10.0"
     },
     "autoload": {

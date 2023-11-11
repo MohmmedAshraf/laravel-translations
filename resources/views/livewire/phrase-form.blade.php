@@ -9,7 +9,8 @@
         </div>
     </div>
     <div class="w-full p-3">
-        <textarea id="textArea" dir="auto" wire:model.defer="phrase.value" class="w-full min-h-36 without-ring resize-none border-0 m-0 p-0"></textarea>
+        <label for="textArea"></label>
+        <textarea id="textArea" dir="auto" wire:model="content" class="w-full min-h-36 without-ring resize-none border-0 m-0 p-0"></textarea>
     </div>
     <div class="w-full grid grid-cols-2 border-t gap-6 px-4 py-3">
         <a href="{{ route('translations_ui.phrases.index', $translation) }}" class="text-sm font-medium text-center w-full border border-violet-400 text-violet-700 hover:bg-violet-50 py-3 rounded-md uppercase">

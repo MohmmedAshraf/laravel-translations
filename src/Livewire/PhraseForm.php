@@ -1,6 +1,6 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Http\Livewire;
+namespace Outhebox\LaravelTranslations\Livewire;
 
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
@@ -12,6 +12,8 @@ class PhraseForm extends Component
 {
     use Actions;
 
+    public $content = '';
+
     public Phrase $phrase;
 
     public Translation $translation;
@@ -20,25 +22,17 @@ class PhraseForm extends Component
     {
         $this->phrase = $phrase;
         $this->translation = $translation;
-    }
 
-    public function rules(): array
-    {
-        return [
-            'phrase.value' => 'required',
-        ];
-    }
-
-    public function messages(): array
-    {
-        return [
-            'phrase.value.required' => 'Please enter a translation.',
-        ];
+        $this->content = $phrase?->value;
     }
 
     public function save(): void
     {
-        $this->validate();
+        if (blank($this->content)) {
+            $this->notification()->error('Please enter a translation.');
+
+            return;
+        }
 
         if (! blank($this->phrase->source) && $this->missingParameters()) {
             $this->notification()->error('Required parameters are missing.');

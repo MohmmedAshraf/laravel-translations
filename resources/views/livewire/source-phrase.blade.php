@@ -8,7 +8,9 @@
             @endif
         @endforeach
     @else
-        <span class="text-gray-600 font-normal">{!! $phrase->value !!}</span>
+        <span class="text-gray-600 font-normal">
+            {!! $phrase->value !!}
+        </span>
     @endif
 
     @push('scripts')

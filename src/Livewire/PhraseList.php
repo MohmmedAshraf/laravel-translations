@@ -1,6 +1,6 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Http\Livewire;
+namespace Outhebox\LaravelTranslations\Livewire;
 
 use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Contracts\View\View;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Http\Livewire\Modals;
+namespace Outhebox\LaravelTranslations\Livewire\Modals;
 
 use Illuminate\Contracts\View\View;
 use LivewireUI\Modal\ModalComponent;
@@ -56,7 +56,7 @@ class CreateTranslation extends ModalComponent
             ]);
         }
 
-        $this->emit('translationCreated', $translation->id);
+        $this->dispatch('translationCreated', $translation->id);
 
         $this->notification()->success('Translation created successfully.');
 

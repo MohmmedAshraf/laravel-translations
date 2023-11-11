@@ -14,7 +14,6 @@
         <wireui:scripts />
         <script src="{{ asset('vendor/translations/app.js') }}" defer></script>
         <link rel="stylesheet" href="{{ asset('vendor/translations/app.css') }}">
-        <livewire:styles />
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-full">
@@ -27,7 +26,6 @@
             </main>
         </div>
 
-        <livewire:scripts />
         @livewire('livewire-ui-modal')
         <x-notifications z-index="z-50" />
         <x-dialog z-index="z-50" blur="md" align="center" />
