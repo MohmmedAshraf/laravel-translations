@@ -29,7 +29,7 @@ Laravel Translations UI is a package that provides a simple and friendly user in
 
 ### Requirements
 
-- PHP 9.1 or higher
+- PHP 8.1 or higher
 - Laravel 10.x or higher
 
 #### Features
