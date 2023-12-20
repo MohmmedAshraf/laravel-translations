@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-translations` will be documented in this file.
 
+## v0.1.2 - 2023-12-20
+
+Fix Saving translations with parameters is not working, #46 #47
+
 ## 0.1.1 - 2023-11-11
 
 Updated to support **Livewire v3**. Please note, we've discontinued support for older PHP versions. This package is now compatible exclusively with **PHP v8.1** or higher.
