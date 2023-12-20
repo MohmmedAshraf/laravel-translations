@@ -40,6 +40,8 @@ class PhraseForm extends Component
             return;
         }
 
+        $this->phrase->value = $this->content;
+
         $this->phrase->save();
 
         $this->notification()->success('Phrase updated successfully!');
