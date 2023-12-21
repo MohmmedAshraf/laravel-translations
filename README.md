@@ -13,10 +13,11 @@
 </p>
 
 <p align="center">
-<a href="https://packagist.org/packages/outhebox/laravel-translations"><img src="https://img.shields.io/packagist/v/outhebox/laravel-translations.svg" alt="Packagist"></a>
-<a href="https://packagist.org/packages/outhebox/laravel-translations"><img src="https://img.shields.io/packagist/dm/outhebox/laravel-translations.svg" alt="Packagist"></a>
+<a href="https://packagist.org/packages/outhebox/laravel-translations"><img src="https://img.shields.io/packagist/v/outhebox/laravel-translations" alt="Latest Stable Version"></a>
+<a href="https://github.com/MohmmedAshraf/laravel-translations/actions?query=workflow%3Arun-tests"><img src="https://github.com/MohmmedAshraf/laravel-translations/workflows/run-tests/badge.svg" alt="Tests"></a>
+<a href="https://packagist.org/packages/outhebox/laravel-translations"><img src="https://img.shields.io/packagist/dt/outhebox/laravel-translations" alt="Total Downloads"></a>
 <a href="https://packagist.org/packages/outhebox/laravel-translations"><img src="https://img.shields.io/packagist/php-v/outhebox/laravel-translations.svg" alt="PHP from Packagist"></a>
-<a href="https://packagist.org/packages/outhebox/laravel-translations"><img src="https://img.shields.io/badge/Laravel-8.x,%209.x-brightgreen.svg" alt="Laravel Version"></a>
+<a href="https://packagist.org/packages/outhebox/laravel-translations"><img src="https://img.shields.io/badge/Laravel-10.x-brightgreen.svg" alt="Laravel Version"></a>
 </p>
 
 ![Cover](https://user-images.githubusercontent.com/44909285/201598702-5bcd47ed-6202-41a1-af4a-40203b3b76ae.png)
