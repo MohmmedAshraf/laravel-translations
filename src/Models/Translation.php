@@ -39,7 +39,13 @@ class Translation extends Model
     public function progress(): Attribute
     {
         return Attribute::get(function () {
-            return 0;
+            $phrases = $this->phrases()->toBase()
+                ->selectRaw('COUNT(CASE WHEN value IS NOT NULL THEN 1 END) AS translated')
+                ->selectRaw('COUNT(CASE WHEN value IS NULL THEN 1 END) AS untranslated')
+                ->selectRaw('COUNT(*) AS total')
+                ->first();
+
+            return round(($phrases->translated / $phrases->total) * 100, 2);
         });
     }
 }

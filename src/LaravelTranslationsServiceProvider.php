@@ -2,95 +2,97 @@
 
 namespace Outhebox\LaravelTranslations;
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\ServiceProvider;
-use Livewire\Livewire;
-use Outhebox\LaravelTranslations\Console\Commands;
-use Outhebox\LaravelTranslations\Livewire\Modals\CreateSourceKey;
-use Outhebox\LaravelTranslations\Livewire\Modals\CreateTranslation;
-use Outhebox\LaravelTranslations\Livewire\PhraseForm;
-use Outhebox\LaravelTranslations\Livewire\PhraseList;
-use Outhebox\LaravelTranslations\Livewire\SourcePhrase;
-use Outhebox\LaravelTranslations\Livewire\TranslationsList;
-use Outhebox\LaravelTranslations\Livewire\Widgets\ExportTranslations;
+use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Support\Facades\Gate;
+use Outhebox\LaravelTranslations\Console\Commands\ContributorCommand;
+use Outhebox\LaravelTranslations\Console\Commands\ExportTranslationsCommand;
+use Outhebox\LaravelTranslations\Console\Commands\ImportTranslationsCommand;
+use Outhebox\LaravelTranslations\Console\Commands\PublishAssetsCommand;
+use Outhebox\LaravelTranslations\Exceptions\TranslationsUIExceptionHandler;
+use Outhebox\LaravelTranslations\Models\Contributor;
+use Spatie\LaravelPackageTools\Commands\InstallCommand;
+use Spatie\LaravelPackageTools\Package;
+use Spatie\LaravelPackageTools\PackageServiceProvider;
 
-class LaravelTranslationsServiceProvider extends ServiceProvider
+class LaravelTranslationsServiceProvider extends PackageServiceProvider
 {
-    public function boot(): void
+    public function configurePackage(Package $package): void
     {
-        $this->registerCommands();
-        $this->registerPublishing();
-        $this->registerRoutes();
-        $this->registerResources();
-        $this->registerMigrations();
-        $this->registerLivewireComponents();
+        $package
+            ->name('laravel-translations')
+            ->hasConfigFile()
+            ->hasViews()
+            ->hasRoute('web')
+            ->hasMigrations([
+                'create_languages_table',
+                'create_translations_table',
+                'create_translation_files_table',
+                'create_phrases_table',
+                'create_contributors_table',
+                'create_contributor_languages_table',
+            ])
+            ->hasCommands([
+                ContributorCommand::class,
+                PublishAssetsCommand::class,
+                ImportTranslationsCommand::class,
+                ExportTranslationsCommand::class,
+            ])->hasInstallCommand(function (InstallCommand $command) {
+                $command
+                    ->startWith(function (InstallCommand $command) {
+                        $this->writeSeparationLine($command);
+                        $command->line('Laravel Translations UI installation, Simple and friendly user interface for managing translations in a Laravel app.');
+                        $command->line('Laravel version: '.app()->version());
+                        $command->line('PHP version: '.trim(phpversion()));
+                        $command->line(' ');
+                        $command->line('Github: https://github.com/MohmmedAshraf/laravel-translations');
+                        $this->writeSeparationLine($command);
+                        $command->line('');
+
+                        $command->comment('Publishing assets');
+                        $command->call('translations:publish-assets');
+                    })
+                    ->publishMigrations()
+                    ->askToRunMigrations()
+                    ->askToStarRepoOnGitHub('MohmmedAshraf/laravel-translations')
+                    ->endWith(function (InstallCommand $command) {
+                        $appUrl = config('app.url');
+
+                        $command->line("Visit the Laravel Translations UI at $appUrl/translations");
+                    });
+            });
     }
 
-    protected function registerRoutes(): void
+    public function packageBooted(): void
     {
-        Route::group([
-            'domain' => config('translations.domain', null),
-            'prefix' => config('translations.path'),
-            'namespace' => 'Outhebox\LaravelTranslations\Http\Controllers',
-            'middleware' => config('translations.middleware', 'web'),
-        ], function () {
-            $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+        $this->registerAuthDriver();
+
+        $this->registerExceptionHandler();
+
+        Gate::define('viewTranslationsUI', function () {
+            return true;
         });
     }
 
-    protected function registerResources(): void
+    private function registerAuthDriver(): void
     {
-        $this->loadViewsFrom(__DIR__.'/../resources/views', 'translations');
+        $this->app->config->set('auth.providers.ltu_contributors', [
+            'driver' => 'eloquent',
+            'model' => Contributor::class,
+        ]);
+
+        $this->app->config->set('auth.guards.translations', [
+            'driver' => 'session',
+            'provider' => 'ltu_contributors',
+        ]);
     }
 
-    protected function registerMigrations(): void
+    protected function registerExceptionHandler(): void
     {
-        if ($this->app->runningInConsole()) {
-            $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
-        }
+        app()->bind(ExceptionHandler::class, TranslationsUIExceptionHandler::class);
     }
 
-    protected function registerPublishing(): void
+    protected function writeSeparationLine(InstallCommand $command): void
     {
-        if ($this->app->runningInConsole()) {
-            $this->publishes([
-                __DIR__.'/../database/migrations' => database_path('migrations'),
-            ], 'translations-migrations');
-
-            $this->publishes([
-                __DIR__.'/../public' => public_path('vendor/translations'),
-            ], ['translations-assets', 'laravel-assets']);
-
-            $this->publishes([
-                __DIR__.'/../stubs/TranslationsServiceProvider.stub' => app_path('Providers/TranslationsServiceProvider.php'),
-            ], 'translations-provider');
-
-            $this->publishes([
-                __DIR__.'/../config/translations.php' => config_path('translations.php'),
-            ], 'translations-config');
-        }
-    }
-
-    protected function registerCommands(): void
-    {
-        if ($this->app->runningInConsole()) {
-            $this->commands([
-                Commands\InstallCommand::class,
-                Commands\PublishCommand::class,
-                Commands\ImportTranslationsCommand::class,
-                Commands\ExportTranslationsCommand::class,
-            ]);
-        }
-    }
-
-    protected function registerLivewireComponents(): void
-    {
-        Livewire::component('translations-ui::phrase-list', PhraseList::class);
-        Livewire::component('translations-ui::phrase-form', PhraseForm::class);
-        Livewire::component('translations-ui::source-phrase', SourcePhrase::class);
-        Livewire::component('translations-ui::translations-list', TranslationsList::class);
-        Livewire::component('translations-ui::export-translations', ExportTranslations::class);
-        Livewire::component('translations-ui::create-source-key-modal', CreateSourceKey::class);
-        Livewire::component('translations-ui::create-translation-modal', CreateTranslation::class);
+        $command->info('*---------------------------------------------------------------------------*');
     }
 }
