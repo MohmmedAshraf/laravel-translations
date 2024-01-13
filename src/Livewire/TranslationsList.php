@@ -38,8 +38,8 @@ class TranslationsList extends Component
     public function getTranslationProgressPercentage(Translation $translation): float
     {
         $phrases = $translation->phrases()->toBase()
-            ->selectRaw('COUNT(CASE WHEN value IS NOT NULL THEN 1 END) AS translated')
-            ->selectRaw('COUNT(CASE WHEN value IS NULL THEN 1 END) AS untranslated')
+            ->selectRaw('COUNT(CASE WHEN value IS NOT NULL AND value <> \'\' THEN 1 END) AS translated')
+            ->selectRaw('COUNT(CASE WHEN value IS NULL OR value <> \'\' THEN 1 END) AS untranslated')
             ->selectRaw('COUNT(*) AS total')
             ->first();
 

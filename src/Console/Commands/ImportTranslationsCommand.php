@@ -91,6 +91,29 @@ class ImportTranslationsCommand extends Command
                 $this->syncPhrases($translation, $key, $value, $locale, $file);
             }
         }
+
+        if ($locale === config('translations.source_language')) {
+            return;
+        }
+
+        $this->syncMissingTranslations($translation, $locale);
+    }
+
+    public function syncMissingTranslations(Translation $source, string $locale): void
+    {
+        $language = Language::where('code', $locale)->first();
+        $translation = Translation::firstOrCreate([
+            'language_id' => $language->id,
+            'source' => false,
+        ]);
+
+        $source->load('phrases.translation', 'phrases.file');
+
+        $source->phrases->each(function ($phrase) use ($translation, $locale) {
+            if (! $translation->phrases()->where('key', $phrase->key)->first()) {
+                $this->syncPhrases($phrase->translation, $phrase->key, '', $locale, $phrase->file->name.'.'.$phrase->file->extension);
+            }
+        });
     }
 
     public function syncPhrases(Translation $source, $key, $value, $locale, $file): void
@@ -102,7 +125,7 @@ class ImportTranslationsCommand extends Command
         $language = Language::where('code', $locale)->first();
 
         if (! $language) {
-            $this->error(PHP_EOL."Language with code $locale not found");
+            $this->error(PHP_EOL."Language with code {$locale} not found");
 
             exit;
         }

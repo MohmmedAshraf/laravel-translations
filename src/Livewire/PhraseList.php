@@ -68,9 +68,13 @@ class PhraseList extends Component
             })
             ->when($this->status, function (Builder $query) {
                 if ($this->status == 1) {
-                    $query->whereNotNull('value');
+                    $query->where(fn($query) => $query
+                        ->where('value', '<>', '')
+                        ->orWhereNull('value'));
                 } elseif ($this->status == 2) {
-                    $query->whereNull('value');
+                    $query->where(fn($query) => $query
+                        ->where('value', '=', '')
+                        ->orWhereNull('value'));
                 }
             })
             ->paginate($this->perPage)->onEachSide(0);
