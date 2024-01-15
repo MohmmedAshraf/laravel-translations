@@ -59,14 +59,20 @@ class TranslationsManager
         }
 
         $translations = [];
-        $baseFileName = "{$locale}.json";
+        $rootFileName = "{$locale}.json";
 
-        collect($this->filesystem->allFiles(lang_path($locale)))
+        $files = [];
+
+        if ($this->filesystem->exists(lang_path($locale))) {
+            $files = $this->filesystem->allFiles(lang_path($locale));
+        }
+
+        collect($files)
             ->map(function ($file) use ($locale) {
                 return $locale . DIRECTORY_SEPARATOR . $file->getFilename();
             })
-            ->when($this->filesystem->exists(lang_path($baseFileName)), function ($collection) use ($baseFileName) {
-                return $collection->prepend($baseFileName);
+            ->when($this->filesystem->exists(lang_path($rootFileName)), function ($collection) use ($rootFileName) {
+                return $collection->prepend($rootFileName);
             })
             ->filter(function ($file) {
                 foreach (config('translations.exclude_files') as $excludeFile) {
@@ -142,7 +148,19 @@ class TranslationsManager
         $tree = [];
 
         foreach ($phrases as $phrase) {
-            Arr::set($tree[$locale][$phrase->file->file_name], $phrase->key, $phrase->value);
+            if ($phrase->file->is_root) {
+                $fileName = $phrase->file->file_name;
+            } else {
+                $fileName = "{$locale}/{$phrase->file->file_name}";
+            }
+
+            $key = $phrase->key;
+
+            if (config('translations.include_file_in_key') && !$phrase->file->is_root) {
+                $key = Str::replaceStart($phrase->file->name . '.', '', $key);
+            }
+
+            Arr::set($tree[$locale][$fileName], $key, $phrase->value);
         }
 
         return $tree;

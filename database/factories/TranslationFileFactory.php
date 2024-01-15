@@ -14,6 +14,7 @@ class TranslationFileFactory extends Factory
         return [
             'name' => $this->faker->randomElement(['app', 'auth', 'pagination', 'passwords', 'validation']),
             'extension' => $this->faker->randomElement(['json', 'php']),
+            'is_root' => false,
         ];
     }
 }

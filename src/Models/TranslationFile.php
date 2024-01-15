@@ -19,6 +19,10 @@ class TranslationFile extends Model
 
     public $timestamps = false;
 
+    protected $casts = [
+        'is_root' => 'boolean',
+    ];
+
     public function phrases(): HasMany
     {
         return $this->hasMany(Phrase::class);

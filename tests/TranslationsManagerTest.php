@@ -20,12 +20,12 @@ beforeEach(function () {
 it('returns the correct list of locales', function () {
     $filesystem = new Filesystem();
     // Create the source language directory
-    createPhpLanguageFile(lang_path('en/auth.php'), []);
-    createJsonLangaueFile(lang_path('en.json'), []);
+    createPhpLanguageFile('en/auth.php', []);
+    createJsonLangaueFile('en.json', []);
 
-    createJsonLangaueFile(lang_path('fr.json'), []);
+    createJsonLangaueFile('fr.json', []);
 
-    createPhpLanguageFile(lang_path('de/validation.php'), []);
+    createPhpLanguageFile('de/validation.php', []);
 
     $translationsManager = new TranslationsManager($filesystem);
     $locales = $translationsManager->getLocales();
@@ -34,13 +34,13 @@ it('returns the correct list of locales', function () {
 });
 
 it('returns the correct translations for a given locale', function () {
-    createPhpLanguageFile(lang_path('en/auth.php'), [
+    createPhpLanguageFile('en/auth.php', [
         'test' => 'Test',
     ]);
-    createPhpLanguageFile(lang_path('en/validation.php'), [
+    createPhpLanguageFile('en/validation.php', [
         'test' => 'Test1',
     ]);
-    createJsonLangaueFile(lang_path('en.json'), [
+    createJsonLangaueFile('en.json', [
         'title' => 'My title',
     ]);
 
@@ -63,13 +63,13 @@ it('returns the correct translations for a given locale', function () {
 });
 
 it('it excludes the correct files', function () {
-    createPhpLanguageFile(lang_path('en/auth.php'), [
+    createPhpLanguageFile('en/auth.php', [
         'test' => 'Test',
     ]);
-    createPhpLanguageFile(lang_path('en/validation.php'), [
+    createPhpLanguageFile('en/validation.php', [
         'test' => 'Test1',
     ]);
-    createJsonLangaueFile(lang_path('en.json'), [
+    createJsonLangaueFile('en.json', [
         'title' => 'My title',
     ]);
 
@@ -102,7 +102,7 @@ test('export creates a new translation file with the correct content', function 
     ])->has(Phrase::factory()->state([
         'phrase_id' => null,
         'translation_file_id' => TranslationFile::factory([
-            'name' => 'en/auth',
+            'name' => 'auth',
             'extension' => 'php',
         ]),
     ]))->create();
@@ -110,7 +110,7 @@ test('export creates a new translation file with the correct content', function 
     $translationsManager = new TranslationsManager($filesystem);
     $translationsManager->export();
 
-    $fileName =  lang_path($translation->phrases[0]->file->name . '.' . $translation->phrases[0]->file->extension);
+    $fileName =  lang_path("en/" . $translation->phrases[0]->file->name . '.' . $translation->phrases[0]->file->extension);
     $fileNameInDisk = File::allFiles(lang_path($translation->language->code))[0]->getPathname();
 
     expect($fileName)->toBe($fileNameInDisk)
@@ -127,7 +127,7 @@ test('export can handle PHP translation files', function () {
 
     $translation = Translation::factory()
         ->has(Phrase::factory()
-            ->for(TranslationFile::factory()->state(['name' => 'en/test', 'extension' => 'php']), 'file')
+            ->for(TranslationFile::factory()->state(['name' => 'test', 'extension' => 'php']), 'file')
             ->state([
                 'key' => 'accepted',
                 'value' => 'The :attribute must be accepted.',
@@ -154,7 +154,7 @@ test('export can handle JSON translation files', function () {
 
     $translation = Translation::factory()
         ->has(Phrase::factory()
-            ->for(TranslationFile::factory()->state(['name' => 'en/test', 'extension' => 'json']), 'file')
+            ->for(TranslationFile::factory()->state(['name' => 'test', 'extension' => 'json']), 'file')
             ->state([
                 'key' => 'accepted',
                 'value' => 'The :attribute must be accepted.',

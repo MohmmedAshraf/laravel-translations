@@ -5,6 +5,7 @@ namespace Outhebox\LaravelTranslations\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Outhebox\LaravelTranslations\Models\Language;
 use Outhebox\LaravelTranslations\Models\Phrase;
 use Outhebox\LaravelTranslations\Models\Translation;
@@ -40,14 +41,14 @@ class ImportTranslationsCommand extends Command
         $this->importLanguages();
 
         if ($this->option('fresh') && $this->confirm('Are you sure you want to truncate all translations and phrases?')) {
-            $this->info('Truncating translations and phrases...'.PHP_EOL);
+            $this->info('Truncating translations and phrases...' . PHP_EOL);
 
             $this->truncateTables();
         }
 
         $translation = $this->createOrGetSourceLanguage();
 
-        $this->info('Importing translations...'.PHP_EOL);
+        $this->info('Importing translations...' . PHP_EOL);
 
         $this->withProgressBar($this->manager->getLocales(), function ($locale) use ($translation) {
             $this->syncTranslations($translation, $locale);
@@ -59,7 +60,7 @@ class ImportTranslationsCommand extends Command
         $language = Language::where('code', config('translations.source_language'))->first();
 
         if (! $language) {
-            $this->error('Language with code '.config('translations.source_language').' not found'.PHP_EOL);
+            $this->error('Language with code ' . config('translations.source_language') . ' not found' . PHP_EOL);
 
             exit;
         }
@@ -111,7 +112,15 @@ class ImportTranslationsCommand extends Command
 
         $source->phrases->each(function ($phrase) use ($translation, $locale) {
             if (! $translation->phrases()->where('key', $phrase->key)->first()) {
-                $this->syncPhrases($phrase->translation, $phrase->key, '', $locale, $phrase->file->name.'.'.$phrase->file->extension);
+                $fileName = $phrase->file->name . '.' . $phrase->file->extension;
+
+                if ($phrase->file->name === config('translations.source_language')) {
+                    $fileName = Str::replaceStart(config('translations.source_language') . '.', "{$locale}.", $fileName);
+                } else {
+                    $fileName = Str::replaceStart(config('translations.source_language') . '/', "{$locale}/", $fileName);
+                }
+
+                $this->syncPhrases($phrase->translation, $phrase->key, '', $locale, $fileName);
             }
         });
     }
@@ -125,7 +134,7 @@ class ImportTranslationsCommand extends Command
         $language = Language::where('code', $locale)->first();
 
         if (! $language) {
-            $this->error(PHP_EOL."Language with code {$locale} not found");
+            $this->error(PHP_EOL . "Language with code {$locale} not found");
 
             exit;
         }
@@ -135,10 +144,14 @@ class ImportTranslationsCommand extends Command
             'source' => config('translations.source_language') === $locale,
         ]);
 
+        $isRoot = $file === $locale . '.json' || $file === $locale . '.php';
         $translationFile = TranslationFile::firstOrCreate([
             'name' => pathinfo($file, PATHINFO_FILENAME),
             'extension' => pathinfo($file, PATHINFO_EXTENSION),
+            'is_root' => $isRoot,
         ]);
+
+        $key = config('translations.include_file_in_key') && ! $isRoot ? "{$translationFile->name}.{$key}" : $key;
 
         $translation->phrases()->updateOrCreate([
             'key' => $key,

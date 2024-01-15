@@ -16,7 +16,7 @@ class TestCase extends Orchestra
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'Outhebox\\LaravelTranslations\\Database\\Factories\\'.class_basename($modelName).'Factory'
+            fn(string $modelName) => 'Outhebox\\LaravelTranslations\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
         );
     }
 
@@ -33,7 +33,10 @@ class TestCase extends Orchestra
     {
         Schema::dropAllTables();
 
-        $migration = include __DIR__.'/../database/migrations/2018_08_08_100000_create_translations_tables.php';
+        $migration = include __DIR__ . '/../database/migrations/2018_08_08_100000_create_translations_tables.php';
+        $migration->up();
+
+        $migration = include __DIR__ . '/../database/migrations/2018_08_08_100001_add_is_root_to_translation_files_table.php';
         $migration->up();
     }
 }

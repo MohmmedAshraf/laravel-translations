@@ -71,4 +71,6 @@ return [
     |
     */
     'database_connection' => env('TRANSLATIONS_DB_CONNECTION', null),
+
+    'include_file_in_key' => env('TRANSLATIONS_INCLUDE_FILE_IN_KEY', false),
 ];

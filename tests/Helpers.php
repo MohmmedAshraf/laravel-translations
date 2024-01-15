@@ -18,6 +18,8 @@ function createDirectoryIfNotExits($path)
 
 function createPhpLanguageFile($path, array $content)
 {
+    $path = lang_path($path);
+
     createDirectoryIfNotExits($path);
 
     File::put($path, "<?php\n\nreturn " . VarExporter::export($content, VarExporter::TRAILING_COMMA_IN_ARRAY) . ';' . PHP_EOL);
@@ -25,6 +27,8 @@ function createPhpLanguageFile($path, array $content)
 
 function createJsonLangaueFile($path, array $content)
 {
+    $path = lang_path($path);
+
     createDirectoryIfNotExits($path);
 
     File::put($path, json_encode($content, JSON_PRETTY_PRINT));

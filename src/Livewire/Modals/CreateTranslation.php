@@ -6,6 +6,7 @@ use Illuminate\Contracts\View\View;
 use LivewireUI\Modal\ModalComponent;
 use Outhebox\LaravelTranslations\Models\Language;
 use Outhebox\LaravelTranslations\Models\Translation;
+use Outhebox\LaravelTranslations\Models\TranslationFile;
 use WireUi\Traits\Actions;
 
 class CreateTranslation extends ModalComponent
@@ -46,13 +47,23 @@ class CreateTranslation extends ModalComponent
         $sourceTranslation = Translation::where('source', true)->first();
 
         foreach ($sourceTranslation->phrases()->with('file')->get() as $sourcePhrase) {
+            $file = $sourcePhrase->file;
+
+            if ($file->is_root) {
+                $file = TranslationFile::firstOrCreate([
+                    'name' => $translation->language->code,
+                    'extension' => $file->extension,
+                    'is_root' => true,
+                ]);
+            }
+
             $translation->phrases()->create([
                 'value' => null,
                 'key' => $sourcePhrase->key,
-                'group' => $sourcePhrase->group,
+                'group' => $file->name,
                 'phrase_id' => $sourcePhrase->id,
                 'parameters' => $sourcePhrase->parameters,
-                'translation_file_id' => $sourcePhrase->file->id,
+                'translation_file_id' => $file->id,
             ]);
         }
 
