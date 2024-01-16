@@ -1,61 +1,84 @@
-<p align="center">
-    <img src="https://user-images.githubusercontent.com/44909285/201471525-be424567-47a4-495d-a9b1-cd673cff0b23.svg" alt="Logo Laravel-Translations">
-</p>
+![Cover](art/cover.png)
 
 <p align="center">
     <a href="#introduction">Introduction</a> |
+    <a href="#roadmap">Roadmap</a> |
     <a href="#installation">Installation</a> |
     <a href="#usage">Usage</a> |
     <a href="#authorization">Authorization</a> |
     <a href="#upgrading">Upgrade</a> |
-    <a href="#roadmap">Roadmap</a> |
     <a href="#changelog">Changelog</a>
 </p>
 
 <p align="center">
-<a href="https://packagist.org/packages/outhebox/laravel-translations"><img src="https://img.shields.io/packagist/v/outhebox/laravel-translations.svg" alt="Packagist"></a>
-<a href="https://packagist.org/packages/outhebox/laravel-translations"><img src="https://img.shields.io/packagist/dm/outhebox/laravel-translations.svg" alt="Packagist"></a>
+<a href="https://packagist.org/packages/outhebox/laravel-translations"><img src="https://img.shields.io/packagist/v/outhebox/laravel-translations" alt="Latest Stable Version"></a>
+<a href="https://github.com/MohmmedAshraf/laravel-translations/actions?query=workflow%3Arun-tests"><img src="https://github.com/MohmmedAshraf/laravel-translations/workflows/run-tests/badge.svg" alt="Tests"></a>
+<a href="https://packagist.org/packages/outhebox/laravel-translations"><img src="https://img.shields.io/packagist/dt/outhebox/laravel-translations" alt="Total Downloads"></a>
 <a href="https://packagist.org/packages/outhebox/laravel-translations"><img src="https://img.shields.io/packagist/php-v/outhebox/laravel-translations.svg" alt="PHP from Packagist"></a>
-<a href="https://packagist.org/packages/outhebox/laravel-translations"><img src="https://img.shields.io/badge/Laravel-8.x,%209.x-brightgreen.svg" alt="Laravel Version"></a>
+<a href="https://packagist.org/packages/outhebox/laravel-translations"><img src="https://img.shields.io/badge/Laravel-10.x-brightgreen.svg" alt="Laravel Version"></a>
 </p>
-
-![Cover](https://user-images.githubusercontent.com/44909285/201598702-5bcd47ed-6202-41a1-af4a-40203b3b76ae.png)
 
 ### Introduction
 
-Laravel Translations UI is a package that provides a simple and friendly user interface for managing translations in a Laravel app. With this package, you can easily add, edit, delete, and export translations, and use the search function to find specific translations.
+Laravel Translations UI package provides a user-friendly interface for managing translations in your Laravel application. It simplifies tasks such as adding, editing, deleting, and exporting translations. The package also includes a handy search feature and the ability to invite collaborators for easy translation management. Currently, the package is integrated with the Google Translate API, allowing you to translate your content into any language of your choice.
 
 > 📺 **[Watch a 4-minute video by Povilas Korop](https://www.youtube.com/watch?v=lYkgXnwnVbw)** showcasing the package.
 
 ### Requirements
 
-- PHP 8.1 or higher
-- Laravel 10.x or higher
+- PHP `8.1` or higher
+- Laravel `v10.x` or higher
 
-#### Features
+### Features
+- Easily view, create, and delete translations with an intuitive interface.
+- Effortlessly manage translation keys for organized language management.
+- Conveniently filter by translation keys or values to quickly locate specific content.
+- Seamlessly import and export translations to and from your Laravel application
+- Utilize a powerful search function to swiftly find the translations, keys, or values you need.
+- Collaborate seamlessly by inviting contributors to manage translations collaboratively.
+- Benefit from Google Translate API integration for accurate and automated language translation.
+- Explore additional features that enhance your translation workflow and more.
 
-- View, create, and delete translations
-- Manage translation keys
-- Filter by translation keys or values
-- Import and export translations
-- Search function to find specific translations
-- and more...
+### Package Roadmap
+- [x] Add tests.
+- [x] Improve the UI.
+- [ ] Vendor translations support.
+- [x] Google Translate API integration.
+- [x] Invite collaborators to manage translations.
+- [ ] Add revision history.
+- [ ] Add more features.
 
 ### Installation
 
-To install Laravel Translations UI in your Laravel project, run the following command:
+🚨 **Important Notice: Breaking Changes in this Version** 🚨
+
+I would like to inform you that this version brings about substantial breaking changes, as the package stack has transitioned from [Livewire](https://livewire.laravel.com/) to [Inertia](https://inertiajs.com/). This adjustment brings several improvements and optimizations, enhancing the overall performance and user experience.
+
+To seamlessly adapt to these changes, please follow the steps below:
+
+#### Uninstall the Previous Version
+
+Completely remove the existing package from your Laravel application, including all assets and configuration files, and then perform a fresh installation of the new version, as described below.
+
+```bash
+composer remove outhebox/laravel-translations
+```
+
+#### Install from Scratch
+
+After uninstallation, perform a fresh installation of the package.
 
 ```bash
 composer require outhebox/laravel-translations
 ```
 
-Before you can import translations, you'll need to migrate your database. Run the following command to do so:
+Before you can access the translations UI, run the migrations by running the following command:
 
 ```bash
 php artisan migrate
 ```
 
-After installing the package, you'll need to publish its assets by running the following command:
+After running the migrations, you'll need to publish the package's assets by running the following command:
 
 ```bash
 php artisan translations:install
@@ -75,13 +98,17 @@ To import and overwrite all previous translations, use the following command:
 php artisan translations:import --fresh
 ```
 
-To access the translations UI, visit /translations in your browser. If you are using a production environment, you will need to login to your application before accessing the translations UI. 
+To access the translations UI, visit `/translations` in your browser. If you are using a production environment, you will need to create owner user first. To do so, run the following command:
 
-You can customize the authorization gate in the configuration file to control access to the translations UI in non-local environments. For more information, see for more details [Authorization](#authorization).
+```bash
+php artisan translations:contributor
+``` 
+
+This command will prompt you to enter the user's name, email, and password. Once you have created the owner user, you can log in to the translations UI dashboard and start managing your translations.
 
 #### Exporting Translations
 
-To export your translations, run the following command:
+You can export your translations from the translations UI dashboard or by running the following command:
 
 ```bash
 php artisan translations:export
@@ -125,15 +152,6 @@ To keep the assets up-to-date and avoid issues in future updates, you may add th
     }
 }
 ```
-
-### Roadmap
-- [ ] Add tests.
-- [ ] Improve the UI.
-- [ ] Vendor translations support.
-- [ ] Google Translate API integration.
-- [ ] Invite collaborators to manage translations.
-- [ ] Add revision history.
-- [ ] Add more features.
 
 ### Changelog
 

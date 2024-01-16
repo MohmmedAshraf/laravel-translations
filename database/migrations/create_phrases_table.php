@@ -3,6 +3,10 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Outhebox\TranslationsUI\Enums\StatusEnum;
+use Outhebox\TranslationsUI\Models\Phrase;
+use Outhebox\TranslationsUI\Models\Translation;
+use Outhebox\TranslationsUI\Models\TranslationFile;
 
 return new class extends Migration
 {
@@ -11,13 +15,15 @@ return new class extends Migration
         Schema::create('ltu_phrases', function (Blueprint $table) {
             $table->id();
             $table->uuid();
-            $table->foreignId('translation_id')->constrained('ltu_translations')->cascadeOnDelete();
-            $table->foreignId('translation_file_id')->constrained('ltu_translation_files')->cascadeOnDelete();
-            $table->foreignId('phrase_id')->nullable()->constrained('ltu_phrases')->cascadeOnDelete();
-            $table->text('key');
-            $table->text('group');
+            $table->foreignIdFor(Translation::class)->constrained('ltu_translations')->cascadeOnDelete();
+            $table->foreignIdFor(TranslationFile::class)->constrained('ltu_translation_files')->cascadeOnDelete();
+            $table->foreignIdFor(Phrase::class)->nullable()->constrained('ltu_phrases')->cascadeOnDelete();
+            $table->string('key');
+            $table->string('group');
             $table->text('value')->nullable();
+            $table->text('status')->default(StatusEnum::active->value);
             $table->json('parameters')->nullable();
+            $table->text('note')->nullable();
             $table->timestamps();
         });
     }

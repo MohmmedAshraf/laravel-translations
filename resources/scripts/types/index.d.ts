@@ -1,11 +1,39 @@
-export interface Language {
-    id: number;
-    name: string;
-    code: string;
-    rtl: boolean;
+export type Language = {
+    id: number
+    name: string
+    code: string
+    rtl: boolean
 }
 
-export interface SourcePhrase {
+export type Role = {
+    value: string
+    label: string
+}
+
+export type NotificationType = "success" | "error" | "warning" | "info" | "default"
+
+export type Notification = {
+    type: NotificationType
+    body: string
+}
+
+export type Contributor = {
+    id: number
+    name: string
+    email: string
+    role: Role
+    created_at: string
+    updated_at: string
+}
+
+export type Invite = {
+    id: number
+    email: string
+    role: Role
+    invited_at: string
+}
+
+export type SourcePhrase = {
     id: number
     uuid: string
     key: string
@@ -15,15 +43,21 @@ export interface SourcePhrase {
     created_at: string
     updated_at: string
     state: boolean
+    note: string
+    status: Array<{
+        value: string
+        label: string
+    }>
     value_html: Array<{
         parameter: boolean
         value: string
     }>
     translation_id: number
     translation_file_id: number
+    file: TranslationFile
 }
 
-export interface Phrase {
+export type Phrase = {
     id: number
     uuid: string
     key: string
@@ -41,30 +75,32 @@ export interface Phrase {
     translation_file_id: number
     phrase_id: number
     source: SourcePhrase
+    file: TranslationFile
 }
 
-export interface SourceTranslation {
-    id: number;
-    language: Language;
-    progress: number;
-    phrases_count: number;
-    created_at: string;
-    updated_at: string;
+export type SourceTranslation = {
+    id: number
+    language: Language
+    progress: number
+    phrases_count: number
+    created_at: string
+    updated_at: string
 }
 
-export interface Translation {
-    id: number;
-    language: Language;
-    source_language: SourceTranslation;
-    progress: number;
-    source: boolean;
-    phrases_count: number;
-    created_at: string;
-    updated_at: string;
+export type Translation = {
+    id: number
+    language: Language
+    source_translation: SourceTranslation
+    progress: number
+    source: boolean
+    phrases_count: number
+    created_at: string
+    updated_at: string
 }
 
-export interface TranslationFile {
-    id: number;
-    name: string;
-    extension: string;
+export type TranslationFile = {
+    id: number
+    name: string
+    extension: string
+    nameWithExtension: string
 }

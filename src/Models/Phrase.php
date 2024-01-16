@@ -1,12 +1,14 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Models;
+namespace Outhebox\TranslationsUI\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Outhebox\LaravelTranslations\Models\Concerns\HasDatabaseConnection;
-use Outhebox\LaravelTranslations\Models\Concerns\HasUuid;
+use Illuminate\Support\Collection;
+use Outhebox\TranslationsUI\Enums\StatusEnum;
+use Outhebox\TranslationsUI\Traits\HasDatabaseConnection;
+use Outhebox\TranslationsUI\Traits\HasUuid;
 
 class Phrase extends Model
 {
@@ -20,10 +22,11 @@ class Phrase extends Model
 
     protected $casts = [
         'parameters' => 'array',
+        'status' => StatusEnum::class,
     ];
 
     protected $with = [
-        'source',
+        'source', 'file',
     ];
 
     public function file(): BelongsTo
@@ -39,5 +42,12 @@ class Phrase extends Model
     public function translation(): BelongsTo
     {
         return $this->belongsTo(Translation::class);
+    }
+
+    public function similarPhrases(): Collection
+    {
+        return $this->translation->phrases()->where('key', 'like', "%$this->key%")
+            ->whereKeyNot($this->id)
+            ->get();
     }
 }

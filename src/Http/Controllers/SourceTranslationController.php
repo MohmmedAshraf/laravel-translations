@@ -1,46 +1,79 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Http\Controllers;
+namespace Outhebox\TranslationsUI\Http\Controllers;
 
-use Illuminate\Database\Eloquent\Builder;
+use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\Artisan;
 use Inertia\Inertia;
 use Inertia\Response;
 use Momentum\Modal\Modal;
-use Outhebox\LaravelTranslations\Http\Resources\PhraseResource;
-use Outhebox\LaravelTranslations\Http\Resources\TranslationResource;
-use Outhebox\LaravelTranslations\Models\Phrase;
-use Outhebox\LaravelTranslations\Models\Translation;
+use Outhebox\TranslationsUI\Actions\CreateSourceKeyAction;
+use Outhebox\TranslationsUI\Http\Resources\PhraseResource;
+use Outhebox\TranslationsUI\Http\Resources\TranslationResource;
+use Outhebox\TranslationsUI\Models\Phrase;
+use Outhebox\TranslationsUI\Models\Translation;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class SourceTranslationController extends BaseController
 {
+    public function import(): RedirectResponse
+    {
+        try {
+            Artisan::call('translations:import', [
+                '--force' => true,
+            ]);
+
+            return redirect()->route('ltu.translation.index');
+        } catch (Exception $e) {
+            report($e);
+
+            return redirect()->back()->withErrors([
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
     public function index(Request $request): Response
     {
-        $source_language = Translation::where('source', true)->first();
+        $source = Translation::where('source', true)->first();
+
+        $phrases = QueryBuilder::for(Phrase::class)
+            ->orderBy('key')
+            ->allowedFilters(['key', 'value', 'status'])
+            ->where('translation_id', $source->id)
+            ->paginate($request->input('perPage') ?? 12)
+            ->appends(request()->query());
 
         return Inertia::render('source/index', [
-            'phrases' => PhraseResource::collection($source_language->phrases()
-                ->orderBy('key')
-                ->with(['file', 'translation'])
-                ->when($request->has('search'), function (Builder $query) use ($request) {
-                    $query->where(function (Builder $query) use ($request) {
-                        $query->where('key', 'like', "%{$request->input('search')}%")
-                            ->orWhere('value', 'like', "%{$request->input('search')}%");
-                    });
-                })
-                ->when($request->has('status'), function (Builder $query) use ($request) {
-                    $query->where(function (Builder $query) use ($request) {
-                        $request->input('status') === 'translated'
-                            ? $query->whereNotNull('value')
-                            : $query->whereNull('value');
-                    });
-                })
-                ->paginate($request->input('perPage') ?? 12)->withQueryString()),
-
-            'translation' => TranslationResource::make($source_language),
+            'phrases' => PhraseResource::collection($phrases),
+            'translation' => TranslationResource::make($source),
         ]);
+    }
+
+    public function create(): Modal
+    {
+        return Inertia::modal('source/modals/add-source-key')
+            ->baseRoute('ltu.source_translation');
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'key' => 'required',
+            'file' => 'required',
+            'key_translation' => 'required',
+        ]);
+
+        CreateSourceKeyAction::execute(
+            key: $request->input('key'),
+            file: $request->input('file'),
+            key_translation: $request->input('key_translation'),
+        );
+
+        return redirect()->route('ltu.source_translation');
     }
 
     public function edit(Phrase $phrase): Response
@@ -48,18 +81,21 @@ class SourceTranslationController extends BaseController
         return Inertia::render('source/edit', [
             'phrase' => PhraseResource::make($phrase),
             'translation' => TranslationResource::make($phrase->translation),
-            'source' => TranslationResource::make(Translation::where('source', true)?->first()),
+            'source' => TranslationResource::make($phrase->translation),
+            'similarPhrases' => PhraseResource::collection($phrase->similarPhrases()),
         ]);
     }
 
     public function update(Phrase $phrase, Request $request): RedirectResponse
     {
         $request->validate([
-            'updatePhrase' => 'required|string',
+            'phrase' => 'required|string',
+            'status' => 'required|string',
+            'note' => 'nullable|string',
         ]);
 
         $phrase->update([
-            'value' => $request->input('updatePhrase'),
+            'value' => $request->input('phrase'),
         ]);
 
         $nextPhrase = $phrase->translation->phrases()
@@ -67,19 +103,8 @@ class SourceTranslationController extends BaseController
             ->whereNull('value')
             ->first();
 
-        if ($nextPhrase) {
-            return redirect()->route('ltu.phrases.edit', [
-                'translation' => $phrase->translation,
-                'phrase' => $nextPhrase,
-            ]);
-        }
-
-        return redirect()->route('ltu.translation.source_language');
-    }
-
-    public function create(): Modal
-    {
-        return Inertia::modal('source/modals/add-source-key')
-            ->baseRoute('ltu.translation.source_language');
+        return $nextPhrase
+            ? redirect()->route('ltu.phrases.edit', ['translation' => $phrase->translation, 'phrase' => $nextPhrase])
+            : redirect()->route('ltu.source_translation');
     }
 }

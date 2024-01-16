@@ -1,12 +1,11 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Console\Commands;
+namespace Outhebox\TranslationsUI\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
-use Outhebox\LaravelTranslations\Enums\RoleEnum;
-use Outhebox\LaravelTranslations\Models\Contributor;
-use Ramsey\Uuid\Uuid;
+use Outhebox\TranslationsUI\Enums\RoleEnum;
+use Outhebox\TranslationsUI\Models\Contributor;
 use Symfony\Component\Console\Command\Command as CommandAlias;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -56,8 +55,6 @@ class ContributorCommand extends Command
                 options: [
                     RoleEnum::owner->value => RoleEnum::owner->label(),
                     RoleEnum::translator->value => RoleEnum::translator->label(),
-                    RoleEnum::reviewer->value => RoleEnum::reviewer->label(),
-                    RoleEnum::translator_manager->value => RoleEnum::translator_manager->label(),
                 ],
                 default: 'Owner',
                 hint: 'The role may be changed at any time.'
@@ -86,7 +83,6 @@ class ContributorCommand extends Command
 
         $contributor = spin(
             fn () => Contributor::create([
-                'id' => Uuid::uuid4(),
                 'name' => $name,
                 'email' => $email,
                 'role' => RoleEnum::from($role),

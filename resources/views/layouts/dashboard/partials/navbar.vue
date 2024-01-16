@@ -1,29 +1,16 @@
 <script setup lang="ts">
+import { Bars3Icon, XMarkIcon, ArrowRightEndOnRectangleIcon } from "@heroicons/vue/24/outline"
+import { Menu, MenuButton, MenuItem, MenuItems, Popover, PopoverButton, PopoverOverlay, PopoverPanel, TransitionChild, TransitionRoot } from "@headlessui/vue"
 
 const user = useAuth()
 
-import { Bars3Icon, XMarkIcon, ArrowRightOnRectangleIcon } from "@heroicons/vue/24/outline"
-import {
-    Menu,
-    MenuButton,
-    MenuItem,
-    MenuItems,
-    Popover,
-    PopoverButton,
-    PopoverOverlay,
-    PopoverPanel,
-    TransitionChild,
-    TransitionRoot
-} from "@headlessui/vue"
-
 const navigation = [
-    { name: "Translations", href: route("ltu.translation.index"), current: route().current('ltu.translation.index') },
-    { name: "Contributors", href: route("ltu.translation.index"), current: false },
-    { name: "Settings", href: route("ltu.translation.index"), current: false }
+    { name: "Translations", href: route("ltu.translation.index"), current: route().current("ltu.translation.*") || route().current("ltu.source_translation.*") || route().current("ltu.phrases.*") },
+    { name: "Contributors", href: route("ltu.contributors.index"), current: route().current("ltu.contributors.*") },
 ]
 const userNavigation = [
-    { name: "Your Profile", href: "#" },
-    { name: "Sign out", href: "#" }
+    { name: "Your Profile", href: route("ltu.profile.edit"), method: "get" },
+    { name: "Sign out", href: route("ltu.logout"), method: "post" },
 ]
 </script>
 
@@ -38,22 +25,14 @@ const userNavigation = [
                 </div>
 
                 <nav aria-label="Global" class="hidden lg:ml-6 lg:flex lg:items-center lg:space-x-4">
-                    <Link
-                        v-for="item in navigation"
-                        :key="item.name"
-                        :href="item.href"
-                        class="rounded-md px-3 py-2 text-sm font-medium"
-                        :class="[item.current ? 'bg-blue-500 text-white' : 'text-white hover:bg-blue-700 hover:text-white']"
-                        :aria-current="item.current ? 'page' : undefined"
-                    >
+                    <Link v-for="item in navigation" :key="item.name" :href="item.href" class="rounded-md px-3 py-2 text-sm font-medium" :class="[item.current ? 'bg-blue-500 text-white' : 'text-white hover:bg-blue-700 hover:text-white']" :aria-current="item.current ? 'page' : undefined">
                         {{ item.name }}
                     </Link>
                 </nav>
             </div>
 
             <div class="flex items-center lg:hidden">
-                <PopoverButton
-                    class="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+                <PopoverButton class="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
                     <span class="absolute -inset-0.5" />
 
                     <span class="sr-only">Open main menu</span>
@@ -64,27 +43,11 @@ const userNavigation = [
 
             <TransitionRoot as="template" :show="open">
                 <div class="lg:hidden">
-                    <TransitionChild
-                        as="template"
-                        enter="duration-150 ease-out"
-                        enter-from="opacity-0"
-                        enter-to="opacity-100"
-                        leave="duration-150 ease-in"
-                        leave-from="opacity-100"
-                        leave-to="opacity-0"
-                    >
+                    <TransitionChild as="template" enter="duration-150 ease-out" enter-from="opacity-0" enter-to="opacity-100" leave="duration-150 ease-in" leave-from="opacity-100" leave-to="opacity-0">
                         <PopoverOverlay class="fixed inset-0 z-20 bg-black/25" aria-hidden="true" />
                     </TransitionChild>
 
-                    <TransitionChild
-                        as="template"
-                        enter="duration-150 ease-out"
-                        enter-from="opacity-0 scale-95"
-                        enter-to="opacity-100 scale-100"
-                        leave="duration-150 ease-in"
-                        leave-from="opacity-100 scale-100"
-                        leave-to="opacity-0 scale-95"
-                    >
+                    <TransitionChild as="template" enter="duration-150 ease-out" enter-from="opacity-0 scale-95" enter-to="opacity-100 scale-100" leave="duration-150 ease-in" leave-from="opacity-100 scale-100" leave-to="opacity-0 scale-95">
                         <PopoverPanel focus class="absolute right-0 top-0 z-30 w-full max-w-none origin-top p-2 transition">
                             <div class="divide-y divide-gray-200 rounded-lg bg-white shadow-lg ring-1 ring-black/5">
                                 <div class="pb-2 pt-3">
@@ -94,8 +57,7 @@ const userNavigation = [
                                         </div>
 
                                         <div class="-mr-2">
-                                            <PopoverButton
-                                                class="relative inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+                                            <PopoverButton class="relative inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
                                                 <span class="absolute -inset-0.5" />
 
                                                 <span class="sr-only">Close menu</span>
@@ -129,7 +91,7 @@ const userNavigation = [
 
                                             <span class="sr-only">Log Out</span>
 
-                                            <ArrowRightOnRectangleIcon class="h-6 w-6" aria-hidden="true" />
+                                            <ArrowRightEndOnRectangleIcon class="h-6 w-6" aria-hidden="true" />
                                         </button>
                                     </div>
                                 </div>
@@ -140,26 +102,23 @@ const userNavigation = [
             </TransitionRoot>
 
             <div class="hidden lg:ml-4 lg:flex lg:items-center">
+                <div class="flex">
+                    <BaseButton variant="success" size="xs">
+                        <span>Publish</span>
+                    </BaseButton>
+                </div>
+
                 <Menu as="div" class="relative ml-4 shrink-0">
                     <div>
-                        <MenuButton
-                            class="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        <MenuButton class="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                             <span class="sr-only">Open user menu</span>
 
                             <div class="h-8 w-8 rounded-full bg-gray-400" />
                         </MenuButton>
                     </div>
 
-                    <transition
-                        enter-active-class="transition ease-out duration-100"
-                        enter-from-class="transform opacity-0 scale-95"
-                        enter-to-class="transform opacity-100 scale-100"
-                        leave-active-class="transition ease-in duration-75"
-                        leave-from-class="transform opacity-100 scale-100"
-                        leave-to-class="transform opacity-0 scale-95"
-                    >
-                        <MenuItems
-                            class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5 focus:outline-none">
+                    <transition enter-active-class="transition ease-out duration-100" enter-from-class="transform opacity-0 scale-95" enter-to-class="transform opacity-100 scale-100" leave-active-class="transition ease-in duration-75" leave-from-class="transform opacity-100 scale-100" leave-to-class="transform opacity-0 scale-95">
+                        <MenuItems class="absolute right-0 z-30 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5 focus:outline-none">
                             <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
                                 <Link :href="item.href" class="block px-4 py-2 text-sm text-gray-700" :class="[active ? 'bg-gray-100' : '']">
                                     {{ item.name }}

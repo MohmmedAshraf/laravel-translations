@@ -5,15 +5,14 @@ import { ChevronRightIcon } from "@heroicons/vue/20/solid"
 
 defineProps<{
     breadcrumbs?: {
-        label: string;
-        link: string;
-    }[];
-}>();
+        label: string
+        link: string
+    }[]
+}>()
 </script>
 
 <template>
     <div class="min-h-full">
-
         <header class="divide-y bg-blue-600 shadow">
             <Navbar />
 
@@ -23,9 +22,7 @@ defineProps<{
                         <nav v-if="breadcrumbs" class="flex" aria-label="Breadcrumb">
                             <ol role="list" class="flex items-center space-x-4">
                                 <li>
-                                    <Link :href="route('ltu.translation.index')" class="text-sm font-medium text-gray-500 hover:text-gray-700">
-                                        Dashboard
-                                    </Link>
+                                    <Link :href="route('ltu.translation.index')" class="text-sm font-medium text-gray-500 hover:text-gray-700"> Dashboard </Link>
                                 </li>
 
                                 <li v-for="(crumb, index) in breadcrumbs" :key="index" class="flex items-center">

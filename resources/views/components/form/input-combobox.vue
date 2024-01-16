@@ -1,13 +1,6 @@
 <script setup lang="ts">
 import { ChevronUpDownIcon } from "@heroicons/vue/24/outline/index.js"
-import {
-    Combobox,
-    ComboboxInput,
-    ComboboxOptions,
-    ComboboxOption,
-    ComboboxButton,
-    TransitionRoot,
-} from "@headlessui/vue"
+import { Combobox, ComboboxInput, ComboboxOptions, ComboboxOption, ComboboxButton, TransitionRoot } from "@headlessui/vue"
 
 const props = withDefaults(
     defineProps<{
@@ -15,7 +8,7 @@ const props = withDefaults(
     }>(),
     {
         items: () => [],
-    }
+    },
 )
 
 const value = defineModel<string[]>({ required: true })
@@ -28,12 +21,7 @@ const button = ref()
 const input = ref()
 
 const results = computed(() => {
-    let items =
-        query.value === ""
-            ? options
-            : options.filter((item) =>
-                item.toLowerCase().replace(/\s+/g, "").includes(query.value.toLowerCase().replace(/\s+/g, ""))
-            )
+    let items = query.value === "" ? options : options.filter((item) => item.toLowerCase().replace(/\s+/g, "").includes(query.value.toLowerCase().replace(/\s+/g, "")))
 
     if (!items.length && query.value) {
         items.push(query.value)

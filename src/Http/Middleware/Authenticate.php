@@ -1,17 +1,14 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Http\Middleware;
+namespace Outhebox\TranslationsUI\Http\Middleware;
 
 use Closure;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Auth\Factory as Auth;
 use Illuminate\Http\Request;
-use Outhebox\LaravelTranslations\Concerns\UsesAuth;
 
 class Authenticate
 {
-    use UsesAuth;
-
     protected Auth $auth;
 
     public function __construct(Auth $auth)

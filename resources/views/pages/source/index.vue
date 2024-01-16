@@ -1,25 +1,25 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, watch } from "vue"
 import { Translation } from "../../../scripts/types"
 
 const props = defineProps<{
-    phrases: Object,
-    translation: Translation,
+    phrases: Object
+    translation: Translation
 }>()
 
 const form = useForm({
-    search: ref(''),
-    status: ref(''),
-});
+    search: ref(""),
+    status: ref(""),
+})
 
 watch(form, () => {
-    form.get(route('ltu.translation.source_language', { translation: props.translation.id }), {
+    form.get(route("ltu.source_translation", { translation: props.translation.id }), {
         replace: true,
         onSuccess: () => {
-            form.reset();
+            form.reset()
         },
-    });
-});
+    })
+})
 </script>
 <template>
     <Head title="Base Language" />
@@ -68,8 +68,7 @@ watch(form, () => {
                             :items="[
                                 { value: 'translated', label: 'Translated' },
                                 { value: 'untranslated', label: 'Untranslated' },
-                            ]"
-                        />
+                            ]" />
                     </div>
                 </div>
 
@@ -93,8 +92,8 @@ watch(form, () => {
                             </div>
                         </div>
 
-                        <div class="grid divide-x w-36 grid-cols-2">
-                            <Link v-tooltip="'Add New Key'" :href="route('ltu.translation.source_language.add_source_key')" class="group flex items-center justify-center hover:bg-blue-50">
+                        <div class="grid w-36 grid-cols-2 divide-x">
+                            <Link v-tooltip="'Add New Key'" :href="route('ltu.source_translation.add_source_key')" class="group flex items-center justify-center hover:bg-blue-50">
                                 <IconPlus class="h-5 w-5 text-gray-400 group-hover:text-blue-600" />
                             </Link>
 
@@ -117,7 +116,7 @@ watch(form, () => {
                             <IconLanguage v-else class="h-5 w-5 text-gray-500" />
                         </div>
 
-                        <Link :href="route('ltu.translation.source_language.edit', phrase.uuid)" class="grid w-full grid-cols-2 divide-x">
+                        <Link :href="route('ltu.source_translation.edit', phrase.uuid)" class="grid w-full grid-cols-2 divide-x">
                             <div class="flex w-full items-center justify-start px-4">
                                 <div class="truncate rounded-md border bg-white px-1.5 py-0.5 text-sm font-medium text-gray-600 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-600">
                                     {{ phrase.key }}
@@ -131,12 +130,12 @@ watch(form, () => {
                             </div>
                         </Link>
 
-                        <div class="grid divide-x w-36 grid-cols-2">
-                            <Link v-tooltip="'Edit'" :href="route('ltu.translation.source_language.edit', phrase.uuid)" class="group flex items-center justify-center px-3 hover:bg-blue-50">
+                        <div class="grid w-36 grid-cols-2 divide-x">
+                            <Link v-tooltip="'Edit'" :href="route('ltu.source_translation.edit', phrase.uuid)" class="group flex items-center justify-center px-3 hover:bg-blue-50">
                                 <IconPencil class="h-5 w-5 text-gray-400 group-hover:text-blue-600" />
                             </Link>
 
-                            <Link v-tooltip="'Delete'" :href="route('ltu.confirmation')" type="button" class="group flex items-center justify-center px-3 hover:bg-red-50">
+                            <Link v-tooltip="'Delete'" href="route('ltu.confirmation')" type="button" class="group flex items-center justify-center px-3 hover:bg-red-50">
                                 <IconTrash class="h-5 w-5 text-gray-400 group-hover:text-red-600" />
                             </Link>
                         </div>

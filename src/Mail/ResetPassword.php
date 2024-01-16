@@ -1,6 +1,6 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Mail;
+namespace Outhebox\TranslationsUI\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;

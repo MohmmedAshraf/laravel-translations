@@ -9,16 +9,15 @@ export default defineConfig({
         alias: {
             "@": "/resources",
             "~": "/node_modules",
-            '@css': "/resources/css",
         },
     },
     plugins: [
         laravel({
             input: "resources/scripts/app.ts",
             ssr: "resources/scripts/ssr.ts",
-            publicDirectory: 'resources/dist',
-            buildDirectory: 'vendor/translations-ui',
-            refresh: true
+            publicDirectory: "resources/dist",
+            buildDirectory: "vendor/translations-ui",
+            refresh: true,
         }),
         vue({
             template: {
@@ -47,7 +46,7 @@ export default defineConfig({
                 },
                 {
                     "@inertiajs/vue3": ["router", "useForm", "usePage", "useRemember"],
-                }
+                },
             ],
         }),
         components({
@@ -78,4 +77,4 @@ export default defineConfig({
             ],
         }),
     ],
-});
+})

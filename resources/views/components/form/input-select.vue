@@ -20,10 +20,7 @@ const { sizeClass } = useInputSize(props.size ?? "lg")
 <template>
     <Listbox v-model="value">
         <div class="relative">
-            <ListboxButton
-                class="w-full rounded-md border border-gray-300 bg-white px-3 text-left shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                :class="[sizeClass, {'border-red-300 text-red-900 placeholder:text-red-300 focus:border-red-500 focus:ring-red-500': error}]"
-            >
+            <ListboxButton class="w-full rounded-md border border-gray-300 bg-white px-3 text-left shadow-sm focus:border-blue-500 focus:ring-blue-500" :class="[sizeClass, { 'border-red-300 text-red-900 placeholder:text-red-300 focus:border-red-500 focus:ring-red-500': error }]">
                 <span v-if="value" class="block truncate">{{ displayBy(value) }}</span>
 
                 <span v-else class="italic text-gray-500">Select from the list</span>

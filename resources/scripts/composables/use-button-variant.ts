@@ -14,7 +14,7 @@ const useButtonVariant = (variant: ButtonVariant): { variantClass: ComputedRef<s
     })
 
     return {
-        variantClass
+        variantClass,
     }
 }
 

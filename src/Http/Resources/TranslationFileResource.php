@@ -1,10 +1,10 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Http\Resources;
+namespace Outhebox\TranslationsUI\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Outhebox\LaravelTranslations\Models\TranslationFile;
+use Outhebox\TranslationsUI\Models\TranslationFile;
 
 /** @mixin TranslationFile */
 class TranslationFileResource extends JsonResource
@@ -15,9 +15,7 @@ class TranslationFileResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'extension' => $this->extension,
-            'file_name' => $this->file_name,
-            'phrases_count' => $this->phrases_count,
-
+            'nameWithExtension' => $this->file_name,
             'phrases' => PhraseResource::collection($this->whenLoaded('phrases')),
         ];
     }

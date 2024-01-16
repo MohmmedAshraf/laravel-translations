@@ -1,24 +1,21 @@
 <?php
 
-namespace Outhebox\LaravelTranslations;
+namespace Outhebox\TranslationsUI;
 
 use Brick\VarExporter\ExportException;
 use Brick\VarExporter\VarExporter;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Outhebox\LaravelTranslations\Models\Translation;
+use Outhebox\TranslationsUI\Models\Translation;
+use SplFileInfo;
 
 class TranslationsManager
 {
-    private array $translations = [];
-
-    protected Filesystem $filesystem;
-
-    public function __construct(Filesystem $filesystem)
-    {
-        $this->filesystem = $filesystem;
+    public function __construct(
+        protected Filesystem $filesystem,
+        private array $translations = []
+    ) {
     }
 
     public function getLocales(): array
@@ -43,6 +40,7 @@ class TranslationsManager
         }
 
         collect($this->filesystem->allFiles(lang_path($local)))
+            ->merge(collect($this->filesystem->glob(lang_path()."/$local.*"))->map(fn ($file) => new SplFileInfo($file)))
             ->filter(function ($file) {
                 return ! in_array($file->getFilename(), config('translations.exclude_files'));
             })
@@ -71,7 +69,7 @@ class TranslationsManager
         $translations = Translation::with('phrases')->get();
 
         foreach ($translations as $translation) {
-            $phrasesTree = $this->buildPhrasesTree($translation->phrases()->with('file')->whereNotNull('value')->get(), $translation->language->code);
+            $phrasesTree = buildPhrasesTree($translation->phrases()->with('file')->whereNotNull('value')->get(), $translation->language->code);
 
             foreach ($phrasesTree as $locale => $groups) {
                 foreach ($groups as $file => $phrases) {
@@ -99,27 +97,5 @@ class TranslationsManager
                 }
             }
         }
-    }
-
-    protected function buildPhrasesTree($phrases, $locale): array
-    {
-        $tree = [];
-
-        foreach ($phrases as $phrase) {
-            Arr::set($tree[$locale][$phrase->file->file_name], $phrase->key, $phrase->value);
-        }
-
-        return $tree;
-    }
-
-    public function getPhraseParameters(string $phrase): ?array
-    {
-        preg_match_all('/(?<!\w):(\w+)/', $phrase, $matches);
-
-        if (empty($matches[1])) {
-            return null;
-        }
-
-        return $matches[1];
     }
 }

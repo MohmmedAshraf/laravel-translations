@@ -1,10 +1,10 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Http\Resources;
+namespace Outhebox\TranslationsUI\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Outhebox\LaravelTranslations\Models\Phrase;
+use Outhebox\TranslationsUI\Models\Phrase;
 
 /** @mixin Phrase */
 class PhraseResource extends JsonResource
@@ -23,12 +23,18 @@ class PhraseResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'state' => (bool) $this->value,
+            'note' => (bool) $this->note,
+            'status' => [
+                'value' => $this->status->value,
+                'label' => $this->status->label(),
+            ],
             'value_html' => $this->splitParameters(),
             'translation_id' => $this->translation_id,
             'translation_file_id' => $this->translation_file_id,
             'phrase_id' => $this->phrase_id,
-            'source' => PhraseResource::make($this->whenLoaded('source')),
+            'file' => TranslationFileResource::make($this->whenLoaded('file')),
             'translation' => TranslationResource::make($this->whenLoaded('translation')),
+            'source' => PhraseResource::make($this->whenLoaded('source')),
         ];
     }
 

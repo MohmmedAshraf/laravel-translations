@@ -5,32 +5,32 @@ import { TransitionRoot, TransitionChild, Dialog, DialogPanel, DialogTitle } fro
 
 const props = withDefaults(
     defineProps<{
-        size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
-        closeable?: boolean;
+        size?: "sm" | "md" | "lg" | "xl" | "2xl"
+        closeable?: boolean
     }>(),
     {
-        size: 'lg',
+        size: "lg",
         closeable: true,
-    }
-);
+    },
+)
 
 const { show, close, redirect } = useModal()
 
 const closeDialog = () => {
     if (props.closeable) {
-        close();
+        close()
     }
-};
+}
 
 const maxWidthClass = computed(() => {
     return {
-        sm: 'sm:max-w-sm',
-        md: 'sm:max-w-md',
-        lg: 'sm:max-w-lg',
-        xl: 'sm:max-w-xl',
-        '2xl': 'sm:max-w-2xl',
-    }[props.size];
-});
+        sm: "sm:max-w-sm",
+        md: "sm:max-w-md",
+        lg: "sm:max-w-lg",
+        xl: "sm:max-w-xl",
+        "2xl": "sm:max-w-2xl",
+    }[props.size]
+})
 </script>
 
 <template>
@@ -50,9 +50,7 @@ const maxWidthClass = computed(() => {
                                         <div class="border-b px-4 py-6 sm:px-6 sm:py-8">
                                             <div class="flex items-start justify-between">
                                                 <DialogTitle class="text-lg font-semibold text-gray-900">
-                                                    <slot name="title">
-                                                        Panel title
-                                                    </slot>
+                                                    <slot name="title"> Panel title </slot>
                                                 </DialogTitle>
 
                                                 <div class="ml-3 flex h-7 items-center">
@@ -74,9 +72,7 @@ const maxWidthClass = computed(() => {
 
                                     <div class="shrink-0 bg-gray-100 px-4 py-6 sm:px-6 sm:py-8">
                                         <div class="flex justify-between gap-6">
-                                            <baseButton type="button" size="lg" class="btn btn-secondary-darker !text-sm" @click="close">
-                                                Cancel
-                                            </baseButton>
+                                            <baseButton type="button" size="lg" class="btn btn-secondary-darker !text-sm" @click="close"> Cancel </baseButton>
 
                                             <slot name="slideover_submit" />
                                         </div>

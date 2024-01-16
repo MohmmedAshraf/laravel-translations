@@ -1,6 +1,6 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Http\Controllers\Auth;
+namespace Outhebox\TranslationsUI\Http\Controllers\Auth;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -9,16 +9,24 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
-use Outhebox\LaravelTranslations\Models\Contributor;
+use Outhebox\TranslationsUI\Models\Contributor;
 use Throwable;
 
 class NewPasswordController extends Controller
 {
-    public function create(Request $request): Response
+    public function create(string $token): Response
     {
+        $token = decrypt($token);
+
+        [$id, $token] = explode('|', $token);
+
+        if (! $user = Contributor::where('id', $id)->first()) {
+            abort(404);
+        }
+
         return Inertia::render('auth/reset-password', [
-            'email' => $request->email,
-            'token' => $request->route('token'),
+            'token' => $token,
+            'email' => $user->email,
         ]);
     }
 
@@ -31,14 +39,14 @@ class NewPasswordController extends Controller
         ]);
 
         try {
-            [$id, $token] = explode('|', decrypt($request->token));
+            [$id, $token] = explode('|', decrypt($request->input('token')));
 
             $user = Contributor::findOrFail($id);
 
             // Here we will attempt to reset the user's password. If it is successful we
             // will update the password on an actual user model and persist it to the
             // database. Otherwise we will parse the error and return the response.
-            $user->password = Hash::make($request->password);
+            $user->password = Hash::make($request->input('password'));
 
             $user->setRememberToken(Str::random(60));
 

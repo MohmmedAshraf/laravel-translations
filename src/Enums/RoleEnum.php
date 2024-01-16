@@ -1,21 +1,36 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Enums;
+namespace Outhebox\TranslationsUI\Enums;
 
 enum RoleEnum: int
 {
     case owner = 1;
-    case reviewer = 2;
-    case translator = 3;
-    case translator_manager = 4;
+    case translator = 2;
 
     public function label(): string
     {
         return match ($this) {
             self::owner => 'Owner',
-            self::reviewer => 'Reviewer',
             self::translator => 'Translator',
-            self::translator_manager => 'Translator Manager',
         };
+    }
+
+    public function description(): string
+    {
+        return match ($this) {
+            self::owner => 'Full access to everything',
+            self::translator => 'Can translate phrases for a language or multiple languages',
+        };
+    }
+
+    public static function toSelectArray(): array
+    {
+        return collect(self::cases())->map(function (RoleEnum $role) {
+            return [
+                'value' => $role->value,
+                'label' => $role->label(),
+                'description' => $role->description(),
+            ];
+        })->toArray();
     }
 }

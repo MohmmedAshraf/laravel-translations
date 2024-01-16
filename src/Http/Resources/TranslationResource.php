@@ -1,11 +1,15 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Http\Resources;
+namespace Outhebox\TranslationsUI\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use Outhebox\LaravelTranslations\Models\Translation;
+use Outhebox\TranslationsUI\Models\Translation;
 
-/** @mixin Translation */
+/**
+ * @mixin Translation
+ *
+ * @property mixed $progress
+ */
 class TranslationResource extends JsonResource
 {
     public static $wrap = null;
@@ -18,8 +22,17 @@ class TranslationResource extends JsonResource
             'source' => $this->source,
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
-            'progress' => $this->progress,
+            'progress' => $this->formatProgress(),
             'phrases_count' => $this->phrases_count,
         ];
+    }
+
+    private function formatProgress(): string
+    {
+        if ($this->progress > 0) {
+            return "{$this->progress}%";
+        }
+
+        return '0%';
     }
 }

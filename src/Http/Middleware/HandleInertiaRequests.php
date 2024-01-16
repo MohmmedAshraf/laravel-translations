@@ -1,21 +1,16 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Http\Middleware;
+namespace Outhebox\TranslationsUI\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Middleware;
-use Outhebox\LaravelTranslations\Concerns\UsesAuth;
-use Outhebox\LaravelTranslations\Data\Shared\SharedData;
-use Outhebox\LaravelTranslations\Data\Shared\UserData;
-use Outhebox\LaravelTranslations\Http\Resources\ContributorResource;
-use Outhebox\LaravelTranslations\Models\Contributor;
+use Outhebox\TranslationsUI\Http\Resources\ContributorResource;
+use Outhebox\TranslationsUI\Models\Contributor;
 use Tightenco\Ziggy\Ziggy;
 
 class HandleInertiaRequests extends Middleware
 {
-    use UsesAuth;
-
     protected $rootView = 'translations::app';
 
     public function version(Request $request): bool|string|null
@@ -29,31 +24,28 @@ class HandleInertiaRequests extends Middleware
 
     public function share(Request $request): array
     {
-        $state = new SharedData(
-            user: fn () => Auth::check() ? UserData::from(Auth::user()) : null,
-        );
-
-        return array_merge(parent::share($request), $state->toArray(), [
+        return array_merge(parent::share($request), [
+            'auth' => $this->auth(),
             'ziggy' => function () use ($request) {
                 return array_merge((new Ziggy)->toArray(), [
                     'location' => $request->url(),
                 ]);
             },
+            'notification' => fn () => $request->session()->get('notification'),
+            'status' => fn () => $request->session()->get('status'),
         ]);
     }
 
     protected function auth(): array
     {
-        if (! self::getAuthGuard()->check()) {
+        if (! Auth::guard('translations')->check()) {
             return [
                 'user' => null,
             ];
         }
 
-        $user = self::getAuthGuard()->user();
+        $user = Auth::guard('translations')->user();
 
-        // If `Auth Middleware` was not resolved first
-        // return empty auth
         if (! $user instanceof Contributor) {
             return [];
         }

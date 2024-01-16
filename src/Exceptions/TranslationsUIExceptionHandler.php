@@ -1,6 +1,6 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Exceptions;
+namespace Outhebox\TranslationsUI\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\JsonResponse;

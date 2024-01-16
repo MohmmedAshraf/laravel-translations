@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import twemoji from 'twemoji';
-import { onMounted, ref } from 'vue';
-import countryCodeEmoji from "country-code-emoji";
+import twemoji from "twemoji"
+import { onMounted, ref } from "vue"
+import countryCodeEmoji from "country-code-emoji"
 
 const mapLanguageToCountry = {
     af: "ZA",
@@ -22,7 +22,7 @@ const mapLanguageToCountry = {
     ca: "ES",
     ceb: "PH",
     zh: "CN",
-    'zh-TW': "CN",
+    "zh-TW": "CN",
     co: "MF",
     hr: "HR",
     cs: "CZ",
@@ -80,7 +80,7 @@ const mapLanguageToCountry = {
     fa: "IR",
     pl: "PL",
     pt: "PT",
-    'pt-br': "BR",
+    "pt-br": "BR",
     pa: "IN",
     ro: "RO",
     ru: "RU",
@@ -115,42 +115,41 @@ const mapLanguageToCountry = {
     sa: "IN",
     sat: "IN",
     zu: "ZA",
-};
+}
 
 const props = defineProps({
     countryCode: {
         type: String,
-        default: '',
+        default: "",
     },
     width: {
         type: String,
-        default: 'w-5',
+        default: "w-5",
     },
-});
+})
 
 const normalizedCode = computed(() => {
-    const noScriptCode = props.countryCode.split('#')[0];
-    const [lang, country] = noScriptCode.split('_');
+    const noScriptCode = props.countryCode.split("#")[0]
+    const [lang, country] = noScriptCode.split("_")
 
-    return country || (mapLanguageToCountry as Record<string, string>)[props.countryCode] || (mapLanguageToCountry as Record<string, string>)[lang] || '';
-});
+    return country || (mapLanguageToCountry as Record<string, string>)[props.countryCode] || (mapLanguageToCountry as Record<string, string>)[lang] || ""
+})
 
 const countryFlag = computed(() => {
     try {
-        return countryCodeEmoji(normalizedCode.value);
+        return countryCodeEmoji(normalizedCode.value)
     } catch (e) {
-        return '🗺️';
+        return "🗺️"
     }
-});
+})
 
-const emojiAlt = ref('');
+const emojiAlt = ref("")
 
 onMounted(() => {
-    emojiAlt.value = twemoji.parse(countryFlag.value, { folder: 'svg', ext: '.svg', className: props.width });
-});
+    emojiAlt.value = twemoji.parse(countryFlag.value, { folder: "svg", ext: ".svg", className: props.width })
+})
 </script>
 
 <template>
-     <div v-html="emojiAlt"></div>
+    <div v-html="emojiAlt"></div>
 </template>
-

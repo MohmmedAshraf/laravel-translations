@@ -1,6 +1,6 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Http\Controllers\Auth;
+namespace Outhebox\TranslationsUI\Http\Controllers\Auth;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -9,8 +9,8 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
-use Outhebox\LaravelTranslations\Mail\ResetPassword;
-use Outhebox\LaravelTranslations\Models\Contributor;
+use Outhebox\TranslationsUI\Mail\ResetPassword;
+use Outhebox\TranslationsUI\Models\Contributor;
 
 class PasswordResetLinkController extends Controller
 {
@@ -22,7 +22,7 @@ class PasswordResetLinkController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'email' => 'required|email|exists:lts_contributors,email',
+            'email' => 'required|email|exists:ltu_contributors,email',
         ]);
 
         $token = Str::random();

@@ -1,9 +1,9 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Http\Resources;
+namespace Outhebox\TranslationsUI\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use Outhebox\LaravelTranslations\Models\Contributor;
+use Outhebox\TranslationsUI\Models\Contributor;
 
 /** @mixin Contributor */
 class ContributorResource extends JsonResource
@@ -15,7 +15,10 @@ class ContributorResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'role' => $this->role,
+            'role' => [
+                'value' => $this->role->value,
+                'label' => $this->role->label(),
+            ],
             'email' => $this->email,
             'avatar' => $this->avatar,
             'created_at' => $this->created_at,

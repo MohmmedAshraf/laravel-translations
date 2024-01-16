@@ -1,21 +1,28 @@
-import { TYPE as NotificationType, useToast } from "vue-toastification"
 import "vue-toastification/dist/index.css"
+import { Notification } from "../types"
+import { POSITION, TYPE as NotificationType, useToast } from "vue-toastification"
 
 const toast = useToast()
 
-export type Type = 'success' | 'error' | 'warning' | 'info' | 'default';
-
-export type NotificationData = {
-    type: Type
-    body: string
-}
-
 export const notifications = () => {
     router.on("finish", () => {
-        const notification = usePage().props.notification as NotificationData | null
+        const notification = usePage().props.notification as Notification | null
 
         if (notification) {
-            toast(notification.body, { type: notification.type as NotificationType })
+            toast(notification.body, {
+                position: POSITION.BOTTOM_CENTER,
+                type: notification.type as NotificationType,
+                timeout: 5000,
+                closeOnClick: true,
+                pauseOnFocusLoss: true,
+                pauseOnHover: true,
+                draggable: true,
+                draggablePercent: 0.6,
+                showCloseButtonOnHover: false,
+                hideProgressBar: true,
+                closeButton: "button",
+                icon: true,
+            })
         }
     })
 }

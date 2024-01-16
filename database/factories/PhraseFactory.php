@@ -1,11 +1,11 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Database\Factories;
+namespace Outhebox\TranslationsUI\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Outhebox\LaravelTranslations\Models\Phrase;
-use Outhebox\LaravelTranslations\Models\Translation;
-use Outhebox\LaravelTranslations\Models\TranslationFile;
+use Outhebox\TranslationsUI\Models\Phrase;
+use Outhebox\TranslationsUI\Models\Translation;
+use Outhebox\TranslationsUI\Models\TranslationFile;
 
 class PhraseFactory extends Factory
 {
@@ -15,7 +15,6 @@ class PhraseFactory extends Factory
     {
         return [
             'uuid' => $this->faker->uuid(),
-            'phrase_id' => Phrase::factory(),
             'key' => $this->faker->unique()->word(),
             'translation_id' => Translation::factory(),
             'translation_file_id' => TranslationFile::factory(),
@@ -32,6 +31,13 @@ class PhraseFactory extends Factory
                 'param1' => $this->faker->word(),
                 'param2' => $this->faker->word(),
             ],
+        ]);
+    }
+
+    public function withSource(): self
+    {
+        return $this->state([
+            'phrase_id' => Phrase::factory(),
         ]);
     }
 }

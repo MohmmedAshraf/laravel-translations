@@ -1,25 +1,20 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Models;
+namespace Outhebox\TranslationsUI\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Outhebox\LaravelTranslations\Enums\RoleEnum;
+use Outhebox\TranslationsUI\Enums\RoleEnum;
+use Outhebox\TranslationsUI\Traits\HasDatabaseConnection;
 
 class Contributor extends Authenticatable
 {
+    use HasDatabaseConnection;
     use HasFactory;
     use Notifiable;
 
     protected $guarded = [];
-
-    protected $primaryKey = 'id';
-
-    protected $keyType = 'string';
-
-    public $incrementing = false;
 
     protected $table = 'ltu_contributors';
 
@@ -31,9 +26,4 @@ class Contributor extends Authenticatable
     protected $casts = [
         'role' => RoleEnum::class,
     ];
-
-    public function languages(): BelongsToMany
-    {
-        return $this->belongsToMany(Language::class, 'ltu_contributor_languages', 'contributor_id', 'language_id');
-    }
 }

@@ -1,9 +1,9 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Http\Resources;
+namespace Outhebox\TranslationsUI\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use Outhebox\LaravelTranslations\Models\Language;
+use Outhebox\TranslationsUI\Models\Language;
 
 /** @mixin Language */
 class LanguageResource extends JsonResource

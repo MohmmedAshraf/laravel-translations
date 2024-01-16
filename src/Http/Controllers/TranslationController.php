@@ -1,6 +1,6 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Http\Controllers;
+namespace Outhebox\TranslationsUI\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -8,32 +8,33 @@ use Illuminate\Routing\Controller as BaseController;
 use Inertia\Inertia;
 use Inertia\Response;
 use Momentum\Modal\Modal;
-use Outhebox\LaravelTranslations\Http\Resources\LanguageResource;
-use Outhebox\LaravelTranslations\Http\Resources\TranslationResource;
-use Outhebox\LaravelTranslations\Models\Language;
-use Outhebox\LaravelTranslations\Models\Translation;
+use Outhebox\TranslationsUI\Actions\CreateTranslationForLanguageAction;
+use Outhebox\TranslationsUI\Http\Resources\LanguageResource;
+use Outhebox\TranslationsUI\Http\Resources\TranslationResource;
+use Outhebox\TranslationsUI\Models\Language;
+use Outhebox\TranslationsUI\Models\Translation;
+use Outhebox\TranslationsUI\TranslationsManager;
 
 class TranslationController extends BaseController
 {
-    public function index(Request $request): Response
+    public function export(): void
     {
-        $source_language = Translation::where('source', true)->withCount('phrases')->first();
+        app(TranslationsManager::class)->export();
+    }
 
-        $translations_languages = Translation::orderByDesc('source')
-            ->whereKeyNot($source_language?->id)
-            ->when($request->has('search'), function ($query) use ($request) {
-                $query->whereHas('language', function ($query) use ($request) {
-                    $query->where(function ($query) use ($request) {
-                        $query->where('name', 'like', "%{$request->input('search')}%")
-                            ->orWhere('code', 'like', "%{$request->input('search')}%");
-                    });
-                });
-            })
+    public function index(): Response
+    {
+        $translations = Translation::with('language')
+            ->withCount('phrases')
+            ->withProgress()
             ->get();
 
-        return Inertia::render('index', [
-            'source_language' => TranslationResource::make($source_language),
-            'languages' => TranslationResource::collection($translations_languages),
+        $allTranslations = $translations->where('source', false);
+        $sourceTranslation = $translations->firstWhere('source', true);
+
+        return Inertia::render('translations/index', [
+            'translations' => TranslationResource::collection($allTranslations),
+            'source_translation' => $sourceTranslation ? TranslationResource::make($sourceTranslation) : null,
         ]);
     }
 
@@ -47,7 +48,7 @@ class TranslationController extends BaseController
     {
         return Inertia::modal('translations/modals/add-translation', [
             'languages' => LanguageResource::collection(
-                Language::whereNotIn('id', Translation::all()->pluck('language_id')->toArray())->get()
+                Language::whereNotIn('id', Translation::pluck('language_id')->toArray())->get()
             )->toArray(request()),
         ])->baseRoute('ltu.translation.index');
     }
@@ -58,35 +59,46 @@ class TranslationController extends BaseController
             'languages' => 'required|array',
         ]);
 
-        $languages = Language::whereIn('id', $request->input('languages'))->get();
+        $selectedLanguageIds = $request->input('languages');
+        $languages = Language::whereIn('id', $selectedLanguageIds)->get();
 
         foreach ($languages as $language) {
-            $translation = Translation::create([
-                'source' => false,
-                'language_id' => $language->id,
-            ]);
-
-            $sourceTranslation = Translation::where('source', true)->first();
-
-            foreach ($sourceTranslation->phrases()->with('file')->get() as $sourcePhrase) {
-                $translation->phrases()->create([
-                    'value' => null,
-                    'key' => $sourcePhrase->key,
-                    'group' => $sourcePhrase->group,
-                    'phrase_id' => $sourcePhrase->id,
-                    'parameters' => $sourcePhrase->parameters,
-                    'translation_file_id' => $sourcePhrase->file->id,
-                ]);
-            }
+            CreateTranslationForLanguageAction::execute($language);
         }
 
-        return redirect()->route('ltu.translation.index');
+        return redirect()->route('ltu.translation.index')->with('notification', [
+            'type' => 'success',
+            'body' => 'Translations have been added successfully',
+        ]);
+
     }
 
     public function destroy(Translation $translation): RedirectResponse
     {
         $translation->delete();
 
-        return redirect()->route('ltu.translation.index');
+        return redirect()->route('ltu.translation.index')->with('notification', [
+            'type' => 'success',
+            'body' => 'Translation has been deleted successfully',
+        ]);
+    }
+
+    public function destroy_multiple(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'selected_ids' => 'required|array',
+        ]);
+
+        $selectedTranslationIds = $request->input('selected_ids');
+        $translations = Translation::whereIn('id', $selectedTranslationIds)->get();
+
+        foreach ($translations as $translation) {
+            $translation->delete();
+        }
+
+        return redirect()->route('ltu.translation.index')->with('notification', [
+            'type' => 'success',
+            'body' => 'Selected translations have been deleted successfully',
+        ]);
     }
 }

@@ -27,6 +27,8 @@
         "illuminate/contracts": "^9.28|^10.0",
         "inertiajs/inertia-laravel": "^0.6.11",
         "spatie/laravel-package-tools": "^1.0",
+        "spatie/laravel-query-builder": "^5.7",
+        "stichoza/google-translate-php": "^5.1",
         "tightenco/ziggy": "^1.8"
     },
     "require-dev": {
@@ -34,8 +36,6 @@
         "nunomaduro/collision": "^7.0",
         "orchestra/testbench": "^8.0",
         "pestphp/pest": "^2.18",
-        "pestphp/pest-plugin-laravel": "^2.2",
-        "pestphp/pest-plugin-faker": "^2.0",
         "phpstan/extension-installer": "^1.1",
         "phpstan/phpstan-deprecation-rules": "^1.0",
         "phpstan/phpstan-phpunit": "^1.0",
@@ -43,9 +43,9 @@
     },
     "autoload": {
         "psr-4": {
-            "Outhebox\\LaravelTranslations\\": "src",
-            "Outhebox\\LaravelTranslations\\Database\\Factories\\": "database/factories",
-            "Outhebox\\LaravelTranslations\\Database\\Seeders\\": "database/seeders"
+            "Outhebox\\TranslationsUI\\": "src",
+            "Outhebox\\TranslationsUI\\Database\\Factories\\": "database/factories",
+            "Outhebox\\TranslationsUI\\Database\\Seeders\\": "database/seeders"
         },
         "files": [
             "src/helpers.php"
@@ -53,7 +53,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Outhebox\\LaravelTranslations\\Tests\\": "tests"
+            "Outhebox\\TranslationsUI\\Tests\\": "tests"
         }
     },
     "scripts": {
@@ -73,10 +73,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Outhebox\\LaravelTranslations\\LaravelTranslationsServiceProvider"
+                "Outhebox\\TranslationsUI\\TranslationsUIServiceProvider"
             ],
             "aliases": {
-                "LaravelTranslations": "Outhebox\\LaravelTranslations\\Facades\\LaravelTranslations"
+                "TranslationsUI": "Outhebox\\TranslationsUI\\Facades\\TranslationsUI"
             }
         }
     },

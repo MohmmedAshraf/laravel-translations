@@ -7,7 +7,7 @@
 }
 
 .vs__dropdown-toggle {
-    @apply p-2 rounded-md border-gray-300 shadow-sm placeholder:text-sm placeholder:text-gray-400 #{!important};
+    @apply px-2 py-1.5 rounded-md border-gray-300 shadow-sm placeholder:text-sm placeholder:text-gray-400 #{!important};
 }
 
 .vs__selected-options {
@@ -18,12 +18,18 @@
     @apply mt-0.5 rounded-md shadow-lg #{!important};
 }
 
-.vs--open .vs__dropdown-toggle {
-    @apply bg-blue-50 text-blue-600 border-blue-400 #{!important};
+.vs--open {
+    .vs__dropdown-toggle {
+        @apply bg-blue-50 text-blue-600 border-blue-400 #{!important};
+    }
+
+    .vs__actions > svg {
+        @apply fill-blue-600 #{!important};
+    }
 }
 
-.vs--open .vs__actions > svg {
-    @apply fill-blue-600 #{!important};
+.vs__actions {
+    @apply px-1 py-2 #{!important};
 }
 
 .vs__dropdown-option {

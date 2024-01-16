@@ -23,13 +23,9 @@ const { close } = useModal()
         </div>
 
         <div class="mt-6 gap-4 sm:ml-10 sm:mt-4 sm:flex sm:pl-4">
-            <BaseButton variant="danger" type="button" size="sm">
-                Deactivate
-            </BaseButton>
+            <BaseButton variant="danger" type="button" size="sm"> Deactivate </BaseButton>
 
-            <BaseButton variant="secondary" type="button" size="sm" @click="close">
-                Cancel
-            </BaseButton>
+            <BaseButton variant="secondary" type="button" size="sm" @click="close"> Cancel </BaseButton>
         </div>
     </Dialog>
 </template>

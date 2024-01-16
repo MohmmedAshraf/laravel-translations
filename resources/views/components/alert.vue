@@ -1,11 +1,14 @@
 <script lang="ts" setup>
 import { CheckCircleIcon, ExclamationCircleIcon, InformationCircleIcon, XCircleIcon } from "@heroicons/vue/20/solid"
 
-const props = withDefaults(defineProps<{
-    variant?: "info" | "success" | "warning" | "error"
-}>(), {
-    variant: "info",
-})
+const props = withDefaults(
+    defineProps<{
+        variant?: "info" | "success" | "warning" | "error"
+    }>(),
+    {
+        variant: "info",
+    },
+)
 
 const variantClass = computed(() => {
     return {
@@ -36,13 +39,13 @@ const icon = computed(() => {
 </script>
 
 <template>
-    <div class="rounded-md p-4" :class="[variantClass]">
-        <div class="flex">
-            <div class="shrink-0">
-                <component :is="icon" class="h-5 w-5" :class="iconClasses" aria-hidden="true" />
+    <div class="rounded-md px-2 py-2.5" :class="[variantClass]">
+        <div class="flex items-start gap-2">
+            <div class="mt-0.5 shrink-0">
+                <component :is="icon" class="h-4 w-4" :class="iconClasses" aria-hidden="true" />
             </div>
 
-            <div class="ml-3 flex-1 md:flex md:justify-between">
+            <div class="flex-1 md:flex md:justify-between">
                 <p class="text-sm">
                     <slot />
                 </p>

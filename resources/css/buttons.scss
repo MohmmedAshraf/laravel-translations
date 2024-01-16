@@ -1,5 +1,5 @@
 .btn {
-    @apply relative inline-flex items-center justify-center overflow-hidden rounded-lg border font-semibold shadow-sm;
+    @apply relative inline-flex items-center justify-center overflow-hidden rounded-lg border font-semibold;
 
     &:disabled {
         @apply opacity-50 cursor-not-allowed;
@@ -22,7 +22,7 @@
     }
 
     &.btn-lg {
-        @apply gap-x-2 px-8 py-2.5 text-base;
+        @apply gap-x-2 px-8 py-2.5 text-sm;
     }
 
     &.btn-xl {

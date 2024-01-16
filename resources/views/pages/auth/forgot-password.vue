@@ -1,69 +1,47 @@
 <script setup lang="ts">
 defineProps<{
-    status?: string;
-}>();
+    status?: string
+}>()
 
 const form = useForm({
-    email: '',
-});
+    email: "",
+})
 
 const submit = () => {
-    form.post(route('ltu.password.email'));
-};
+    form.post(route("ltu.password.email"), {
+        onFinish: () => {
+            form.reset()
+        },
+    })
+}
 </script>
 
 <template>
     <LayoutGuest>
-        <Head title="Forgot Password" />
+        <Head title="Reset your password" />
 
-        <template #title> Forgot Password </template>
+        <template #title> Reset your password </template>
 
-        <template #subtitle>
-            Enter your email address below, and we'll send you instructions on how to reset your password.
-        </template>
+        <template #subtitle> Enter your email address below, and we'll send you instructions on how to reset your password. </template>
 
-        <div v-if="status" class="mb-4 text-sm font-medium text-green-600">
+        <Alert variant="success" v-if="status" class="mb-4 w-full">
             {{ status }}
-        </div>
+        </Alert>
 
         <form class="space-y-6" @submit.prevent="submit">
             <div class="space-y-1">
-                <InputLabel for="email" value="Email" />
+                <InputLabel for="email" value="Email" class="sr-only" />
 
-                <InputText
-                    id="email"
-                    v-model="form.email"
-                    :error="form.errors.email"
-                    type="email"
-                    required
-                    autofocus
-                    autocomplete="username"
-                />
+                <InputText id="email" v-model="form.email" :error="form.errors.email" type="email" required autofocus autocomplete="username" placeholder="Email address" class="bg-gray-50" />
 
                 <InputError :message="form.errors.email" />
             </div>
 
-            <BaseButton type="submit" variant="primary" :is-loading="form.processing" full-width>
-                Send Instructions
-            </BaseButton>
+            <BaseButton type="submit" variant="secondary" :is-loading="form.processing" full-width> Send reset instructions </BaseButton>
         </form>
 
-        <div class="mt-10">
-            <div class="relative">
-                <div class="absolute inset-0 flex items-center" aria-hidden="true">
-                    <div class="w-full border-t border-gray-200" />
-                </div>
-
-                <div class="relative flex justify-center text-sm font-medium leading-6">
-                    <span class="bg-white px-6 text-gray-900">Or</span>
-                </div>
-            </div>
-
-            <div class="mt-6 grid grid-cols-1 gap-4">
-                <Link :href="route('ltu.login')" class="btn btn-lg border border-slate-200 text-gray-700 transition duration-150 hover:border-gray-400 hover:text-gray-900 hover:shadow">
-                    <span>Go back to sign in</span>
-                </Link>
-            </div>
+        <div class="mt-8 flex w-full justify-center">
+            <Link :href="route('ltu.login')" class="text-xs font-medium text-gray-500 hover:text-blue-500"> Go back to sign in </Link>
         </div>
     </LayoutGuest>
 </template>

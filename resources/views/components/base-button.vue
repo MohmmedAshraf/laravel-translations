@@ -2,27 +2,30 @@
 import useButtonSize from "@/scripts/composables/use-button-size"
 import useButtonVariant from "@/scripts/composables/use-button-variant"
 
-const props = withDefaults(defineProps<{
-    size?: "xs" | "sm" | "md" | "lg"
-    type?: "button" | "submit" | "reset"
-    variant?: "primary" | "secondary" | "success" | "danger" | "warning"
-    fullWidth?: boolean
-    isLoading?: boolean
-}>(), {
-    size: "lg",
-    type: "button",
-    variant: "primary",
-    fullWidth: false,
-    isLoading: false,
-})
+const props = withDefaults(
+    defineProps<{
+        size?: "xs" | "sm" | "md" | "lg"
+        type?: "button" | "submit" | "reset"
+        variant?: "primary" | "secondary" | "success" | "danger" | "warning"
+        fullWidth?: boolean
+        isLoading?: boolean
+    }>(),
+    {
+        size: "lg",
+        type: "button",
+        variant: "primary",
+        fullWidth: false,
+        isLoading: false,
+    },
+)
 
 const { sizeClass } = useButtonSize(props.size)
 const { variantClass } = useButtonVariant(props.variant)
 </script>
 
 <template>
-    <button :type="type" class="btn" :class="[sizeClass, variantClass, {'w-full': fullWidth}]" :disabled="isLoading">
-        <span class="flex gap-1" :class="{'opacity-0': isLoading}">
+    <button :type="type" class="btn" :class="[sizeClass, variantClass, { 'w-full': fullWidth }]" :disabled="isLoading">
+        <span class="flex gap-1" :class="{ 'opacity-0': isLoading }">
             <slot />
         </span>
 

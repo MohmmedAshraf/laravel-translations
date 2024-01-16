@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
 
 if (! function_exists('translationsUIAssets')) {
@@ -35,5 +36,31 @@ if (! function_exists('translationsUIAssets')) {
                 <link rel="stylesheet" href="/vendor/translations-ui/{$manifest['resources/scripts/app.ts']['css'][0]}">
             HTML
         );
+    }
+}
+
+if (! function_exists('getPhraseParameters')) {
+    function getPhraseParameters(string $phrase): ?array
+    {
+        preg_match_all('/(?<!\w):(\w+)/', $phrase, $matches);
+
+        if (empty($matches[1])) {
+            return null;
+        }
+
+        return $matches[1];
+    }
+}
+
+if (! function_exists('buildPhrasesTree')) {
+    function buildPhrasesTree($phrases, $locale): array
+    {
+        $tree = [];
+
+        foreach ($phrases as $phrase) {
+            Arr::set($tree[$locale][$phrase->file->file_name], $phrase->key, $phrase->value);
+        }
+
+        return $tree;
     }
 }
