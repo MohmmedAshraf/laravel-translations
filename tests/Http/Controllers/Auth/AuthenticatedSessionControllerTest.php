@@ -18,7 +18,8 @@ class AuthenticatedSessionControllerTest extends TestCase
 
     }
 
-    public function test_login_request_will_validate_email(): void
+    /** @test */
+    public function login_request_will_validate_email(): void
     {
         $response = $this->post(route('ltu.login.attempt'), [
             'email' => 'not-an-email',
@@ -28,7 +29,8 @@ class AuthenticatedSessionControllerTest extends TestCase
         $this->assertInstanceOf(ValidationException::class, $response->exception);
     }
 
-    public function test_login_request_will_validate_password(): void
+    /** @test */
+    public function login_request_will_validate_password(): void
     {
         $response = $this->post(route('ltu.login.attempt'), [
             'email' => $this->owner->email,
@@ -38,7 +40,8 @@ class AuthenticatedSessionControllerTest extends TestCase
         $this->assertInstanceOf(ValidationException::class, $response->exception);
     }
 
-    public function test_login_request_will_authenticate_user(): void
+    /** @test */
+    public function login_request_will_authenticate_user(): void
     {
         $this->withoutExceptionHandling();
 
@@ -53,14 +56,16 @@ class AuthenticatedSessionControllerTest extends TestCase
         ])->assertRedirect(route('ltu.translation.index'));
     }
 
-    public function test_authenticated_users_can_access_dashboard(): void
+    /** @test */
+    public function authenticated_users_can_access_dashboard(): void
     {
         $this->actingAs($this->owner, 'translations')
             ->get(route('ltu.login'))
             ->assertRedirect(route('ltu.translation.index'));
     }
 
-    public function test_authenticated_users_can_logout(): void
+    /** @test */
+    public function authenticated_users_can_logout(): void
     {
         $this->actingAs($this->owner, 'translations')
             ->get(route('ltu.logout'))

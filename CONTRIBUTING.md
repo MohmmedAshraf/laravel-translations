@@ -33,6 +33,10 @@ Once finished, proceed to install Node dependencies. Run the command:
 ```shell
 npm install
 ```
+or
+```shell
+yarn install
+```
 
 ### 📌 Step 3
 
@@ -46,7 +50,7 @@ git checkout -b feature/feature-name
 
 Now, you can work on this newly created branch.
 
-> 💡 Tip: While developing, you may run the command `npm run watch` to automatically rebuild any CSS and JavaScript files.
+> 💡 Tip: While developing, you may run the command `vite` to automatically rebuild any CSS and JavaScript files.
 
 
 ### 📌 Step 4
@@ -71,11 +75,9 @@ In your Laravel application, modify the `composer.json` adding a `repositories` 
 
 This will instruct composer to install Laravel Translations UI from your local folder instead of using the version on the official repository.
 
-Example:
+Example: `composer.json`
 
 ```json
-// File: composer.json
-
 {
     "require": {
         "outhebox/laravel-translations": "*"
@@ -98,7 +100,7 @@ If you changed any CSS or JavaScript files, you must build the assets for produc
 Run the command:
 
 ```shell
-npm run production
+vite build
 ```
 
 ### 📌 Step 7

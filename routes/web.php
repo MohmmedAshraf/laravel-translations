@@ -45,8 +45,14 @@ Route::middleware([
             Route::get('/', [SourceTranslationController::class, 'index'])->name('source_translation');
             Route::post('import', [SourceTranslationController::class, 'import'])->name('source_translation.import');
             Route::get('create', [SourceTranslationController::class, 'create'])->name('source_translation.add_source_key');
-            Route::get('/{phrase:uuid}', [SourceTranslationController::class, 'edit'])->name('source_translation.edit');
-            Route::post('/{phrase:uuid}', [SourceTranslationController::class, 'update'])->name('source_translation.update');
+            Route::post('create', [SourceTranslationController::class, 'store'])->name('source_translation.store');
+            Route::post('delete-phrases', [SourceTranslationController::class, 'destroy_multiple'])->name('source_translation.delete_phrases');
+
+            Route::prefix('{phrase:uuid}')->group(function () {
+                Route::get('/', [SourceTranslationController::class, 'edit'])->name('source_translation.edit');
+                Route::post('/', [SourceTranslationController::class, 'update'])->name('source_translation.update');
+                Route::delete('delete', [SourceTranslationController::class, 'destroy'])->name('source_translation.delete_phrase');
+            });
         });
 
         Route::prefix('phrases')->group(function () {
@@ -72,8 +78,8 @@ Route::middleware([
             Route::delete('{contributor}/delete', [ContributorController::class, 'destroy'])->name('contributors.delete');
         });
 
-        Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-        Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+        Route::get('profile', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::patch('profile', [ProfileController::class, 'update'])->name('profile.update');
         Route::put('password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
     });
 });

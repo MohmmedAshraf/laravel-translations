@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { ref } from "vue"
+import { ref, computed } from "vue"
 import { XCircleIcon } from "@heroicons/vue/20/solid"
-import { SourcePhrase, Translation, SourceTranslation } from "../../../scripts/types"
+import { SourcePhrase, Translation, SourceTranslation, TranslationFile } from "../../../scripts/types"
 
 const props = defineProps<{
     phrase: SourcePhrase
+    files: TranslationFile
     translation: Translation
     source: SourceTranslation
     similarPhrases: SourcePhrase
@@ -13,7 +14,7 @@ const props = defineProps<{
 const form = useForm({
     note: props.phrase.note || ref(""),
     phrase: props.phrase.value || ref(""),
-    status: props.phrase.status.value || ref("active"),
+    file: props.phrase.translation_file_id || ref(""),
 })
 
 const submit = () => {
@@ -23,6 +24,15 @@ const submit = () => {
         },
     })
 }
+
+const translationFiles = computed(() => {
+    return props.files.data.map((fileType) => {
+        return {
+            value: fileType.id,
+            label: fileType.nameWithExtension,
+        };
+    });
+});
 </script>
 <template>
     <Head title="Translate" />
@@ -61,7 +71,7 @@ const submit = () => {
         </div>
 
         <div class="mx-auto max-w-7xl px-6 py-10 lg:px-8">
-            <div class="flex w-full flex-col lg:flex-row">
+            <div class="flex w-full flex-col gap-8 lg:flex-row">
                 <div class="relative w-full overflow-hidden rounded-md bg-white shadow ring-2 ring-blue-100 focus-within:ring-blue-400">
                     <div class="flex items-center justify-between border-b px-4">
                         <div class="flex gap-2 py-2.5">
@@ -98,42 +108,20 @@ const submit = () => {
                     </div>
                 </div>
 
-                <div class="flex h-16 w-full items-center justify-center lg:h-auto lg:w-32">
-                    <IconArrowRight class="h-12 w-12 rotate-90 text-blue-200 lg:rotate-0" />
-                </div>
-
                 <div class="w-full overflow-hidden rounded-md bg-white shadow ring-2 ring-blue-100">
                     <div class="flex min-h-[231px] flex-col p-4">
                         <div class="w-full space-y-1">
-                            <InputLabel for="status" value="Status" />
+                            <InputLabel for="file" value="File" />
 
-                            <InputNativeSelect
-                                size="md"
-                                id="status"
-                                v-model="form.status"
-                                :error="form.errors.status"
-                                :items="[
-                                    { value: 'active', label: 'Active' },
-                                    { value: 'hidden', label: 'Hidden' },
-                                    { value: 'deprecated', label: 'Deprecated' },
-                                ]" />
+                            <InputNativeSelect size="md" id="file" v-model="form.file" :error="form.errors.file" :items="translationFiles" />
 
-                            <InputError :message="form.errors.status" />
+                            <InputError :message="form.errors.file" />
                         </div>
 
                         <div class="mt-4 w-full space-y-1">
                             <InputLabel for="note" value="Translation note" />
 
                             <InputTextarea size="md" id="note" rows="3" class="resize-none" v-model="form.note" :error="form.errors.note" placeholder="Add a note to this translation" />
-
-                            <InputError :message="form.errors.note" />
-                        </div>
-
-                        <div class="mt-4 w-full space-y-1">
-                            <label class="flex items-center gap-2">
-                                <InputCheckbox id="is_approved" v-model="form.is_approved" />
-                                <span class="cursor-pointer text-sm font-medium text-gray-600">Existing translations need to be updated</span>
-                            </label>
 
                             <InputError :message="form.errors.note" />
                         </div>

@@ -14,7 +14,7 @@ use Outhebox\TranslationsUI\Models\Contributor;
 
 class PasswordResetLinkController extends Controller
 {
-    public function create(Request $request): Response
+    public function create(): Response
     {
         return Inertia::render('auth/forgot-password');
     }

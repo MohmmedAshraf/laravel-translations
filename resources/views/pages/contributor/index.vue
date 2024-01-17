@@ -2,6 +2,7 @@
 import InvitedTable from "./partials/invited-table.vue"
 import { Contributor, Invite } from "../../../scripts/types"
 import { useAuth } from "../../../scripts/composables/use-auth"
+import useConfirmationDialog from "../../../scripts/composables/use-confirmation-dialog"
 
 defineProps<{
     invited: Invite
@@ -10,34 +11,10 @@ defineProps<{
 
 const user = useAuth().value
 
-const deleting = ref(false)
+const { loading, showDialog, openDialog, performAction, closeDialog } = useConfirmationDialog()
 
-const showConfirmDeleteDialog = ref(false)
-
-const openConfirmDeleteDialog = () => {
-    showConfirmDeleteDialog.value = true
-}
-
-function deleteTranslation(id: number) {
-    deleting.value = true
-
-    router.delete(route("ltu.contributors.delete", id), {
-        preserveScroll: true,
-        onSuccess: () => {
-            deleting.value = false
-            closeConfirmDeleteDialog()
-        },
-        onError: () => {
-            toast.error("Something went wrong, please try again.", {
-                icon: true,
-                position: POSITION.BOTTOM_CENTER,
-            })
-        },
-    })
-}
-
-const closeConfirmDeleteDialog = () => {
-    showConfirmDeleteDialog.value = false
+const deleteContributor = async (id: number) => {
+    await performAction(() => router.delete(route("ltu.contributors.delete", id)))
 }
 </script>
 
@@ -53,7 +30,7 @@ const closeConfirmDeleteDialog = () => {
                     <div class="w-full divide-y overflow-hidden rounded-md bg-white shadow">
                         <div class="w-full shadow-md">
                             <div class="flex h-14 w-full divide-x">
-                                <div class="grid w-full grid-cols-3 divide-x">
+                                <div class="grid w-full grid-cols-2 divide-x md:grid-cols-3">
                                     <div class="flex w-full items-center justify-start px-4">
                                         <span class="text-sm font-medium text-gray-400">Name</span>
                                     </div>
@@ -77,15 +54,15 @@ const closeConfirmDeleteDialog = () => {
 
                         <div v-for="contributor in contributors.data" :key="contributor.id" class="w-full hover:bg-gray-100">
                             <div class="flex h-14 w-full divide-x">
-                                <div class="grid w-full grid-cols-3 divide-x">
-                                    <div class="col-span-2 flex w-full items-center justify-start px-4 sm:col-span-1">
-                                        <span class="text-sm font-medium text-gray-500">
+                                <div class="grid w-full grid-cols-2 divide-x md:grid-cols-3">
+                                    <div class="flex w-full items-center justify-start px-4">
+                                        <span class="truncate text-sm font-medium text-gray-500">
                                             {{ contributor.name }}
                                         </span>
                                     </div>
 
-                                    <div class="col-span-2 flex w-full items-center justify-start px-4 sm:col-span-1">
-                                        <span class="text-sm font-medium text-gray-500">
+                                    <div class="flex w-full items-center justify-start px-4">
+                                        <span class="truncate text-sm font-medium text-gray-500">
                                             {{ contributor.email }}
                                         </span>
                                     </div>
@@ -102,12 +79,12 @@ const closeConfirmDeleteDialog = () => {
                                         <IconTrash class="h-5 w-5 text-gray-400" />
                                     </button>
 
-                                    <button v-else v-tooltip="'Delete'" @click="openConfirmDeleteDialog" class="group flex items-center justify-center px-3 hover:bg-red-50">
+                                    <button v-else v-tooltip="'Delete'" @click="openDialog" class="group flex items-center justify-center px-3 hover:bg-red-50">
                                         <IconTrash class="h-5 w-5 text-gray-400 group-hover:text-red-600" />
                                     </button>
                                 </div>
 
-                                <ConfirmationDialog size="sm" :show="showConfirmDeleteDialog">
+                                <ConfirmationDialog size="sm" :show="showDialog">
                                     <div class="flex flex-col p-6">
                                         <span class="text-xl font-medium text-gray-700">Are you sure?</span>
 
@@ -116,8 +93,8 @@ const closeConfirmDeleteDialog = () => {
                                         </span>
 
                                         <div class="mt-4 flex gap-4">
-                                            <BaseButton variant="secondary" type="button" size="lg" @click="closeConfirmDeleteDialog" full-width> Cancel </BaseButton>
-                                            <BaseButton variant="danger" type="button" size="lg" @click="deleteTranslation(contributor.id)" :is-loading="deleting" full-width> Delete </BaseButton>
+                                            <BaseButton variant="secondary" type="button" size="lg" @click="closeDialog" full-width> Cancel </BaseButton>
+                                            <BaseButton variant="danger" type="button" size="lg" @click="deleteContributor(contributor.id)" :is-loading="loading" full-width> Delete </BaseButton>
                                         </div>
                                     </div>
                                 </ConfirmationDialog>

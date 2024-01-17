@@ -9,13 +9,15 @@ use Outhebox\TranslationsUI\Models\TranslationFile;
 /** @mixin TranslationFile */
 class TranslationFileResource extends JsonResource
 {
+    public static $wrap = null;
+
     public function toArray(Request $request): array
     {
         return [
             'id' => $this->id,
             'name' => $this->name,
             'extension' => $this->extension,
-            'nameWithExtension' => $this->file_name,
+            'nameWithExtension' => "$this->name.$this->extension",
             'phrases' => PhraseResource::collection($this->whenLoaded('phrases')),
         ];
     }

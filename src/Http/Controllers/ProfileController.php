@@ -6,7 +6,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Redirect;
 use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -29,7 +28,7 @@ class ProfileController extends BaseController
 
         $request->user()->update($request->only('name', 'email'));
 
-        return Redirect::route('ltu.profile.edit');
+        return redirect()->route('ltu.profile.edit');
     }
 
     public function updatePassword(Request $request): RedirectResponse
@@ -43,6 +42,7 @@ class ProfileController extends BaseController
             'password' => Hash::make($validated['password']),
         ]);
 
-        return back()->with('status', 'password-updated');
+        return redirect()->route('ltu.profile.edit')
+            ->with('status', 'password-updated');
     }
 }

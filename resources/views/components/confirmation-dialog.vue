@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { watch, onMounted } from "vue"
+import { watch, onMounted, defineEmits } from "vue"
 import { TransitionRoot, TransitionChild, Dialog, DialogPanel } from "@headlessui/vue"
 
 const props = withDefaults(

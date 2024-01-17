@@ -44,7 +44,7 @@ class PhraseControllerTest extends TestCase
     }
 
     /** @test */
-    public function test_edit_phrase_page_can_be_rendered()
+    public function edit_phrase_page_can_be_rendered()
     {
         $this->actingAs($this->translator, 'translations')
             ->get(route('ltu.phrases.edit', [
@@ -55,7 +55,7 @@ class PhraseControllerTest extends TestCase
     }
 
     /** @test */
-    public function test_phrase_can_be_updated_and_will_validate_required_parameters()
+    public function phrase_can_be_updated()
     {
         $this->actingAs($this->translator, 'translations')
             ->post(route('ltu.phrases.update', [

@@ -1,45 +1,19 @@
 <script setup lang="ts">
 import { ref, defineEmits } from "vue"
 import { Translation } from "../../../scripts/types"
-import { POSITION, useToast } from "vue-toastification"
+import useConfirmationDialog from "../../../scripts/composables/use-confirmation-dialog"
 
 const props = defineProps<{
     translation: Translation
     selectedIds: number[]
 }>()
 
-const toast = useToast()
-
 const { emit } = defineEmits()
 
-const deleting = ref(false)
+const { loading, showDialog, openDialog, performAction, closeDialog } = useConfirmationDialog()
 
-const showConfirmDeleteDialog = ref(false)
-
-const openConfirmDeleteDialog = () => {
-    showConfirmDeleteDialog.value = true
-}
-
-function deleteTranslation(id: number) {
-    deleting.value = true
-
-    router.delete(route("ltu.translation.destroy", id), {
-        preserveScroll: true,
-        onSuccess: () => {
-            deleting.value = false
-            closeConfirmDeleteDialog()
-        },
-        onError: () => {
-            toast.error("Something went wrong, please try again.", {
-                icon: true,
-                position: POSITION.BOTTOM_CENTER,
-            })
-        },
-    })
-}
-
-const closeConfirmDeleteDialog = () => {
-    showConfirmDeleteDialog.value = false
+const deleteTranslation = async (id: number) => {
+    await performAction(() => router.delete(route("ltu.translation.destroy", id)))
 }
 
 const selected = ref(props.selectedIds.includes(props.translation.id))
@@ -91,23 +65,19 @@ watch(
         </div>
 
         <div class="hidden w-full border-r sm:flex sm:w-14">
-            <Link :href="route('ltu.phrases.index', translation.id)" class="relative inline-flex h-14 w-full cursor-pointer select-none items-center justify-center px-4 text-sm font-medium tracking-wide text-gray-400 outline-none transition-colors duration-150 ease-out hover:bg-blue-50 hover:text-blue-500 focus:border-blue-50">
-                <div class="visible flex h-full w-full items-center justify-center leading-none">
-                    <span class="mx-auto whitespace-nowrap sm:hidden">Manage Keys</span>
-
-                    <IconLanguage class="hidden h-5 w-5 sm:flex" />
-                </div>
+            <Link :href="route('ltu.phrases.index', translation.id)" v-tooltip="'Translate'" class="relative inline-flex h-14 w-full cursor-pointer select-none items-center justify-center px-4 text-sm font-medium tracking-wide text-gray-400 outline-none transition-colors duration-150 ease-out hover:bg-blue-50 hover:text-blue-500 focus:border-blue-50">
+                <IconLanguage class="hidden h-5 w-5 sm:flex" />
             </Link>
         </div>
 
         <div class="flex h-full">
-            <div class="flex w-full max-w-full">
-                <button type="button" @click="openConfirmDeleteDialog" class="relative inline-flex h-14 w-14 cursor-pointer select-none items-center justify-center p-4 text-sm font-medium uppercase tracking-wide text-gray-400 no-underline outline-none transition-colors duration-150 ease-out hover:bg-red-50 hover:text-red-600">
+            <div class="flex w-full max-w-full" v-tooltip="'Delete'">
+                <button type="button" @click="openDialog" class="relative inline-flex h-14 w-14 cursor-pointer select-none items-center justify-center p-4 text-sm font-medium uppercase tracking-wide text-gray-400 no-underline outline-none transition-colors duration-150 ease-out hover:bg-red-50 hover:text-red-600">
                     <IconTrash class="h-5 w-5" />
                 </button>
             </div>
 
-            <ConfirmationDialog size="sm" :show="showConfirmDeleteDialog">
+            <ConfirmationDialog size="sm" :show="showDialog">
                 <div class="flex flex-col p-6">
                     <span class="text-xl font-medium text-gray-700">Are you sure?</span>
 
@@ -116,8 +86,8 @@ watch(
                     </span>
 
                     <div class="mt-4 flex gap-4">
-                        <BaseButton variant="secondary" type="button" size="lg" @click="closeConfirmDeleteDialog" full-width> Cancel </BaseButton>
-                        <BaseButton variant="danger" type="button" size="lg" @click="deleteTranslation(translation.id)" :is-loading="deleting" full-width> Delete </BaseButton>
+                        <BaseButton variant="secondary" type="button" size="lg" @click="closeDialog" full-width> Cancel </BaseButton>
+                        <BaseButton variant="danger" type="button" size="lg" @click="deleteTranslation(translation.id)" :is-loading="loading" full-width> Delete </BaseButton>
                     </div>
                 </div>
             </ConfirmationDialog>

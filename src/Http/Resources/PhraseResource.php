@@ -23,7 +23,7 @@ class PhraseResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'state' => (bool) $this->value,
-            'note' => (bool) $this->note,
+            'note' => $this->note,
             'status' => [
                 'value' => $this->status->value,
                 'label' => $this->status->label(),

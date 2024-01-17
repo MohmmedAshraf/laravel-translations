@@ -9,7 +9,15 @@ use Outhebox\TranslationsUI\Tests\TestCase;
 
 class PasswordResetLinkControllerTest extends TestCase
 {
-    public function test_forgot_password_link_request_will_validate_email(): void
+    /** @test */
+    public function forgot_password_link_screen_can_be_rendered(): void
+    {
+        $this->get(route('ltu.password.request'))
+            ->assertOk();
+    }
+
+    /** @test */
+    public function forgot_password_link_request_will_validate_email(): void
     {
         $response = $this->post(route('ltu.password.email'), [
             'email' => 'not-an-email',
@@ -18,7 +26,8 @@ class PasswordResetLinkControllerTest extends TestCase
         $this->assertInstanceOf(ValidationException::class, $response->exception);
     }
 
-    public function test_the_password_reset_link_can_sent(): void
+    /** @test */
+    public function the_password_reset_link_can_sent(): void
     {
         Mail::fake();
 

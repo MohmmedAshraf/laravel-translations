@@ -28,8 +28,8 @@ class PhraseFactory extends Factory
     {
         return $this->state([
             'parameters' => [
-                'param1' => $this->faker->word(),
-                'param2' => $this->faker->word(),
+                'param1',
+                'param2',
             ],
         ]);
     }

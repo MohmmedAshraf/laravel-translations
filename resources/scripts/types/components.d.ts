@@ -60,5 +60,8 @@ declare module 'vue' {
     SimilarPhrases: typeof import('./../../views/components/phrase/similar/similar-phrases.vue')['default']
     SimilarPhrasesItem: typeof import('./../../views/components/phrase/similar/similar-phrases-item.vue')['default']
     Slideover: typeof import('./../../views/components/slideover.vue')['default']
+    Table: typeof import('./../../views/components/table/table.vue')['default']
+    TableCell: typeof import('./../../views/components/table/table-cell.vue')['default']
+    TableRow: typeof import('./../../views/components/table/table-row.vue')['default']
   }
 }

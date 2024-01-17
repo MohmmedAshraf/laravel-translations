@@ -2,8 +2,8 @@
 import { ref, computed } from "vue"
 import { UseClipboard } from "@vueuse/components"
 import TranslationItem from "./translation-item.vue"
-import { POSITION, useToast } from "vue-toastification"
 import { SourceTranslation, Translation } from "../../../scripts/types"
+import useConfirmationDialog from "../../../scripts/composables/use-confirmation-dialog"
 
 const props = defineProps<{
     translations: {
@@ -13,41 +13,23 @@ const props = defineProps<{
     source_translation: SourceTranslation
 }>()
 
-const toast = useToast()
 const searchQuery = ref("")
 const selectedIds = ref<number[]>([])
-const deletingSelected = ref(false)
 
-const showConfirmDeleteSelectedDialog = ref(false)
+const { loading, showDialog, openDialog, performAction, closeDialog } = useConfirmationDialog()
 
-const openConfirmDeleteSelectedDialog = () => {
-    showConfirmDeleteSelectedDialog.value = true
-}
-
-const closeConfirmDeleteSelectedDialog = () => {
-    showConfirmDeleteSelectedDialog.value = false
-}
-
-function deleteSelected() {
-    deletingSelected.value = true
-
-    router.post(
-        route("ltu.translation.destroy.multiple"),
-        { selected_ids: selectedIds.value },
-        {
-            preserveScroll: true,
-            onSuccess: () => {
-                selectedIds.value = []
-                deletingSelected.value = false
-                closeConfirmDeleteSelectedDialog()
+const deleteTranslations = async (id: number) => {
+    await performAction(() =>
+        router.post(
+            route("ltu.translation.destroy.multiple"),
+            { selected_ids: selectedIds.value },
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    selectedIds.value = []
+                },
             },
-            onError: () => {
-                toast.error("Something went wrong, please try again.", {
-                    icon: true,
-                    position: POSITION.BOTTOM_CENTER,
-                })
-            },
-        },
+        ),
     )
 }
 
@@ -92,7 +74,7 @@ const isAllSelected = computed(() => selectedIds.value.length === filteredTransl
                     <div class="hidden flex-1 items-center px-4 text-sm text-gray-500 md:flex md:max-w-72 lg:max-w-80 xl:max-w-96">Translation progress</div>
 
                     <div class="w-full sm:w-14">
-                        <Link :href="route('ltu.translation.create')" class="relative inline-flex h-14 w-full cursor-pointer select-none items-center justify-center px-4 text-sm font-medium tracking-wide text-gray-700 outline-none transition-colors duration-150 ease-out hover:bg-blue-50 hover:text-blue-500 focus:border-blue-50 sm:text-gray-400">
+                        <Link :href="route('ltu.translation.create')" v-tooltip="'Add Language'" class="relative inline-flex h-14 w-full cursor-pointer select-none items-center justify-center px-4 text-sm font-medium tracking-wide text-gray-700 outline-none transition-colors duration-150 ease-out hover:bg-blue-50 hover:text-blue-500 focus:border-blue-50 sm:text-gray-400">
                             <div class="visible flex h-full w-full items-center justify-center leading-none">
                                 <span class="mx-auto whitespace-nowrap sm:hidden">Add Language</span>
 
@@ -106,7 +88,8 @@ const isAllSelected = computed(() => selectedIds.value.length === filteredTransl
                             <button
                                 type="button"
                                 class="relative inline-flex h-14 w-14 select-none items-center justify-center p-4 text-sm font-medium uppercase tracking-wide text-gray-400 no-underline outline-none transition-colors duration-150 ease-out"
-                                @click="openConfirmDeleteSelectedDialog"
+                                @click="openDialog"
+                                v-tooltip="selectedIds.length ? 'Delete selected' : 'Select languages to delete'"
                                 :disabled="!selectedIds.length"
                                 :class="{
                                     'cursor-not-allowed': !selectedIds.length,
@@ -119,15 +102,15 @@ const isAllSelected = computed(() => selectedIds.value.length === filteredTransl
                         </div>
                     </div>
 
-                    <ConfirmationDialog size="sm" :show="showConfirmDeleteSelectedDialog">
+                    <ConfirmationDialog size="sm" :show="showDialog">
                         <div class="flex flex-col p-6">
                             <span class="text-xl font-medium text-gray-700">Are you sure?</span>
 
                             <span class="mt-2 text-sm text-gray-500"> This action cannot be undone, This will permanently delete the selected languages and all of their translations. </span>
 
                             <div class="mt-4 flex gap-4">
-                                <BaseButton variant="secondary" type="button" size="lg" @click="closeConfirmDeleteSelectedDialog" full-width> Cancel </BaseButton>
-                                <BaseButton variant="danger" type="button" size="lg" @click="deleteSelected()" :is-loading="deletingSelected" full-width> Delete </BaseButton>
+                                <BaseButton variant="secondary" type="button" size="lg" @click="closeDialog" full-width> Cancel </BaseButton>
+                                <BaseButton variant="danger" type="button" size="lg" @click="deleteTranslations" :is-loading="loading" full-width> Delete </BaseButton>
                             </div>
                         </div>
                     </ConfirmationDialog>
@@ -167,17 +150,13 @@ const isAllSelected = computed(() => selectedIds.value.length === filteredTransl
                             </Link>
                         </div>
 
-                        <Link :href="route('ltu.source_translation')" class="group hidden w-full border-r sm:flex sm:w-14">
+                        <Link :href="route('ltu.source_translation')" v-tooltip="'Manage Keys'" class="group hidden w-full border-r sm:flex sm:w-14">
                             <div class="relative inline-flex h-14 w-full cursor-pointer select-none items-center justify-center px-4 text-sm font-medium tracking-wide text-gray-700 outline-none transition-colors duration-150 ease-out focus:border-blue-50 group-hover:bg-blue-50 group-hover:text-blue-500">
-                                <div class="visible flex h-full w-full items-center justify-center leading-none">
-                                    <span class="mx-auto whitespace-nowrap sm:hidden">Manage Keys</span>
-
-                                    <IconCog class="hidden h-5 w-5 fill-current text-gray-400 group-hover:text-blue-500 sm:flex" />
-                                </div>
+                                <IconCog class="hidden h-5 w-5 fill-current text-gray-400 group-hover:text-blue-500 sm:flex" />
                             </div>
                         </Link>
 
-                        <div class="flex h-full">
+                        <div class="flex h-full" v-tooltip="'Source language cannot be deleted!'">
                             <div class="flex w-full max-w-full">
                                 <div class="relative inline-flex h-14 w-14 cursor-not-allowed select-none items-center justify-center p-4 text-sm font-medium uppercase tracking-wide text-gray-400 no-underline outline-none transition-colors duration-150 ease-out">
                                     <IconTrash class="h-5 w-5" />

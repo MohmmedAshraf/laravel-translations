@@ -11,10 +11,12 @@ use Psr\Container\NotFoundExceptionInterface;
 class NewPasswordControllerTest extends TestCase
 {
     /**
+     * @test
+     *
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function test_password_can_be_reset(): void
+    public function password_can_be_reset(): void
     {
         $token = encrypt($this->owner->id.'|'.Str::random());
 
@@ -32,7 +34,8 @@ class NewPasswordControllerTest extends TestCase
         $this->assertEmpty(cache()->get("password.reset.{$this->owner->id}"));
     }
 
-    public function test_new_password_request_will_validate_email(): void
+    /** @test */
+    public function new_password_request_will_validate_email(): void
     {
         $token = encrypt($this->owner->id.'|'.Str::random());
 
@@ -46,7 +49,8 @@ class NewPasswordControllerTest extends TestCase
         $this->assertInstanceOf(ValidationException::class, $response->exception);
     }
 
-    public function test_new_password_request_will_validate_unconfirmed_password(): void
+    /** @test */
+    public function new_password_request_will_validate_unconfirmed_password(): void
     {
         $token = encrypt($this->owner->id.'|'.Str::random());
 
@@ -60,7 +64,8 @@ class NewPasswordControllerTest extends TestCase
         $this->assertInstanceOf(ValidationException::class, $response->exception);
     }
 
-    public function test_password_will_validate_bad_token(): void
+    /** @test */
+    public function password_will_validate_bad_token(): void
     {
         $this->post(route('ltu.password.update'), [
             'token' => Str::random(),

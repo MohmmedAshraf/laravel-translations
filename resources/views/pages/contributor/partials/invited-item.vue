@@ -1,40 +1,18 @@
 <script setup lang="ts">
 import { Invite } from "../../../../scripts/types"
-import { ref } from "vue"
-import { POSITION } from "vue-toastification"
+import { POSITION, useToast } from "vue-toastification"
+import useConfirmationDialog from "../../../../scripts/composables/use-confirmation-dialog"
 
 defineProps<{
     invitation: Invite
 }>()
 
-const deleting = ref(false)
+const toast = useToast()
 
-const showConfirmDeleteDialog = ref(false)
+const { loading, showDialog, openDialog, performAction, closeDialog } = useConfirmationDialog()
 
-const openConfirmDeleteDialog = () => {
-    showConfirmDeleteDialog.value = true
-}
-
-function deleteTranslation(id: number) {
-    deleting.value = true
-
-    router.delete(route("ltu.contributors.invite.delete", id), {
-        preserveScroll: true,
-        onSuccess: () => {
-            deleting.value = false
-            closeConfirmDeleteDialog()
-        },
-        onError: () => {
-            toast.error("Something went wrong, please try again.", {
-                icon: true,
-                position: POSITION.BOTTOM_CENTER,
-            })
-        },
-    })
-}
-
-const closeConfirmDeleteDialog = () => {
-    showConfirmDeleteDialog.value = false
+const deleteInvitation = async (id: number) => {
+    await performAction(() => router.delete(route("ltu.contributors.invite.delete", id)))
 }
 </script>
 
@@ -62,12 +40,12 @@ const closeConfirmDeleteDialog = () => {
             </div>
 
             <div class="grid w-16">
-                <button type="button" v-tooltip="'Delete'" @click="openConfirmDeleteDialog" class="group flex items-center justify-center px-3 hover:bg-red-50">
+                <button type="button" v-tooltip="'Delete'" @click="openDialog" class="group flex items-center justify-center px-3 hover:bg-red-50">
                     <IconTrash class="h-5 w-5 text-gray-400 group-hover:text-red-600" />
                 </button>
             </div>
 
-            <ConfirmationDialog size="sm" :show="showConfirmDeleteDialog">
+            <ConfirmationDialog size="sm" :show="showDialog">
                 <div class="flex flex-col p-6">
                     <span class="text-xl font-medium text-gray-700">Are you sure?</span>
 
@@ -76,8 +54,8 @@ const closeConfirmDeleteDialog = () => {
                     </span>
 
                     <div class="mt-4 flex gap-4">
-                        <BaseButton variant="secondary" type="button" size="lg" @click="closeConfirmDeleteDialog" full-width> Cancel </BaseButton>
-                        <BaseButton variant="danger" type="button" size="lg" @click="deleteTranslation(invitation.id)" :is-loading="deleting" full-width> Delete </BaseButton>
+                        <BaseButton variant="secondary" type="button" size="lg" @click="closeDialog" full-width> Cancel </BaseButton>
+                        <BaseButton variant="danger" type="button" size="lg" @click="deleteInvitation(invitation.id)" :is-loading="loading" full-width> Delete </BaseButton>
                     </div>
                 </div>
             </ConfirmationDialog>

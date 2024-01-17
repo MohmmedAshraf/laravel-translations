@@ -14,10 +14,6 @@ defineProps<{
         </div>
 
         <div class="flex flex-1 items-center px-3 py-2 text-base">
-            <a :href="route('ltu.source_translation.edit', phrase.uuid)" target="_blank" class="mr-1 hidden rounded-md p-1 transition-colors duration-100 hover:bg-blue-50 md:inline-flex">
-                <IconExternalLink class="w-4 text-blue-500" />
-            </a>
-
             <div v-if="phrase?.value_html.length && phrase?.value_html[0]?.value" class="flex flex-wrap items-center gap-1">
                 <PhraseWithParameters :phrase="phrase.value_html" />
             </div>
