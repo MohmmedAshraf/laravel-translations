@@ -2,6 +2,67 @@
 
 All notable changes to `laravel-translations` will be documented in this file.
 
+## v1.0.0 - 2024-01-18
+
+🚀 **Exciting News: Version 1.0 Release!** 🚀
+
+After months of thorough beta testing, presenting Version 1.0 of the package, loaded with game-changing features and improvements.
+
+**Highlights:**
+
+1. **Inertia Stack Transition:**
+   
+   - Reimagined the package using Inertia alongside Vue and Typescript, focusing on delivering a significantly improved user experience.
+   
+2. **Google Translation Integration:**
+   
+   - Seamless integration with `stichoza/google-translate-php` for Google Translate functionality, and it's completely free of charge!
+   
+3. **Collaborate with Contributors:**
+   
+   - Easily invite external contributors to assist with translations or manage them collaboratively.
+   
+4. **Enhanced UI and More:**
+   
+   - Refined user interface and various improvements promise an even smoother translation management experience.
+   
+
+**Additional Notes:**
+
+- As part of ongoing improvements, delved into TypeScript. Some components are still a work in progress, committed to refining their structure and functionality.
+
+**Action Required:**
+
+1. **Uninstall Previous Version:**
+   
+   - A new command, has been added to help uninstall the package. It removes all assets, configuration files, and cleans up the database. Please ensure everything is removed before proceeding with the installation, as this command is still in beta, give it a shot by running the following command:
+     
+     ```bash
+     php artisan translations:clean
+     
+     ```
+   - Alternatively, manually uninstall using:
+     
+     ```bash
+     composer remove outhebox/laravel-translations
+     
+     ```
+   
+2. **Install v1.0:**
+   
+     ```bash
+     composer require outhebox/laravel-translations
+   
+     ```
+3. **Configuration Update:**
+   
+   - Review and update configuration files, especially those related to Livewire.
+   
+
+Your feedback is highly valued as we continue to enhance the package.
+
+Cheers to version 1.0! 🎉
+
 ## v0.1.2 - 2023-12-20
 
 Fix Saving translations with parameters is not working, #46 #47
