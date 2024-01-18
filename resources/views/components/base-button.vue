@@ -29,8 +29,8 @@ const { variantClass } = useButtonVariant(props.variant)
             <slot />
         </span>
 
-        <span v-if="isLoading" class="absolute left-0 top-0 flex h-full w-full items-center justify-center">
-            <icon-loading class="h-6 w-6 animate-spin text-white" />
+        <span v-if="isLoading" class="absolute left-0 top-0 flex size-full items-center justify-center">
+            <icon-loading class="size-6 animate-spin text-white" />
         </span>
     </button>
 </template>

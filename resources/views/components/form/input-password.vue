@@ -14,9 +14,10 @@ const showPassword = () => {
     <div class="bg-grey-100 placeholder:text-grey-400 flex items-center overflow-hidden rounded-md border border-gray-300 focus-within:border-blue-500 focus-within:shadow">
         <InputText ref="input" v-model="value" :type="type" v-bind="$attrs" class="border-none focus:border-transparent focus:ring-transparent" />
 
-        <button @click="showPassword" type="button" class="px-4 text-gray-400 focus:text-blue-500 focus:outline-none" tabindex="-1">
-            <IconEye v-if="type === 'password'" class="h-5 w-5" />
-            <IconEyeOff v-else class="h-5 w-5" />
+        <button type="button" class="px-4 text-gray-400 focus:text-blue-500 focus:outline-none" tabindex="-1" @click="showPassword">
+            <IconEye v-if="type === 'password'" class="size-5" />
+
+            <IconEyeOff v-else class="size-5" />
         </button>
     </div>
 </template>

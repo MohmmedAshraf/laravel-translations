@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import { ref, computed } from "vue"
+import { ref, computed, onMounted } from "vue"
+import { useSpeechSynthesis } from "@vueuse/core"
 import { XCircleIcon } from "@heroicons/vue/20/solid"
 import { SourcePhrase, Translation, SourceTranslation, TranslationFile } from "../../../scripts/types"
+import useLanguageCodeConversion from "../../../scripts/composables/use-language-code-conversion"
 
 const props = defineProps<{
     phrase: SourcePhrase
-    files: TranslationFile
     translation: Translation
     source: SourceTranslation
     similarPhrases: SourcePhrase
+    files: { data: Record<string, TranslationFile> }
 }>()
 
 const form = useForm({
@@ -26,13 +28,38 @@ const submit = () => {
 }
 
 const translationFiles = computed(() => {
-    return props.files.data.map((fileType) => {
+    return props.files.data.map((fileType: TranslationFile) => {
         return {
             value: fileType.id,
             label: fileType.nameWithExtension,
-        };
-    });
-});
+        }
+    })
+})
+
+const { convertLanguageCode } = useLanguageCodeConversion();
+
+const rate = ref(1)
+const pitch = ref(1)
+const text = props.phrase.value
+const langCode = convertLanguageCode(props.translation.language.code)
+const lang = langCode || "en-US"
+const voice = ref<SpeechSynthesisVoice>(undefined as unknown as SpeechSynthesisVoice)
+
+const speech = useSpeechSynthesis(text, { lang, pitch, rate })
+
+let synth: SpeechSynthesis
+
+const voices = ref<SpeechSynthesisVoice[]>([])
+
+onMounted(() => {
+    if (speech.isSupported.value) {
+        setTimeout(() => {
+            synth = window.speechSynthesis
+            voices.value = synth.getVoices()
+            voice.value = voices.value[0]
+        })
+    }
+})
 </script>
 <template>
     <Head title="Translate" />
@@ -53,19 +80,19 @@ const translationFiles = computed(() => {
                         </Link>
 
                         <div>
-                            <IconArrowRight class="h-6 w-6 text-gray-400" />
+                            <IconArrowRight class="size-6 text-gray-400" />
                         </div>
 
                         <div class="flex items-center gap-2 rounded-md border border-blue-100 bg-blue-50 px-2 py-1 text-blue-500">
-                            <IconKey class="h-4 w-4" />
+                            <IconKey class="size-4" />
 
                             <span class="text-sm" v-text="phrase.key"></span>
                         </div>
                     </div>
                 </div>
 
-                <Link v-tooltip="'Go back'" :href="route('ltu.source_translation')" class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 p-1 hover:bg-gray-200">
-                    <IconArrowRight class="h-6 w-6 text-gray-400" />
+                <Link v-tooltip="'Go back'" :href="route('ltu.source_translation')" class="flex size-10 items-center justify-center rounded-full bg-gray-100 p-1 hover:bg-gray-200">
+                    <IconArrowRight class="size-6 text-gray-400" />
                 </Link>
             </div>
         </div>
@@ -89,7 +116,7 @@ const translationFiles = computed(() => {
                         <div v-if="form.errors.phrase" class="rounded-md border border-red-400 bg-red-50 px-3 py-1">
                             <div class="flex items-center gap-1">
                                 <div class="shrink-0">
-                                    <XCircleIcon class="h-5 w-5 text-red-400" aria-hidden="true" />
+                                    <XCircleIcon class="size-5 text-red-400" aria-hidden="true" />
                                 </div>
 
                                 <div class="text-sm text-red-700">
@@ -100,11 +127,23 @@ const translationFiles = computed(() => {
                     </div>
 
                     <div class="flex h-[calc(100%-80px)]">
-                        <input-textarea id="textArea" v-model="form.phrase" rows="7" autofocus class="h-full w-full resize-none rounded-none border-none px-4 py-2.5 shadow-none ring-transparent focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0" />
+                        <input-textarea id="textArea" v-model="form.phrase" rows="7" autofocus class="size-full resize-none rounded-none border-none px-4 py-2.5 shadow-none ring-transparent focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0" />
                     </div>
 
-                    <div class="grid grid-cols-2 border-t border-blue-200">
-                        <span class="px-4 py-2.5 text-xs text-gray-400">Characters Length: {{ form.phrase.length }}</span>
+                    <div class="flex w-full items-center justify-center gap-4 border-t border-blue-200 px-4 py-1.5">
+                        <div class="flex w-full items-center">
+                            <span class="text-xs text-gray-400">Characters Length: {{ form.phrase.length }}</span>
+                        </div>
+
+                        <button
+                            v-tooltip="langCode ? 'Speak' : 'Language not supported'"
+                            class="flex size-6 shrink-0 items-center justify-center text-gray-400"
+                            :class="{ 'cursor-not-allowed opacity-50': !langCode, 'hover:text-gray-700': langCode }"
+                            :disabled="!langCode && !speech.isPlaying.value"
+                            @click="langCode && speech.speak()"
+                        >
+                            <IconSpeak class="size-5" />
+                        </button>
                     </div>
                 </div>
 
@@ -113,7 +152,7 @@ const translationFiles = computed(() => {
                         <div class="w-full space-y-1">
                             <InputLabel for="file" value="File" />
 
-                            <InputNativeSelect size="md" id="file" v-model="form.file" :error="form.errors.file" :items="translationFiles" />
+                            <InputNativeSelect id="file" v-model="form.file" size="md" :error="form.errors.file" :items="translationFiles" />
 
                             <InputError :message="form.errors.file" />
                         </div>
@@ -121,7 +160,7 @@ const translationFiles = computed(() => {
                         <div class="mt-4 w-full space-y-1">
                             <InputLabel for="note" value="Translation note" />
 
-                            <InputTextarea size="md" id="note" rows="3" class="resize-none" v-model="form.note" :error="form.errors.note" placeholder="Add a note to this translation" />
+                            <InputTextarea id="note" v-model="form.note" size="md" rows="3" class="resize-none" :error="form.errors.note" placeholder="Add a note to this translation" />
 
                             <InputError :message="form.errors.note" />
                         </div>
@@ -146,8 +185,8 @@ const translationFiles = computed(() => {
                     <SimilarPhrases :similar-phrases="similarPhrases" />
                 </tab>
 
-                <tab prefix='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.25 2.52.77-1.28-3.52-2.09V8z"/></svg>' name="Versions">
-                    <div class="flex h-48 w-full items-center justify-center px-4 py-6">
+                <tab name="History" prefix='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.25 2.52.77-1.28-3.52-2.09V8z"/></svg>'>
+                    <div class="relative flex size-full min-h-[250px] w-full items-center justify-center px-4 py-6">
                         <span class="text-sm text-gray-500">Coming soon...</span>
                     </div>
                 </tab>

@@ -13,6 +13,7 @@ class CopyPhrasesFromSourceAction
         $sourceTranslation->phrases()->with('file')->get()->each(function ($sourcePhrase) use ($translation) {
             $translation->phrases()->create([
                 'value' => null,
+                'uuid' => str()->uuid(),
                 'key' => $sourcePhrase->key,
                 'group' => $sourcePhrase->group,
                 'phrase_id' => $sourcePhrase->id,

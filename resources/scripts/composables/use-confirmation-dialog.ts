@@ -10,11 +10,11 @@ export default function useConfirmationDialog() {
         showDialog.value = true
     }
 
-    async function performAction(actionFunction, options) {
+    async function performAction(actionFunction: () => void, options?: { onSuccess?: () => void; onError?: () => void }) {
         loading.value = true
 
         try {
-            await actionFunction()
+            actionFunction()
 
             loading.value = false
             closeDialog()

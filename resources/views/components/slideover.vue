@@ -59,7 +59,7 @@ const maxWidthClass = computed(() => {
 
                                                         <span class="sr-only">Close panel</span>
 
-                                                        <XMarkIcon class="h-6 w-6" aria-hidden="true" />
+                                                        <XMarkIcon class="size-6" aria-hidden="true" />
                                                     </button>
                                                 </div>
                                             </div>

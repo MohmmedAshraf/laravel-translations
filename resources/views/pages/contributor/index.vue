@@ -5,8 +5,16 @@ import { useAuth } from "../../../scripts/composables/use-auth"
 import useConfirmationDialog from "../../../scripts/composables/use-confirmation-dialog"
 
 defineProps<{
-    invited: Invite
-    contributors: Contributor
+    invited: {
+        data: Record<string, Invite>
+        links: Record<string, string>
+        meta: Record<string, string>
+    }
+    contributors: {
+        data: Record<string, Contributor>
+        links: Record<string, string>
+        meta: Record<string, string>
+    }
 }>()
 
 const user = useAuth().value
@@ -45,8 +53,8 @@ const deleteContributor = async (id: number) => {
                                 </div>
 
                                 <div class="grid w-16">
-                                    <Link :href="route('ltu.contributors.invite')" v-tooltip="'Invite Contributor'" href="#" class="group flex items-center justify-center px-3 hover:bg-blue-50">
-                                        <IconPlus class="h-5 w-5 text-gray-400 group-hover:text-blue-600" />
+                                    <Link v-tooltip="'Invite Contributor'" :href="route('ltu.contributors.invite')" href="#" class="group flex items-center justify-center px-3 hover:bg-blue-50">
+                                        <IconPlus class="size-5 text-gray-400 group-hover:text-blue-600" />
                                     </Link>
                                 </div>
                             </div>
@@ -76,11 +84,11 @@ const deleteContributor = async (id: number) => {
 
                                 <div class="grid w-16">
                                     <button v-if="user.id === contributor.id" v-tooltip="'You cannot delete yourself!'" disabled class="group flex cursor-not-allowed items-center justify-center bg-gray-50 px-3">
-                                        <IconTrash class="h-5 w-5 text-gray-400" />
+                                        <IconTrash class="size-5 text-gray-400" />
                                     </button>
 
-                                    <button v-else v-tooltip="'Delete'" @click="openDialog" class="group flex items-center justify-center px-3 hover:bg-red-50">
-                                        <IconTrash class="h-5 w-5 text-gray-400 group-hover:text-red-600" />
+                                    <button v-else v-tooltip="'Delete'" class="group flex items-center justify-center px-3 hover:bg-red-50" @click="openDialog">
+                                        <IconTrash class="size-5 text-gray-400 group-hover:text-red-600" />
                                     </button>
                                 </div>
 
@@ -93,8 +101,9 @@ const deleteContributor = async (id: number) => {
                                         </span>
 
                                         <div class="mt-4 flex gap-4">
-                                            <BaseButton variant="secondary" type="button" size="lg" @click="closeDialog" full-width> Cancel </BaseButton>
-                                            <BaseButton variant="danger" type="button" size="lg" @click="deleteContributor(contributor.id)" :is-loading="loading" full-width> Delete </BaseButton>
+                                            <BaseButton variant="secondary" type="button" size="lg" full-width @click="closeDialog"> Cancel </BaseButton>
+
+                                            <BaseButton variant="danger" type="button" size="lg" :is-loading="loading" full-width @click="deleteContributor(contributor.id)"> Delete </BaseButton>
                                         </div>
                                     </div>
                                 </ConfirmationDialog>

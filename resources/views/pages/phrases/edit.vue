@@ -1,19 +1,20 @@
 <script setup lang="ts">
-import { ref } from "vue"
+import { onMounted, ref } from "vue"
+import { useSpeechSynthesis } from "@vueuse/core"
 import { XCircleIcon } from "@heroicons/vue/20/solid"
-import { FaceFrownIcon } from "@heroicons/vue/24/outline"
-import { Phrase, Translation, SourceTranslation } from "../../../scripts/types"
+import { Phrase, Translation, SourceTranslation, MachineTranslations } from "../../../scripts/types"
+import useLanguageCodeConversion from "../../../scripts/composables/use-language-code-conversion"
 
 const props = defineProps<{
     phrase: Phrase
     translation: Translation
     source: SourceTranslation
     similarPhrases: SourceTranslation
-    suggestedTranslations: Object
+    suggestedTranslations: Record<string, MachineTranslations>
 }>()
 
 const form = useForm({
-    phrase: ref(props.phrase.value) || "",
+    phrase: ref(props.phrase.value) || ref(""),
 })
 
 const submit = () => {
@@ -24,9 +25,34 @@ const submit = () => {
     })
 }
 
-const useTranslation = (value) => {
+const useTranslation = (value: string) => {
     form.phrase = value
 }
+
+const { convertLanguageCode } = useLanguageCodeConversion();
+
+const rate = ref(1)
+const pitch = ref(1)
+const text = props.phrase.value
+const langCode = convertLanguageCode(props.translation.language.code)
+const lang = langCode || "en-US"
+const voice = ref<SpeechSynthesisVoice>(undefined as unknown as SpeechSynthesisVoice)
+
+const speech = useSpeechSynthesis(text, { lang, pitch, rate })
+
+let synth: SpeechSynthesis
+
+const voices = ref<SpeechSynthesisVoice[]>([])
+
+onMounted(() => {
+    if (speech.isSupported.value) {
+        setTimeout(() => {
+            synth = window.speechSynthesis
+            voices.value = synth.getVoices()
+            voice.value = voices.value[0]
+        })
+    }
+})
 </script>
 <template>
     <Head title="Translate" />
@@ -47,19 +73,19 @@ const useTranslation = (value) => {
                         </Link>
 
                         <div>
-                            <IconArrowRight class="h-6 w-6 text-gray-400" />
+                            <IconArrowRight class="size-6 text-gray-400" />
                         </div>
 
                         <div class="flex items-center gap-2 rounded-md border border-blue-100 bg-blue-50 px-2 py-1 text-blue-500">
-                            <IconKey class="h-4 w-4" />
+                            <IconKey class="size-4" />
 
                             <span class="text-sm" v-text="phrase.key"></span>
                         </div>
                     </div>
                 </div>
 
-                <Link v-tooltip="'Go back'" :href="route('ltu.phrases.index', translation.id)" class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 p-1 hover:bg-gray-200">
-                    <IconArrowRight class="h-6 w-6 text-gray-400" />
+                <Link v-tooltip="'Go back'" :href="route('ltu.phrases.index', translation.id)" class="flex size-10 items-center justify-center rounded-full bg-gray-100 p-1 hover:bg-gray-200">
+                    <IconArrowRight class="size-6 text-gray-400" />
                 </Link>
             </div>
         </div>
@@ -82,21 +108,21 @@ const useTranslation = (value) => {
 
                         <div class="flex items-center divide-x border-l">
                             <button v-tooltip="'Copy'" type="button" class="group h-full p-3 hover:bg-blue-50" @click="useTranslation(phrase.source.value)">
-                                <IconClipboard class="h-5 w-5 text-gray-400 group-hover:text-blue-600" />
+                                <IconClipboard class="size-5 text-gray-400 group-hover:text-blue-600" />
                             </button>
 
                             <Link v-tooltip="'Edit Source Key'" :href="route('ltu.source_translation.edit', phrase.source.uuid)" type="button" class="group h-full p-3 hover:bg-blue-50">
-                                <IconPencil class="h-5 w-5 text-gray-400 group-hover:text-blue-600" />
+                                <IconPencil class="size-5 text-gray-400 group-hover:text-blue-600" />
                             </Link>
 
                             <button v-tooltip="'Delete'" type="button" class="group h-full p-3 hover:bg-red-50">
-                                <IconTrash class="h-5 w-5 text-gray-400 group-hover:text-red-600" />
+                                <IconTrash class="size-5 text-gray-400 group-hover:text-red-600" />
                             </button>
                         </div>
                     </div>
 
                     <div dir="auto" class="flex min-h-[204px] w-full px-4 py-2.5">
-                        <div class="flex h-full w-full flex-wrap gap-x-1 gap-y-0.5">
+                        <div class="flex size-full flex-wrap gap-x-1 gap-y-0.5">
                             <template v-if="phrase.source?.value_html.length">
                                 <PhraseWithParameters :phrase="phrase.source.value_html" copyable />
                             </template>
@@ -107,15 +133,27 @@ const useTranslation = (value) => {
                         </div>
                     </div>
 
-                    <div class="flex select-none items-center gap-1 border-t border-blue-200 px-4 py-2.5 text-gray-400">
-                        <IconDocument class="h-4 w-4" />
+                    <div class="flex w-full items-center justify-center gap-4 border-t border-blue-200 px-4 py-1.5">
+                        <div class="flex w-full select-none items-center gap-1 text-gray-400">
+                            <IconDocument class="size-4" />
 
-                        <div class="text-xs" v-html="phrase.source?.file.nameWithExtension"></div>
+                            <div class="text-xs" v-html="phrase.source?.file.nameWithExtension"></div>
+                        </div>
+
+                        <button
+                            v-tooltip="langCode ? 'Speak' : 'Language not supported'"
+                            class="flex size-6 shrink-0 items-center justify-center text-gray-400"
+                            :class="{ 'cursor-not-allowed opacity-50': !langCode, 'hover:text-gray-700': langCode }"
+                            :disabled="!langCode && !speech.isPlaying.value"
+                            @click="langCode && speech.speak()"
+                        >
+                            <IconSpeak class="size-5" />
+                        </button>
                     </div>
                 </div>
 
                 <div class="flex h-16 w-full items-center justify-center lg:h-auto lg:w-32">
-                    <IconArrowRight class="h-12 w-12 rotate-90 text-blue-200 lg:rotate-0" />
+                    <IconArrowRight class="size-10 rotate-90 text-blue-200 lg:rotate-0" />
                 </div>
 
                 <div class="w-full overflow-hidden rounded-md bg-white shadow ring-2 ring-blue-100 focus-within:ring-blue-400">
@@ -135,7 +173,7 @@ const useTranslation = (value) => {
                         <div v-if="form.errors.phrase" class="rounded-md border border-red-400 bg-red-50 px-3 py-1">
                             <div class="flex items-center gap-1">
                                 <div class="shrink-0">
-                                    <XCircleIcon class="h-5 w-5 text-red-400" aria-hidden="true" />
+                                    <XCircleIcon class="size-5 text-red-400" aria-hidden="true" />
                                 </div>
 
                                 <div class="text-sm text-red-700">
@@ -146,7 +184,7 @@ const useTranslation = (value) => {
                     </div>
 
                     <div class="flex">
-                        <input-textarea id="textArea" v-model="form.phrase" dir="auto" rows="7" autofocus class="h-full w-full resize-none rounded-none border-none px-4 py-2.5 shadow-none ring-transparent focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0" />
+                        <input-textarea id="textArea" v-model="form.phrase" dir="auto" rows="7" autofocus class="size-full resize-none rounded-none border-none px-4 py-2.5 shadow-none ring-transparent focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0" />
                     </div>
 
                     <div class="grid grid-cols-2 border-t border-blue-200">
@@ -166,41 +204,7 @@ const useTranslation = (value) => {
                     name="Suggestions"
                     class="w-full"
                     prefix='<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="h-5 w-5"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.3417 7.60001L18.3334 8.11668L13.7917 12.0583L15.15 17.9167L10 14.8083L4.85002 17.9167L6.21669 12.0583L1.66669 8.11668L7.65835 7.60834L10 2.08334L12.3417 7.60001ZM6.86669 15.1417L10 13.25L13.1417 15.15L12.3084 11.5833L15.075 9.18334L11.425 8.86668L10 5.50001L8.58335 8.85834L4.93335 9.17501L7.70002 11.575L6.86669 15.1417Z"></path></svg>'>
-                    <div v-if="Object.keys(suggestedTranslations).length > 0" class="flex w-full flex-col divide-y">
-                        <div v-for="suggestedPhrase in suggestedTranslations" :key="suggestedPhrase.id" class="flex flex-col py-4 md:flex-row md:py-0">
-                            <div class="flex flex-1 items-center px-4 py-3 md:order-2 md:border-x">
-                                <span class="text-gray-700">{{ suggestedPhrase.value }}</span>
-                            </div>
-
-                            <div class="px-4 py-3 md:order-1 md:w-64">
-                                <div class="hidden w-full text-xs font-medium uppercase tracking-tight text-gray-500 md:block">
-                                    <span>Machine translation</span>
-                                </div>
-
-                                <div class="mt-2 flex items-center">
-                                    <IconGoogle class="mr-2 h-4 w-4 text-gray-500" />
-
-                                    <div class="text-sm font-medium text-gray-700" v-text="suggestedPhrase.engine"></div>
-                                </div>
-                            </div>
-
-                            <button @click="useTranslation(suggestedPhrase.value)" class="relative order-3 flex w-28 items-center justify-center bg-blue-50 px-4 py-3 transition-colors duration-100 hover:bg-blue-100">
-                                <span class="text-sm font-medium text-blue-600">Use this</span>
-                                <IconArrowRight class="h-6 w-6 text-blue-600" />
-                            </button>
-                        </div>
-
-                        <div class="flex h-20 w-full items-center justify-center px-4 py-6">
-                            <span class="text-sm text-gray-500">More integrations coming in next releases...</span>
-                        </div>
-                    </div>
-
-                    <div v-else class="relative flex h-full min-h-[250px] w-full">
-                        <div class="absolute left-0 top-0 flex min-h-full w-full flex-col items-center justify-center backdrop-blur-sm">
-                            <FaceFrownIcon class="h-12 w-12 text-gray-200" />
-                            <span class="mt-4 text-gray-500">No suggestions found...</span>
-                        </div>
-                    </div>
+                    <MachineTranslate :suggested-translations="suggestedTranslations" :language="translation.language.code" @use-translation="useTranslation" />
                 </tab>
 
                 <tab

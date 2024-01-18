@@ -1,13 +1,10 @@
 <script setup lang="ts">
 import { Invite } from "../../../../scripts/types"
-import { POSITION, useToast } from "vue-toastification"
 import useConfirmationDialog from "../../../../scripts/composables/use-confirmation-dialog"
 
 defineProps<{
     invitation: Invite
 }>()
-
-const toast = useToast()
 
 const { loading, showDialog, openDialog, performAction, closeDialog } = useConfirmationDialog()
 
@@ -40,8 +37,8 @@ const deleteInvitation = async (id: number) => {
             </div>
 
             <div class="grid w-16">
-                <button type="button" v-tooltip="'Delete'" @click="openDialog" class="group flex items-center justify-center px-3 hover:bg-red-50">
-                    <IconTrash class="h-5 w-5 text-gray-400 group-hover:text-red-600" />
+                <button v-tooltip="'Delete'" type="button" class="group flex items-center justify-center px-3 hover:bg-red-50" @click="openDialog">
+                    <IconTrash class="size-5 text-gray-400 group-hover:text-red-600" />
                 </button>
             </div>
 
@@ -54,8 +51,9 @@ const deleteInvitation = async (id: number) => {
                     </span>
 
                     <div class="mt-4 flex gap-4">
-                        <BaseButton variant="secondary" type="button" size="lg" @click="closeDialog" full-width> Cancel </BaseButton>
-                        <BaseButton variant="danger" type="button" size="lg" @click="deleteInvitation(invitation.id)" :is-loading="loading" full-width> Delete </BaseButton>
+                        <BaseButton variant="secondary" type="button" size="lg" full-width @click="closeDialog"> Cancel </BaseButton>
+
+                        <BaseButton variant="danger" type="button" size="lg" :is-loading="loading" full-width @click="deleteInvitation(invitation.id)"> Delete </BaseButton>
                     </div>
                 </div>
             </ConfirmationDialog>

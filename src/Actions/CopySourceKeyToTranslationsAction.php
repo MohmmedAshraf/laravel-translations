@@ -7,11 +7,12 @@ use Outhebox\TranslationsUI\Models\Translation;
 
 class CopySourceKeyToTranslationsAction
 {
-    public function execute(Phrase $sourceKey): void
+    public static function execute(Phrase $sourceKey): void
     {
         Translation::where('source', false)->get()->each(function ($translation) use ($sourceKey) {
             $translation->phrases()->create([
                 'value' => null,
+                'uuid' => str()->uuid(),
                 'key' => $sourceKey->key,
                 'group' => $sourceKey->group,
                 'phrase_id' => $sourceKey->id,

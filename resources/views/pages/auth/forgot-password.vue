@@ -24,7 +24,7 @@ const submit = () => {
 
         <template #subtitle> Enter your email address below, and we'll send you instructions on how to reset your password. </template>
 
-        <Alert variant="success" v-if="status" class="mb-4 w-full">
+        <Alert v-if="status" variant="success" class="mb-4 w-full">
             {{ status }}
         </Alert>
 

@@ -34,7 +34,8 @@ withDefaults(
 
             <div class="mt-10 flex items-center justify-center gap-x-6">
                 <Link :href="route('ltu.translation.index')" class="btn btn-md btn-primary">
-                    <IconArrowLeft class="h-5 w-5" />
+                    <IconArrowLeft class="size-5" />
+
                     <span>Go back home</span>
                 </Link>
             </div>

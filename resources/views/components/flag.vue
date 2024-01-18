@@ -3,6 +3,17 @@ import twemoji from "twemoji"
 import { onMounted, ref } from "vue"
 import countryCodeEmoji from "country-code-emoji"
 
+const props = withDefaults(
+    defineProps<{
+        countryCode?: string
+        width?: string
+    }>(),
+    {
+        countryCode: "",
+        width: "w-5",
+    },
+)
+
 const mapLanguageToCountry = {
     af: "ZA",
     am: "ET",
@@ -116,17 +127,6 @@ const mapLanguageToCountry = {
     sat: "IN",
     zu: "ZA",
 }
-
-const props = defineProps({
-    countryCode: {
-        type: String,
-        default: "",
-    },
-    width: {
-        type: String,
-        default: "w-5",
-    },
-})
 
 const normalizedCode = computed(() => {
     const noScriptCode = props.countryCode.split("#")[0]

@@ -42,7 +42,7 @@ const icon = computed(() => {
     <div class="rounded-md px-2 py-2.5" :class="[variantClass]">
         <div class="flex items-start gap-2">
             <div class="mt-0.5 shrink-0">
-                <component :is="icon" class="h-4 w-4" :class="iconClasses" aria-hidden="true" />
+                <component :is="icon" class="size-4" :class="iconClasses" aria-hidden="true" />
             </div>
 
             <div class="flex-1 md:flex md:justify-between">

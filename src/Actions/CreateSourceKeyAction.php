@@ -17,6 +17,7 @@ class CreateSourceKeyAction
             'parameters' => null,
             'value' => $key_translation,
             'translation_file_id' => $file,
+            'uuid' => str()->uuid(),
             'group' => TranslationFile::find($file)?->name,
         ]);
 

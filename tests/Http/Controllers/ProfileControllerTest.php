@@ -9,7 +9,7 @@ use Outhebox\TranslationsUI\Tests\TestCase;
 class ProfileControllerTest extends TestCase
 {
     /** @test */
-    public function test_profile_page_is_displayed(): void
+    public function profile_page_is_displayed(): void
     {
         $this->actingAs($this->translator, 'translations')
             ->get(route('ltu.profile.edit'))
@@ -21,7 +21,7 @@ class ProfileControllerTest extends TestCase
      *
      * @throws JsonException
      */
-    public function test_profile_information_can_be_updated(): void
+    public function profile_information_can_be_updated(): void
     {
         $this->actingAs($this->translator, 'translations')
             ->from(route('ltu.profile.edit'))
@@ -43,7 +43,7 @@ class ProfileControllerTest extends TestCase
      *
      * @throws JsonException
      */
-    public function test_password_can_be_updated(): void
+    public function password_can_be_updated(): void
     {
         $this->withoutExceptionHandling();
 
@@ -63,7 +63,7 @@ class ProfileControllerTest extends TestCase
     }
 
     /** @test */
-    public function test_correct_password_must_be_provided_to_update_password(): void
+    public function correct_password_must_be_provided_to_update_password(): void
     {
         $response = $this
             ->actingAs($this->translator, 'translations')

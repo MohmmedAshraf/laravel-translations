@@ -26,7 +26,7 @@ const { sizeClass } = useInputSize(props.size ?? "lg")
                 <span v-else class="italic text-gray-500">Select from the list</span>
 
                 <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                    <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+                    <ChevronUpDownIcon class="size-5 text-gray-400" aria-hidden="true" />
                 </div>
             </ListboxButton>
 
@@ -39,7 +39,7 @@ const { sizeClass } = useInputSize(props.size ?? "lg")
                             </span>
 
                             <span class="absolute inset-y-0 right-0 flex items-center pr-3">
-                                <span class="h-2 w-2 transition-colors" :class="[selected ? 'bg-gray-800' : active ? 'bg-gray-300' : 'bg-gray-100']" aria-hidden="true" />
+                                <span class="size-2 transition-colors" :class="[selected ? 'bg-gray-800' : active ? 'bg-gray-300' : 'bg-gray-100']" aria-hidden="true" />
                             </span>
                         </li>
                     </ListboxOption>

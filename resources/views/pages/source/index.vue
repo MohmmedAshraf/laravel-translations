@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue"
-import { Translation } from "../../../scripts/types"
+import { Phrase, Translation } from "../../../scripts/types"
 import SourcePhraseItem from "./source-phrase-item.vue"
 import useConfirmationDialog from "../../../scripts/composables/use-confirmation-dialog"
 
 const props = defineProps<{
-    phrases: Object
+    phrases: {
+        data: Record<string, Phrase>
+        links: Record<string, string>
+        meta: Record<string, string>
+    }
     translation: Translation
 }>()
 
@@ -43,14 +47,14 @@ const deletePhrases = async () => {
 }
 
 function toggleSelection() {
-    if (selectedIds.value.length === props.phrases.data.length) {
+    if (selectedIds.value.length === Object.keys(props.phrases.data).length) {
         selectedIds.value = []
     } else {
-        selectedIds.value = props.phrases.data.map((language: Translation) => language.id)
+        selectedIds.value = Object.keys(props.phrases.data).map((key) => parseInt(key, 10))
     }
 }
 
-const isAllSelected = computed(() => selectedIds.value.length === props.phrases.data.length)
+const isAllSelected = computed(() => selectedIds.value.length === Object.keys(props.phrases.data).length)
 </script>
 <template>
     <Head title="Base Language" />
@@ -74,8 +78,8 @@ const isAllSelected = computed(() => selectedIds.value.length === props.phrases.
                     </div>
                 </div>
 
-                <Link v-tooltip="'Go back'" :href="route('ltu.translation.index')" class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 p-1 hover:bg-gray-200">
-                    <IconArrowRight class="h-6 w-6 text-gray-400" />
+                <Link v-tooltip="'Go back'" :href="route('ltu.translation.index')" class="flex size-10 items-center justify-center rounded-full bg-gray-100 p-1 hover:bg-gray-200">
+                    <IconArrowRight class="size-6 text-gray-400" />
                 </Link>
             </div>
         </div>
@@ -84,17 +88,17 @@ const isAllSelected = computed(() => selectedIds.value.length === props.phrases.
             <div class="w-full divide-y overflow-hidden rounded-md bg-white shadow">
                 <div class="grid w-full grid-cols-8 justify-between px-4 py-3">
                     <div class="col-span-2">
-                        <InputText placeholder="Search" v-model="form.search" size="md" />
+                        <InputText v-model="form.search" placeholder="Search" size="md" />
                     </div>
 
                     <div class="col-span-4"></div>
 
                     <div class="col-span-2">
                         <InputNativeSelect
-                            size="md"
                             id="status"
-                            placeholder="Filter by status"
                             v-model="form.status"
+                            size="md"
+                            placeholder="Filter by status"
                             :error="form.errors.status"
                             :items="[
                                 { value: 'translated', label: 'Translated' },
@@ -106,7 +110,7 @@ const isAllSelected = computed(() => selectedIds.value.length === props.phrases.
                 <div class="w-full shadow-md">
                     <div class="flex h-14 w-full divide-x">
                         <div class="flex w-12 items-center justify-center p-4">
-                            <InputCheckbox :disabled="!phrases.data.length" @click="toggleSelection" :checked="isAllSelected" />
+                            <InputCheckbox :disabled="!phrases.data.length" :checked="isAllSelected" @click="toggleSelection" />
                         </div>
 
                         <div class="hidden w-20 items-center justify-center px-4 md:flex">
@@ -125,24 +129,24 @@ const isAllSelected = computed(() => selectedIds.value.length === props.phrases.
 
                         <div class="grid w-36 grid-cols-2 divide-x">
                             <Link v-tooltip="'Add New Key'" :href="route('ltu.source_translation.add_source_key')" class="group flex items-center justify-center hover:bg-blue-50">
-                                <IconPlus class="h-5 w-5 text-gray-400 group-hover:text-blue-600" />
+                                <IconPlus class="size-5 text-gray-400 group-hover:text-blue-600" />
                             </Link>
 
                             <div class="flex h-full">
                                 <div class="flex w-full max-w-full">
                                     <button
-                                        type="button"
-                                        class="relative inline-flex h-14 w-14 select-none items-center justify-center p-4 text-sm font-medium uppercase tracking-wide text-gray-400 no-underline outline-none transition-colors duration-150 ease-out"
-                                        @click="openDialog"
                                         v-tooltip="selectedIds.length ? 'Delete selected' : 'Select phrases to delete'"
+                                        type="button"
+                                        class="relative inline-flex size-14 select-none items-center justify-center p-4 text-sm font-medium uppercase tracking-wide text-gray-400 no-underline outline-none transition-colors duration-150 ease-out"
                                         :disabled="!selectedIds.length"
                                         :class="{
                                             'cursor-not-allowed': !selectedIds.length,
                                             'cursor-pointer': selectedIds.length,
                                             'hover:bg-red-50 hover:text-red-600': selectedIds.length,
                                             'bg-gray-50': !selectedIds.length,
-                                        }">
-                                        <IconTrash class="h-5 w-5" />
+                                        }"
+                                        @click="openDialog">
+                                        <IconTrash class="size-5" />
                                     </button>
                                 </div>
                             </div>
@@ -154,8 +158,9 @@ const isAllSelected = computed(() => selectedIds.value.length === props.phrases.
                                     <span class="mt-2 text-sm text-gray-500"> This action cannot be undone, This will permanently delete the selected phrases and all of their translations. </span>
 
                                     <div class="mt-4 flex gap-4">
-                                        <BaseButton variant="secondary" type="button" size="lg" @click="closeDialog" full-width> Cancel </BaseButton>
-                                        <BaseButton variant="danger" type="button" size="lg" @click="deletePhrases" :is-loading="loading" full-width> Delete </BaseButton>
+                                        <BaseButton variant="secondary" type="button" size="lg" full-width @click="closeDialog"> Cancel </BaseButton>
+
+                                        <BaseButton variant="danger" type="button" size="lg" :is-loading="loading" full-width @click="deletePhrases"> Delete </BaseButton>
                                     </div>
                                 </div>
                             </ConfirmationDialog>
@@ -163,7 +168,7 @@ const isAllSelected = computed(() => selectedIds.value.length === props.phrases.
                     </div>
                 </div>
 
-                <SourcePhraseItem v-for="phrase in phrases.data" :phrase="phrase" :selected-ids="selectedIds" :key="phrase.uuid" />
+                <SourcePhraseItem v-for="phrase in phrases.data" :key="phrase.uuid" :phrase="phrase" :selected-ids="selectedIds" />
 
                 <Pagination :links="phrases.links" :meta="phrases.meta" />
             </div>

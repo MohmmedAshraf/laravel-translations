@@ -7,10 +7,11 @@ import useConfirmationDialog from "../../../scripts/composables/use-confirmation
 
 const props = defineProps<{
     translations: {
-        data: Translation[]
+        data: Record<string, Translation>
+        links: Record<string, string>
+        meta: Record<string, string>
     }
-
-    source_translation: SourceTranslation
+    sourceTranslation: SourceTranslation
 }>()
 
 const searchQuery = ref("")
@@ -34,20 +35,27 @@ const deleteTranslations = async (id: number) => {
 }
 
 const filteredTranslations = computed(() => {
-    return props.translations.data.filter((language) => {
-        return language.language.name.toLowerCase().includes(searchQuery.value.toLowerCase()) || language.language.code.toLowerCase().includes(searchQuery.value.toLowerCase())
-    })
-})
+    return Object.keys(props.translations.data).map((key) => {
+        return props.translations.data[key];
+    }).filter((translation: Translation | undefined) => {
+        return (
+            translation &&
+            (translation.language.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+                translation.language.code.toLowerCase().includes(searchQuery.value.toLowerCase()))
+        );
+    });
+});
+
 
 function toggleSelection() {
-    if (selectedIds.value.length === props.translations.data.length) {
+    if (selectedIds.value.length === Object.keys(props.translations.data).length) {
         selectedIds.value = []
     } else {
-        selectedIds.value = props.translations.data.map((language: Translation) => language.id)
+        selectedIds.value = Object.keys(props.translations.data).map((key) => parseInt(key, 10))
     }
 }
 
-const isAllSelected = computed(() => selectedIds.value.length === filteredTranslations.length)
+const isAllSelected = computed(() => selectedIds.value.length === Object.keys(props.translations.data).length)
 </script>
 
 <template>
@@ -55,17 +63,17 @@ const isAllSelected = computed(() => selectedIds.value.length === filteredTransl
 
     <LayoutDashboard>
         <div class="mx-auto max-w-7xl px-6 py-10 lg:px-8">
-            <div v-if="source_translation" class="w-full filter">
+            <div v-if="sourceTranslation" class="w-full">
                 <div class="w-auto">
                     <InputText v-model="searchQuery" placeholder="Search languages by name or code" />
                 </div>
             </div>
 
-            <div v-if="source_translation" class="mt-4 overflow-hidden rounded-lg border bg-white shadow">
+            <div v-if="sourceTranslation" class="mt-4 overflow-hidden rounded-lg border bg-white shadow">
                 <div class="relative z-10 flex w-full divide-x shadow">
                     <div class="flex w-14 shrink-0 items-center justify-center">
                         <div class="flex shrink-0 items-center">
-                            <InputCheckbox :disabled="!translations.data.length" @click="toggleSelection" :checked="isAllSelected" />
+                            <InputCheckbox :disabled="!translations.data.length" :checked="isAllSelected" @click="toggleSelection" />
                         </div>
                     </div>
 
@@ -74,11 +82,11 @@ const isAllSelected = computed(() => selectedIds.value.length === filteredTransl
                     <div class="hidden flex-1 items-center px-4 text-sm text-gray-500 md:flex md:max-w-72 lg:max-w-80 xl:max-w-96">Translation progress</div>
 
                     <div class="w-full sm:w-14">
-                        <Link :href="route('ltu.translation.create')" v-tooltip="'Add Language'" class="relative inline-flex h-14 w-full cursor-pointer select-none items-center justify-center px-4 text-sm font-medium tracking-wide text-gray-700 outline-none transition-colors duration-150 ease-out hover:bg-blue-50 hover:text-blue-500 focus:border-blue-50 sm:text-gray-400">
-                            <div class="visible flex h-full w-full items-center justify-center leading-none">
+                        <Link v-tooltip="'Add Language'" :href="route('ltu.translation.create')" class="relative inline-flex h-14 w-full cursor-pointer select-none items-center justify-center px-4 text-sm font-medium tracking-wide text-gray-700 outline-none transition-colors duration-150 ease-out hover:bg-blue-50 hover:text-blue-500 focus:border-blue-50 sm:text-gray-400">
+                            <div class="visible flex size-full items-center justify-center leading-none">
                                 <span class="mx-auto whitespace-nowrap sm:hidden">Add Language</span>
 
-                                <IconPlus class="hidden h-5 w-5 fill-current sm:flex" />
+                                <IconPlus class="hidden size-5 fill-current sm:flex" />
                             </div>
                         </Link>
                     </div>
@@ -86,18 +94,18 @@ const isAllSelected = computed(() => selectedIds.value.length === filteredTransl
                     <div class="flex h-full">
                         <div class="flex w-full max-w-full">
                             <button
-                                type="button"
-                                class="relative inline-flex h-14 w-14 select-none items-center justify-center p-4 text-sm font-medium uppercase tracking-wide text-gray-400 no-underline outline-none transition-colors duration-150 ease-out"
-                                @click="openDialog"
                                 v-tooltip="selectedIds.length ? 'Delete selected' : 'Select languages to delete'"
+                                type="button"
+                                class="relative inline-flex size-14 select-none items-center justify-center p-4 text-sm font-medium uppercase tracking-wide text-gray-400 no-underline outline-none transition-colors duration-150 ease-out"
                                 :disabled="!selectedIds.length"
                                 :class="{
                                     'cursor-not-allowed': !selectedIds.length,
                                     'cursor-pointer': selectedIds.length,
                                     'hover:bg-red-50 hover:text-red-600': selectedIds.length,
                                     'bg-gray-50': !selectedIds.length,
-                                }">
-                                <IconTrash class="h-5 w-5" />
+                                }"
+                                @click="openDialog">
+                                <IconTrash class="size-5" />
                             </button>
                         </div>
                     </div>
@@ -109,8 +117,9 @@ const isAllSelected = computed(() => selectedIds.value.length === filteredTransl
                             <span class="mt-2 text-sm text-gray-500"> This action cannot be undone, This will permanently delete the selected languages and all of their translations. </span>
 
                             <div class="mt-4 flex gap-4">
-                                <BaseButton variant="secondary" type="button" size="lg" @click="closeDialog" full-width> Cancel </BaseButton>
-                                <BaseButton variant="danger" type="button" size="lg" @click="deleteTranslations" :is-loading="loading" full-width> Delete </BaseButton>
+                                <BaseButton variant="secondary" type="button" size="lg" full-width @click="closeDialog"> Cancel </BaseButton>
+
+                                <BaseButton variant="danger" type="button" size="lg" :is-loading="loading" full-width @click="deleteTranslations"> Delete </BaseButton>
                             </div>
                         </div>
                     </ConfirmationDialog>
@@ -130,49 +139,54 @@ const isAllSelected = computed(() => selectedIds.value.length === filteredTransl
                             <Link :href="route('ltu.source_translation')" class="flex w-full divide-x">
                                 <div class="flex flex-1 justify-between gap-x-4 truncate px-4">
                                     <div class="flex w-full items-center truncate font-medium">
-                                        <Flag :country-code="source_translation.language.code" class="mr-2" />
+                                        <Flag :country-code="sourceTranslation.language.code" class="mr-2" />
 
                                         <span class="mr-2 max-w-full truncate text-base text-gray-700">
-                                            {{ source_translation.language.name }}
+                                            {{ sourceTranslation.language.name }}
                                         </span>
 
                                         <div class="inline-block">
                                             <span class="flex h-5 items-center rounded-md border px-1.5 text-xs font-normal leading-none text-gray-600">
-                                                {{ source_translation.language.code }}
+                                                {{ sourceTranslation.language.code }}
                                             </span>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="hidden flex-1 flex-wrap content-center items-center gap-1 px-4 md:flex md:max-w-72 lg:max-w-80 xl:max-w-96">
-                                    <span class="mr-1 shrink-0 text-sm leading-tight text-gray-600">{{ source_translation.phrases_count }} source keys</span>
+                                    <span class="mr-1 shrink-0 text-sm leading-tight text-gray-600">{{ sourceTranslation.phrases_count }} source keys</span>
                                 </div>
                             </Link>
                         </div>
 
-                        <Link :href="route('ltu.source_translation')" v-tooltip="'Manage Keys'" class="group hidden w-full border-r sm:flex sm:w-14">
+                        <Link v-tooltip="'Manage Keys'" :href="route('ltu.source_translation')" class="group hidden w-full border-r sm:flex sm:w-14">
                             <div class="relative inline-flex h-14 w-full cursor-pointer select-none items-center justify-center px-4 text-sm font-medium tracking-wide text-gray-700 outline-none transition-colors duration-150 ease-out focus:border-blue-50 group-hover:bg-blue-50 group-hover:text-blue-500">
-                                <IconCog class="hidden h-5 w-5 fill-current text-gray-400 group-hover:text-blue-500 sm:flex" />
+                                <IconCog class="hidden size-5 fill-current text-gray-400 group-hover:text-blue-500 sm:flex" />
                             </div>
                         </Link>
 
-                        <div class="flex h-full" v-tooltip="'Source language cannot be deleted!'">
+                        <div v-tooltip="'Source language cannot be deleted!'" class="flex h-full">
                             <div class="flex w-full max-w-full">
-                                <div class="relative inline-flex h-14 w-14 cursor-not-allowed select-none items-center justify-center p-4 text-sm font-medium uppercase tracking-wide text-gray-400 no-underline outline-none transition-colors duration-150 ease-out">
-                                    <IconTrash class="h-5 w-5" />
+                                <div class="relative inline-flex size-14 cursor-not-allowed select-none items-center justify-center p-4 text-sm font-medium uppercase tracking-wide text-gray-400 no-underline outline-none transition-colors duration-150 ease-out">
+                                    <IconTrash class="size-5" />
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <template v-if="filteredTranslations.length">
-                        <TranslationItem v-for="translation in filteredTranslations" :translation="translation" :selected-ids="selectedIds" :key="translation.language.code" />
+                        <TranslationItem
+                            v-for="translation in filteredTranslations"
+                            :key="translation.language.code"
+                            :translation="translation"
+                            :selected-ids="selectedIds"
+                        />
                     </template>
 
                     <Link v-if="filteredTranslations.length" :href="route('ltu.translation.create')" class="flex cursor-pointer items-center justify-between rounded-b border-t p-4 text-gray-500 transition-colors duration-100 hover:bg-blue-50 hover:text-blue-600">
                         <div class="text-sm font-medium uppercase tracking-wide">Add new language</div>
 
-                        <IconPlus class="h-6 w-6" />
+                        <IconPlus class="size-6" />
                     </Link>
 
                     <EmptyState v-else class="bg-gray-50 py-32" title="There are no languages to translate your project to." description="Add the first one and start translating.">
@@ -182,7 +196,7 @@ const isAllSelected = computed(() => selectedIds.value.length === filteredTransl
 
                         <Link :href="route('ltu.translation.create')" class="btn btn-primary btn-md mt-4">
                             <div class="visible flex items-center leading-none">
-                                <IconPlus class="mr-1 h-5 w-5 fill-white" />
+                                <IconPlus class="mr-1 size-5 fill-white" />
 
                                 <span class="whitespace-nowrap">Add languages</span>
                             </div>
@@ -200,8 +214,8 @@ const isAllSelected = computed(() => selectedIds.value.length === filteredTransl
                     <span class="px-2 py-1 text-sm font-medium text-gray-500">php artisan translation:import</span>
 
                     <UseClipboard v-slot="{ copy, copied }" source="php artisan translation:import">
-                        <button type="button" @click="copy()" v-tooltip="copied ? 'Copied' : 'Copy'" class="h-full border-l p-2 text-gray-400 hover:bg-blue-50 hover:text-blue-500">
-                            <IconClipboard class="h-4 w-4" />
+                        <button v-tooltip="copied ? 'Copied' : 'Copy'" type="button" class="h-full border-l p-2 text-gray-400 hover:bg-blue-50 hover:text-blue-500" @click="copy()">
+                            <IconClipboard class="size-4" />
                         </button>
                     </UseClipboard>
                 </code>

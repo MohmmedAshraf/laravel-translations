@@ -26,7 +26,6 @@
         "brick/varexporter": "^0.3.7",
         "illuminate/contracts": "^9.28|^10.0",
         "inertiajs/inertia-laravel": "^0.6.11",
-        "protonemedia/inertiajs-tables-laravel-query-builder": "^2.2",
         "spatie/laravel-package-tools": "^1.0",
         "spatie/laravel-query-builder": "^5.7",
         "stichoza/google-translate-php": "^5.1",

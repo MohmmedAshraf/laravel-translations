@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Phrase, Translation } from "../../../scripts/types"
 
-const props = defineProps<{
+defineProps<{
     phrase: Phrase
     translation: Translation
 }>()
@@ -10,9 +10,9 @@ const props = defineProps<{
     <div class="w-full hover:bg-gray-100">
         <div class="flex h-14 w-full divide-x">
             <div class="hidden w-20 items-center justify-center px-4 md:flex" :class="{ 'bg-green-50': phrase.state, 'hover:bg-green-100': phrase.state }">
-                <IconCheck v-if="phrase.state" class="h-5 w-5 text-green-600" />
+                <IconCheck v-if="phrase.state" class="size-5 text-green-600" />
 
-                <IconLanguage v-else class="h-5 w-5 text-gray-500" />
+                <IconLanguage v-else class="size-5 text-gray-500" />
             </div>
 
             <Link :href="route('ltu.phrases.edit', { translation: translation.id, phrase: phrase.uuid })" class="grid w-full grid-cols-2 divide-x md:grid-cols-3">
@@ -37,7 +37,7 @@ const props = defineProps<{
 
             <div class="grid w-[67px] grid-cols-1 divide-x">
                 <Link v-tooltip="'Edit'" :href="route('ltu.phrases.edit', { translation: translation.id, phrase: phrase.uuid })" class="group flex items-center justify-center px-3 hover:bg-blue-50">
-                    <IconPencil class="h-5 w-5 text-gray-400 group-hover:text-blue-600" />
+                    <IconPencil class="size-5 text-gray-400 group-hover:text-blue-600" />
                 </Link>
             </div>
         </div>

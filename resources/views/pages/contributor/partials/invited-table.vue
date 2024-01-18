@@ -3,7 +3,11 @@ import InvitedItem from "./invited-item.vue"
 import { Invite } from "../../../../scripts/types"
 
 defineProps<{
-    invitations: Invite
+    invitations: {
+        data: Record<string, Invite>
+        links: Record<string, string>
+        meta: Record<string, string>
+    }
 }>()
 </script>
 
@@ -26,14 +30,14 @@ defineProps<{
                 </div>
 
                 <div class="grid w-16">
-                    <Link :href="route('ltu.contributors.invite')" v-tooltip="'Invite Contributor'" href="#" class="group flex items-center justify-center px-3 hover:bg-blue-50">
-                        <IconPlus class="h-5 w-5 text-gray-400 group-hover:text-blue-600" />
+                    <Link v-tooltip="'Invite Contributor'" :href="route('ltu.contributors.invite')" class="group flex items-center justify-center px-3 hover:bg-blue-50">
+                        <IconPlus class="size-5 text-gray-400 group-hover:text-blue-600" />
                     </Link>
                 </div>
             </div>
         </div>
 
-        <InvitedItem v-if="invitations.data.length" v-for="invitation in invitations.data" :invitation="invitation" :key="invitation.id" />
+        <InvitedItem v-for="invitation in invitations.data" v-if="invitations.data.length" :key="invitation.id" :invitation="invitation" />
 
         <div v-else class="flex w-full items-center justify-center bg-gray-50 px-4 py-12">
             <span class="text-sm text-gray-400">There are no invitations yet..</span>

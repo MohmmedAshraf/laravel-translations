@@ -24,7 +24,7 @@ defineProps<{
         </div>
 
         <a :href="route('ltu.source_translation.edit', phrase.uuid)" target="_blank" class="transition-color relative flex w-14 cursor-pointer items-center justify-center text-gray-400 duration-100 hover:bg-blue-100 hover:text-blue-600">
-            <IconPencil class="inline-block h-5 w-5" />
+            <IconPencil class="inline-block size-5" />
         </a>
     </div>
 </template>

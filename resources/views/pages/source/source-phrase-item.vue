@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, defineEmits } from "vue"
+import { ref } from "vue"
 import { Phrase } from "../../../scripts/types"
 import useConfirmationDialog from "../../../scripts/composables/use-confirmation-dialog"
 
@@ -7,8 +7,6 @@ const props = defineProps<{
     phrase: Phrase
     selectedIds: number[]
 }>()
-
-const { emit } = defineEmits()
 
 const { loading, showDialog, openDialog, performAction, closeDialog } = useConfirmationDialog()
 
@@ -33,9 +31,9 @@ watch(
             </div>
 
             <div class="hidden w-20 items-center justify-center px-4 md:flex" :class="{ 'bg-green-50': phrase.state, 'hover:bg-green-100': phrase.state }">
-                <IconCheck v-if="phrase.state" class="h-5 w-5 text-green-600" />
+                <IconCheck v-if="phrase.state" class="size-5 text-green-600" />
 
-                <IconLanguage v-else class="h-5 w-5 text-gray-500" />
+                <IconLanguage v-else class="size-5 text-gray-500" />
             </div>
 
             <Link :href="route('ltu.source_translation.edit', phrase.uuid)" class="grid w-full grid-cols-2 divide-x">
@@ -54,11 +52,11 @@ watch(
 
             <div class="grid w-36 grid-cols-2 divide-x">
                 <Link v-tooltip="'Edit'" :href="route('ltu.source_translation.edit', phrase.uuid)" class="group flex items-center justify-center px-3 hover:bg-blue-50">
-                    <IconPencil class="h-5 w-5 text-gray-400 group-hover:text-blue-600" />
+                    <IconPencil class="size-5 text-gray-400 group-hover:text-blue-600" />
                 </Link>
 
-                <button @click="openDialog" type="button" v-tooltip="'Delete'" class="group flex items-center justify-center px-3 hover:bg-red-50">
-                    <IconTrash class="h-5 w-5 text-gray-400 group-hover:text-red-600" />
+                <button v-tooltip="'Delete'" type="button" class="group flex items-center justify-center px-3 hover:bg-red-50" @click="openDialog">
+                    <IconTrash class="size-5 text-gray-400 group-hover:text-red-600" />
                 </button>
             </div>
 
@@ -69,8 +67,9 @@ watch(
                     <span class="mt-2 text-sm text-gray-500"> This action cannot be undone, This will permanently delete the selected languages and all of their translations. </span>
 
                     <div class="mt-4 flex gap-4">
-                        <BaseButton variant="secondary" type="button" size="lg" @click="closeDialog" full-width> Cancel </BaseButton>
-                        <BaseButton variant="danger" type="button" size="lg" @click="deletePhrase(phrase.uuid)" :is-loading="loading" full-width> Delete </BaseButton>
+                        <BaseButton variant="secondary" type="button" size="lg" full-width @click="closeDialog"> Cancel </BaseButton>
+
+                        <BaseButton variant="danger" type="button" size="lg" :is-loading="loading" full-width @click="deletePhrase(phrase.uuid)"> Delete </BaseButton>
                     </div>
                 </div>
             </ConfirmationDialog>

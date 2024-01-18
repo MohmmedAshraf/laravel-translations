@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, defineEmits } from "vue"
+import { ref } from "vue"
 import { Translation } from "../../../scripts/types"
 import useConfirmationDialog from "../../../scripts/composables/use-confirmation-dialog"
 
@@ -7,8 +7,6 @@ const props = defineProps<{
     translation: Translation
     selectedIds: number[]
 }>()
-
-const { emit } = defineEmits()
 
 const { loading, showDialog, openDialog, performAction, closeDialog } = useConfirmationDialog()
 
@@ -65,15 +63,15 @@ watch(
         </div>
 
         <div class="hidden w-full border-r sm:flex sm:w-14">
-            <Link :href="route('ltu.phrases.index', translation.id)" v-tooltip="'Translate'" class="relative inline-flex h-14 w-full cursor-pointer select-none items-center justify-center px-4 text-sm font-medium tracking-wide text-gray-400 outline-none transition-colors duration-150 ease-out hover:bg-blue-50 hover:text-blue-500 focus:border-blue-50">
-                <IconLanguage class="hidden h-5 w-5 sm:flex" />
+            <Link v-tooltip="'Translate'" :href="route('ltu.phrases.index', translation.id)" class="relative inline-flex h-14 w-full cursor-pointer select-none items-center justify-center px-4 text-sm font-medium tracking-wide text-gray-400 outline-none transition-colors duration-150 ease-out hover:bg-blue-50 hover:text-blue-500 focus:border-blue-50">
+                <IconLanguage class="hidden size-5 sm:flex" />
             </Link>
         </div>
 
         <div class="flex h-full">
-            <div class="flex w-full max-w-full" v-tooltip="'Delete'">
-                <button type="button" @click="openDialog" class="relative inline-flex h-14 w-14 cursor-pointer select-none items-center justify-center p-4 text-sm font-medium uppercase tracking-wide text-gray-400 no-underline outline-none transition-colors duration-150 ease-out hover:bg-red-50 hover:text-red-600">
-                    <IconTrash class="h-5 w-5" />
+            <div v-tooltip="'Delete'" class="flex w-full max-w-full">
+                <button type="button" class="relative inline-flex size-14 cursor-pointer select-none items-center justify-center p-4 text-sm font-medium uppercase tracking-wide text-gray-400 no-underline outline-none transition-colors duration-150 ease-out hover:bg-red-50 hover:text-red-600" @click="openDialog">
+                    <IconTrash class="size-5" />
                 </button>
             </div>
 
@@ -86,8 +84,9 @@ watch(
                     </span>
 
                     <div class="mt-4 flex gap-4">
-                        <BaseButton variant="secondary" type="button" size="lg" @click="closeDialog" full-width> Cancel </BaseButton>
-                        <BaseButton variant="danger" type="button" size="lg" @click="deleteTranslation(translation.id)" :is-loading="loading" full-width> Delete </BaseButton>
+                        <BaseButton variant="secondary" type="button" size="lg" full-width @click="closeDialog"> Cancel </BaseButton>
+
+                        <BaseButton variant="danger" type="button" size="lg" :is-loading="loading" full-width @click="deleteTranslation(translation.id)"> Delete </BaseButton>
                     </div>
                 </div>
             </ConfirmationDialog>

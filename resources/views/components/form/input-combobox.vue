@@ -45,7 +45,7 @@ const focus = () => {
                 <ComboboxInput ref="input" class="w-full cursor-default truncate border border-gray-300 py-2.5 pl-3 pr-8 text-sm transition focus:border-gray-700" :display-value="(items) => ((items ?? []) as string[]).join(', ')" @focus="focus" @change="query = $event.target.value" />
 
                 <ComboboxButton ref="button" class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                    <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+                    <ChevronUpDownIcon class="size-5 text-gray-400" aria-hidden="true" />
                 </ComboboxButton>
             </div>
 
@@ -58,7 +58,7 @@ const focus = () => {
                             <span class="block truncate" :class="[selected ? 'font-medium' : 'font-normal']">{{ item }}</span>
 
                             <div class="absolute inset-y-0 right-0 flex items-center pr-3">
-                                <span class="h-2 w-2 transition-colors" :class="[selected ? 'bg-gray-800' : active ? 'bg-gray-300' : 'bg-gray-100']" aria-hidden="true" />
+                                <span class="size-2 transition-colors" :class="[selected ? 'bg-gray-800' : active ? 'bg-gray-300' : 'bg-gray-100']" aria-hidden="true" />
                             </div>
                         </li>
                     </ComboboxOption>

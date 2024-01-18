@@ -2,6 +2,7 @@
 
 namespace Outhebox\TranslationsUI\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
@@ -17,9 +18,27 @@ use Outhebox\TranslationsUI\TranslationsManager;
 
 class TranslationController extends BaseController
 {
-    public function export(): void
+    public function publish(): Modal
     {
-        app(TranslationsManager::class)->export();
+        return Inertia::modal('translations/modals/publish-translations')
+            ->baseRoute('ltu.translation.index');
+    }
+
+    public function export(): RedirectResponse
+    {
+        try {
+            app(TranslationsManager::class)->export();
+
+            return redirect()->route('ltu.translation.index')->with('notification', [
+                'type' => 'success',
+                'body' => 'Translations have been exported successfully',
+            ]);
+        } catch (Exception $e) {
+            return redirect()->route('ltu.translation.index')->with('notification', [
+                'type' => 'error',
+                'body' => $e->getMessage(),
+            ]);
+        }
     }
 
     public function index(): Response
@@ -34,14 +53,8 @@ class TranslationController extends BaseController
 
         return Inertia::render('translations/index', [
             'translations' => TranslationResource::collection($allTranslations),
-            'source_translation' => $sourceTranslation ? TranslationResource::make($sourceTranslation) : null,
+            'sourceTranslation' => $sourceTranslation ? TranslationResource::make($sourceTranslation) : null,
         ]);
-    }
-
-    public function confirmationModal(): Modal
-    {
-        return Inertia::modal('modals/confirmation')
-            ->baseRoute('ltu.translation.index');
     }
 
     public function create(): Modal

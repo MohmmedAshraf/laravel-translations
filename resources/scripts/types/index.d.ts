@@ -17,6 +17,12 @@ export type Notification = {
     body: string
 }
 
+export type MachineTranslations = {
+    id: number
+    value: string
+    engine: string
+}
+
 export type Contributor = {
     id: number
     name: string

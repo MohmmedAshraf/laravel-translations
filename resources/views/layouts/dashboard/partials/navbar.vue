@@ -34,7 +34,7 @@ const navigation = [
 
                     <span class="sr-only">Open main menu</span>
 
-                    <Bars3Icon class="block h-6 w-6" aria-hidden="true" />
+                    <Bars3Icon class="block size-6" aria-hidden="true" />
                 </PopoverButton>
             </div>
 
@@ -51,6 +51,7 @@ const navigation = [
                                     <div class="flex items-center justify-between px-4">
                                         <Link :href="route('ltu.translation.index')" tabindex="-1" class="flex items-center gap-3">
                                             <Logo class="h-8 w-auto" />
+
                                             <h1 class="mt-1 text-xl font-medium text-gray-600">Translations <span class="font-bold text-blue-600">UI</span></h1>
                                         </Link>
 
@@ -60,7 +61,7 @@ const navigation = [
 
                                                 <span class="sr-only">Close menu</span>
 
-                                                <XMarkIcon class="h-6 w-6" aria-hidden="true" />
+                                                <XMarkIcon class="size-6" aria-hidden="true" />
                                             </PopoverButton>
                                         </div>
                                     </div>
@@ -85,7 +86,7 @@ const navigation = [
 
                                             <span class="sr-only">Log Out</span>
 
-                                            <ArrowRightEndOnRectangleIcon class="h-6 w-6" aria-hidden="true" />
+                                            <ArrowRightEndOnRectangleIcon class="size-6" aria-hidden="true" />
                                         </Link>
                                     </div>
                                 </div>
@@ -97,13 +98,15 @@ const navigation = [
 
             <div class="hidden gap-4 lg:ml-4 lg:flex lg:items-center">
                 <div class="flex">
-                    <BaseButton variant="success" size="xs">
+                    <Link :href="route('ltu.translation.publish')" class="btn btn-xs btn-success">
+                        <IconPublish class="size-4" />
+
                         <span>Publish</span>
-                    </BaseButton>
+                    </Link>
                 </div>
 
                 <Link as="button" method="POST" href="{{ route('ltu.logout') }}" class="flex items-center text-white hover:text-gray-900">
-                    <ArrowRightEndOnRectangleIcon class="h-6 w-6" />
+                    <ArrowRightEndOnRectangleIcon class="size-6" />
                 </Link>
             </div>
         </Popover>

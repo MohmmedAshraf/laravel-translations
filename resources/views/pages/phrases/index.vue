@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { ref, watch } from "vue"
 import PhraseItem from "./phrase-item.vue"
-import { Phrase, Translation } from "../../../scripts/types"
+import { Invite, Phrase, Translation } from "../../../scripts/types"
 
 const props = defineProps<{
-    phrases: Phrase
+    phrases: {
+        data: Record<string, Phrase>
+        links: Record<string, string>
+        meta: Record<string, string>
+    }
     translation: Translation
 }>()
 
@@ -44,8 +48,8 @@ watch(form, () => {
                     </div>
                 </div>
 
-                <Link v-tooltip="'Go back'" :href="route('ltu.translation.index')" class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 p-1 hover:bg-gray-200">
-                    <IconArrowRight class="h-6 w-6 text-gray-400" />
+                <Link v-tooltip="'Go back'" :href="route('ltu.translation.index')" class="flex size-10 items-center justify-center rounded-full bg-gray-100 p-1 hover:bg-gray-200">
+                    <IconArrowRight class="size-6 text-gray-400" />
                 </Link>
             </div>
         </div>
@@ -54,17 +58,17 @@ watch(form, () => {
             <div class="w-full divide-y overflow-hidden rounded-md bg-white shadow">
                 <div class="grid w-full grid-cols-8 justify-between px-4 py-3">
                     <div class="col-span-2">
-                        <InputText placeholder="Search" v-model="form.search" size="md" />
+                        <InputText v-model="form.search" placeholder="Search" size="md" />
                     </div>
 
                     <div class="col-span-4"></div>
 
                     <div class="col-span-2">
                         <InputNativeSelect
-                            size="md"
                             id="status"
-                            placeholder="Filter by status"
                             v-model="form.status"
+                            size="md"
+                            placeholder="Filter by status"
                             :error="form.errors.status"
                             :items="[
                                 { value: 'translated', label: 'Translated' },
@@ -95,7 +99,7 @@ watch(form, () => {
 
                         <div class="grid w-[67px] grid-cols-1 divide-x">
                             <Link v-tooltip="'Add New Key'" :href="route('ltu.source_translation.add_source_key')" class="group flex items-center justify-center hover:bg-blue-50">
-                                <IconPlus class="h-5 w-5 text-gray-400 group-hover:text-blue-600" />
+                                <IconPlus class="size-5 text-gray-400 group-hover:text-blue-600" />
                             </Link>
                         </div>
                     </div>

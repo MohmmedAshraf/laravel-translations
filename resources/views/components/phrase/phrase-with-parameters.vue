@@ -53,12 +53,12 @@ function copyParameters(text: string): void {
         v-for="word in phrase"
         :key="word.value"
         class="flex items-center"
-        @click="copyable && word.parameter && copyParameters(word.value)"
         :class="{
             'text-gray-600': !word.parameter,
             'cursor-pointer': word.parameter && copyable,
             'rounded bg-blue-50 px-1 py-px text-sm text-blue-600 hover:bg-blue-100': word.parameter,
-        }">
+        }"
+        @click="copyable && word.parameter && copyParameters(word.value)">
         {{ word.value }}
     </div>
 </template>

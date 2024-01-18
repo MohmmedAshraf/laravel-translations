@@ -3,11 +3,11 @@ import { ref } from "vue"
 import { Role } from "../../../../scripts/types"
 import { RadioGroup, RadioGroupDescription, RadioGroupLabel, RadioGroupOption } from "@headlessui/vue"
 
-const { close } = useModal()
-
 const props = defineProps<{
     roles: Role[]
 }>()
+
+const { close } = useModal()
 
 const form = useForm({
     email: "",
@@ -33,8 +33,8 @@ const submit = () => {
 
     <Dialog size="lg">
         <div class="flex items-start justify-between gap-4 border-b px-6 py-4">
-            <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full border">
-                <IconMail class="h-6 w-6 text-gray-400" />
+            <div class="flex size-12 shrink-0 items-center justify-center rounded-full border">
+                <IconMail class="size-6 text-gray-400" />
             </div>
 
             <div class="w-full">
@@ -44,7 +44,7 @@ const submit = () => {
             </div>
 
             <div class="flex w-8 cursor-pointer items-center justify-center text-gray-400 hover:text-gray-600" @click="close">
-                <IconClose class="h-5 w-5" />
+                <IconClose class="size-5" />
             </div>
         </div>
 
@@ -62,15 +62,18 @@ const submit = () => {
 
                 <RadioGroup v-model="form.role">
                     <RadioGroupLabel class="sr-only">Role</RadioGroupLabel>
+
                     <div class="-space-y-px rounded-md bg-white">
-                        <RadioGroupOption as="template" v-for="(role, rolesIdx) in roles" :key="role.value" :value="role.value" v-slot="{ checked, active }">
-                            <div :class="[rolesIdx === 0 ? 'rounded-tl-md rounded-tr-md' : '', rolesIdx === roles.length - 1 ? 'rounded-bl-md rounded-br-md' : '', checked ? 'z-10 border-blue-200 bg-blue-50' : 'border-gray-200', 'relative flex cursor-pointer border p-4 focus:outline-none']">
-                                <div :class="[checked ? 'border-transparent bg-blue-600' : 'border-gray-300 bg-white', active ? 'ring-2 ring-blue-600 ring-offset-2' : '', 'mt-0.5 flex h-4 w-4 shrink-0 cursor-pointer items-center justify-center rounded-full border']" aria-hidden="true">
-                                    <span class="h-1.5 w-1.5 rounded-full bg-white" />
+                        <RadioGroupOption v-for="(role, rolesIdx) in roles" :key="role.value" v-slot="{ checked, active }" as="template" :value="role.value">
+                            <div class="relative flex cursor-pointer border p-4 focus:outline-none" :class="[rolesIdx === 0 ? 'rounded-t-md' : '', rolesIdx === roles.length - 1 ? 'rounded-b-md' : '', checked ? 'z-10 border-blue-200 bg-blue-50' : 'border-gray-200']">
+                                <div class="mt-0.5 flex size-4 shrink-0 cursor-pointer items-center justify-center rounded-full border" :class="[checked ? 'border-transparent bg-blue-600' : 'border-gray-300 bg-white', active ? 'ring-2 ring-blue-600 ring-offset-2' : '']" aria-hidden="true">
+                                    <span class="size-1.5 rounded-full bg-white" />
                                 </div>
+
                                 <div class="ml-3 flex flex-col space-y-2">
-                                    <RadioGroupLabel as="span" :class="[checked ? 'text-blue-900' : 'text-gray-900', 'block text-sm font-medium']">{{ role.label }}</RadioGroupLabel>
-                                    <RadioGroupDescription as="span" :class="[checked ? 'text-blue-700' : 'text-gray-500', 'block text-sm']">{{ role.description }}</RadioGroupDescription>
+                                    <RadioGroupLabel as="span" class="block text-sm font-medium" :class="[checked ? 'text-blue-900' : 'text-gray-900']">{{ role.label }}</RadioGroupLabel>
+
+                                    <RadioGroupDescription as="span" class="block text-sm" :class="[checked ? 'text-blue-700' : 'text-gray-500']">{{ role.description }}</RadioGroupDescription>
                                 </div>
                             </div>
                         </RadioGroupOption>
@@ -82,7 +85,7 @@ const submit = () => {
         <div class="grid grid-cols-1 gap-6 border-t px-6 py-4 md:grid-cols-2">
             <BaseButton variant="secondary" type="button" size="lg" @click="close"> Close </BaseButton>
 
-            <BaseButton @click="submit" variant="primary" type="button" size="lg" :disabled="!canSubmit || form.processing" :is-loading="form.processing"> Send Invitation </BaseButton>
+            <BaseButton variant="primary" type="button" size="lg" :disabled="!canSubmit || form.processing" :is-loading="form.processing" @click="submit"> Send Invitation </BaseButton>
         </div>
     </Dialog>
 </template>
