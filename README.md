@@ -64,7 +64,7 @@ php artisan translations:clean
 
 Alternatively, you can manually remove the package by following these steps:
 
-```bash
+```bash[.env](..%2Ftestapp%2F.env)
 composer remove outhebox/laravel-translations
 ```
 
@@ -73,16 +73,10 @@ composer remove outhebox/laravel-translations
 After uninstallation, perform a fresh installation of the package.
 
 ```bash
-composer require outhebox/laravel-translations
+composer require outhebox/laravel-translations --with-all-dependencies
 ```
 
-Before you can access the translations UI, run the migrations by running the following command:
-
-```bash
-php artisan migrate
-```
-
-After running the migrations, you'll need to publish the package's assets by running the following command:
+Before you can access the translations UI, you'll need to publish the package's assets and migrations files by running the following command:
 
 ```bash
 php artisan translations:install

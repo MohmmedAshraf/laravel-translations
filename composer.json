@@ -20,11 +20,11 @@
         }
     ],
     "require": {
-        "php": "^8.1",
+        "php": "^8.1|^8.2|^8.3",
         "based/momentum-lock": "^0.2.0",
         "based/momentum-modal": "^0.2.0",
-        "brick/varexporter": "^0.4.0",
-        "illuminate/contracts": "^9.28|^10.0",
+        "brick/varexporter": "^0.3.7|^0.4.0",
+        "illuminate/contracts": "^10.0",
         "inertiajs/inertia-laravel": "^0.6.11",
         "spatie/laravel-package-tools": "^1.0",
         "spatie/laravel-query-builder": "^5.7",

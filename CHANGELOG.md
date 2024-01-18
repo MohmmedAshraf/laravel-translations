@@ -2,10 +2,6 @@
 
 All notable changes to `laravel-translations` will be documented in this file.
 
-## v1.0.1 - 2024-01-18
-
-Fix installation issue `brick/varexporter`
-
 ## v1.0.0 - 2024-01-18
 
 🚀 **Exciting News: Version 1.0 Release!** 🚀
