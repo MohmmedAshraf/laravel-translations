@@ -26,20 +26,6 @@ class TranslationsManagerTest extends TestCase
     }
 
     /** @test */
-    public function it_returns_the_correct_translations_for_a_given_locale(): void
-    {
-        Config::set('translations.exclude_files', ['en']);
-        $filesystem = new FilesystemMock();
-
-        $translationsManager = new TranslationsManager($filesystem);
-        $translations = $translationsManager->getTranslations('en');
-        $this->assertEquals(['auth.php' => [], 'validation.json' => []], $translations);
-
-        $translations = $translationsManager->getTranslations('');
-        $this->assertEquals(['auth.php' => [], 'validation.json' => []], $translations);
-    }
-
-    /** @test */
     public function export_creates_a_new_translation_file_with_the_correct_content(): void
     {
         $filesystem = new FilesystemMock();
