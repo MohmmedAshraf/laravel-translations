@@ -13,8 +13,8 @@ class TranslationFactory extends Factory
     public function definition(): array
     {
         return [
+            'source' => false,
             'language_id' => Language::factory(),
-            'source' => $this->faker->boolean(),
         ];
     }
 
