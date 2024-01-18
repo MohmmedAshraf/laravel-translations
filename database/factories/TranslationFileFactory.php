@@ -1,9 +1,9 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Database\Factories;
+namespace Outhebox\TranslationsUI\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Outhebox\LaravelTranslations\Models\TranslationFile;
+use Outhebox\TranslationsUI\Models\TranslationFile;
 
 class TranslationFileFactory extends Factory
 {

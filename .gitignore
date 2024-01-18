@@ -1,4 +1,5 @@
 .idea
+.env
 .phpunit.result.cache
 build
 composer.lock
@@ -9,4 +10,6 @@ phpstan.neon
 testbench.yaml
 vendor
 node_modules
+resources/dist/hot
 .DS_Store
+.phpunit.cache

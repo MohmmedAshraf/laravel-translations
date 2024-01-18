@@ -1,9 +1,9 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Database\Seeders;
+namespace Outhebox\TranslationsUI\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Outhebox\LaravelTranslations\Models\Language;
+use Outhebox\TranslationsUI\Models\Language;
 
 class LanguagesTableSeeder extends Seeder
 {

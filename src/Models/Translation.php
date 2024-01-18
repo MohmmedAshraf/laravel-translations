@@ -1,13 +1,12 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Models;
+namespace Outhebox\TranslationsUI\Models;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Outhebox\LaravelTranslations\Models\Concerns\HasDatabaseConnection;
+use Outhebox\TranslationsUI\Traits\HasDatabaseConnection;
 
 class Translation extends Model
 {
@@ -36,10 +35,19 @@ class Translation extends Model
         return $this->belongsTo(Language::class);
     }
 
-    public function progress(): Attribute
+    public function scopeIsSource($query): void
     {
-        return Attribute::get(function () {
-            return 0;
-        });
+        $query->where('source', true);
+    }
+
+    public function scopeWithProgress($query): void
+    {
+        $query->addSelect([
+            'progress' => Phrase::selectRaw('COUNT(CASE WHEN value IS NOT NULL THEN 1 END) / COUNT(*) * 100')
+                ->whereColumn('ltu_phrases.translation_id', 'ltu_translations.id')
+                ->limit(1),
+        ])->withCasts([
+            'progress' => 'decimal:1',
+        ]);
     }
 }

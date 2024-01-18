@@ -6,7 +6,8 @@
         "laravel-translations",
         "translations",
         "localization",
-        "livewire",
+        "inertiajs",
+        "inertia",
         "translation-manager"
     ],
     "homepage": "https://github.com/MohmmedAshraf/laravel-translations",
@@ -19,32 +20,40 @@
         }
     ],
     "require": {
-        "php": "^8.1|^8.2",
+        "php": "^8.1",
+        "based/momentum-lock": "^0.2.0",
+        "based/momentum-modal": "^0.2.0",
         "brick/varexporter": "^0.3.7",
-        "livewire/livewire": "^3.0",
-        "outhebox/blade-flags": "^1.0",
-        "saade/blade-iconsax": "^1.0",
-        "wire-elements/modal": "^2.0",
-        "wireui/wireui": "^1.18"
+        "illuminate/contracts": "^9.28|^10.0",
+        "inertiajs/inertia-laravel": "^0.6.11",
+        "spatie/laravel-package-tools": "^1.0",
+        "spatie/laravel-query-builder": "^5.7",
+        "stichoza/google-translate-php": "^5.1",
+        "tightenco/ziggy": "^1.8"
     },
     "require-dev": {
         "laravel/pint": "^1.0",
-        "orchestra/testbench": "^6.0|^7.6|^8.0",
+        "nunomaduro/collision": "^7.0",
+        "orchestra/testbench": "^8.0",
         "pestphp/pest": "^2.18",
-        "pestphp/pest-plugin-laravel": "^2.2",
-        "pestphp/pest-plugin-livewire": "^2.1",
-        "phpunit/phpunit": "^9.5|^10.0"
+        "phpstan/extension-installer": "^1.1",
+        "phpstan/phpstan-deprecation-rules": "^1.0",
+        "phpstan/phpstan-phpunit": "^1.0",
+        "phpunit/phpunit": "^10.0"
     },
     "autoload": {
         "psr-4": {
-            "Outhebox\\LaravelTranslations\\": "src",
-            "Outhebox\\LaravelTranslations\\Database\\Factories\\": "database/factories",
-            "Outhebox\\LaravelTranslations\\Database\\Seeders\\": "database/seeders"
-        }
+            "Outhebox\\TranslationsUI\\": "src",
+            "Outhebox\\TranslationsUI\\Database\\Factories\\": "database/factories",
+            "Outhebox\\TranslationsUI\\Database\\Seeders\\": "database/seeders"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
-            "Outhebox\\LaravelTranslations\\Tests\\": "tests"
+            "Outhebox\\TranslationsUI\\Tests\\": "tests"
         }
     },
     "scripts": {
@@ -64,10 +73,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Outhebox\\LaravelTranslations\\LaravelTranslationsServiceProvider"
+                "Outhebox\\TranslationsUI\\TranslationsUIServiceProvider"
             ],
             "aliases": {
-                "LaravelTranslations": "Outhebox\\LaravelTranslations\\Facades\\LaravelTranslations"
+                "TranslationsUI": "Outhebox\\TranslationsUI\\Facades\\TranslationsUI"
             }
         }
     },

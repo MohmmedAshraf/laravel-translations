@@ -1,15 +1,17 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Console\Commands;
+namespace Outhebox\TranslationsUI\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Schema;
-use Outhebox\LaravelTranslations\Models\Language;
-use Outhebox\LaravelTranslations\Models\Phrase;
-use Outhebox\LaravelTranslations\Models\Translation;
-use Outhebox\LaravelTranslations\Models\TranslationFile;
-use Outhebox\LaravelTranslations\TranslationsManager;
+use Outhebox\TranslationsUI\Actions\SyncPhrasesAction;
+use Outhebox\TranslationsUI\Database\Seeders\LanguagesTableSeeder;
+use Outhebox\TranslationsUI\Models\Language;
+use Outhebox\TranslationsUI\Models\Phrase;
+use Outhebox\TranslationsUI\Models\Translation;
+use Outhebox\TranslationsUI\Models\TranslationFile;
+use Outhebox\TranslationsUI\TranslationsManager;
 
 class ImportTranslationsCommand extends Command
 {
@@ -24,15 +26,6 @@ class ImportTranslationsCommand extends Command
         parent::__construct();
 
         $this->manager = $manager;
-    }
-
-    protected function truncateTables(): void
-    {
-        Schema::withoutForeignKeyConstraints(function () {
-            Phrase::truncate();
-            Translation::truncate();
-            TranslationFile::truncate();
-        });
     }
 
     public function handle(): void
@@ -51,6 +44,28 @@ class ImportTranslationsCommand extends Command
 
         $this->withProgressBar($this->manager->getLocales(), function ($locale) use ($translation) {
             $this->syncTranslations($translation, $locale);
+        });
+    }
+
+    protected function importLanguages(): void
+    {
+        if (! Schema::hasTable('ltu_languages') || Language::count() === 0) {
+            if ($this->confirm('The ltu_languages table does not exist or is empty, would you like to install the default languages?', true)) {
+                $this->callSilent('db:seed', ['--class' => LanguagesTableSeeder::class]);
+            } else {
+                $this->error('The ltu_languages table does not exist or is empty, please run the translations:install command first.');
+
+                exit;
+            }
+        }
+    }
+
+    protected function truncateTables(): void
+    {
+        Schema::withoutForeignKeyConstraints(function () {
+            Phrase::truncate();
+            Translation::truncate();
+            TranslationFile::truncate();
         });
     }
 
@@ -88,55 +103,7 @@ class ImportTranslationsCommand extends Command
     {
         foreach ($this->manager->getTranslations($locale) as $file => $translations) {
             foreach (Arr::dot($translations) as $key => $value) {
-                $this->syncPhrases($translation, $key, $value, $locale, $file);
-            }
-        }
-    }
-
-    public function syncPhrases(Translation $source, $key, $value, $locale, $file): void
-    {
-        if (is_array($value) && empty($value)) {
-            return;
-        }
-
-        $language = Language::where('code', $locale)->first();
-
-        if (! $language) {
-            $this->error(PHP_EOL."Language with code $locale not found");
-
-            exit;
-        }
-
-        $translation = Translation::firstOrCreate([
-            'language_id' => $language->id,
-            'source' => config('translations.source_language') === $locale,
-        ]);
-
-        $translationFile = TranslationFile::firstOrCreate([
-            'name' => pathinfo($file, PATHINFO_FILENAME),
-            'extension' => pathinfo($file, PATHINFO_EXTENSION),
-        ]);
-
-        $translation->phrases()->updateOrCreate([
-            'key' => $key,
-            'group' => $translationFile->name,
-            'translation_file_id' => $translationFile->id,
-        ], [
-            'value' => $value,
-            'parameters' => $this->manager->getPhraseParameters($value),
-            'phrase_id' => $translation->source ? null : $source->phrases()->where('key', $key)->first()?->id,
-        ]);
-    }
-
-    protected function importLanguages(): void
-    {
-        if (! Schema::hasTable('ltu_languages') || Language::count() === 0) {
-            if ($this->confirm('The ltu_languages table does not exist or is empty, would you like to install the default languages?', true)) {
-                $this->call('translations:install');
-            } else {
-                $this->error('The ltu_languages table does not exist or is empty, please run the translations:install command first.');
-
-                exit;
+                SyncPhrasesAction::execute($translation, $key, $value, $locale, $file);
             }
         }
     }

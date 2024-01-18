@@ -1,0 +1,57 @@
+.vs__selected {
+    @apply flex items-center gap-1 bg-blue-50 text-blue-600 text-sm font-medium border-blue-400 m-0 px-1.5 py-0.5 rounded-md #{!important};
+}
+
+.vs__deselect {
+    @apply fill-blue-400 hover:fill-red-600 #{!important};
+}
+
+.vs__dropdown-toggle {
+    @apply px-2 py-1.5 rounded-md border-gray-300 shadow-sm placeholder:text-sm placeholder:text-gray-400 #{!important};
+}
+
+.vs__selected-options {
+    @apply flex flex-wrap gap-1.5 #{!important};
+}
+
+.vs__dropdown-menu {
+    @apply mt-0.5 rounded-md shadow-lg #{!important};
+}
+
+.vs--open {
+    .vs__dropdown-toggle {
+        @apply bg-blue-50 text-blue-600 border-blue-400 #{!important};
+    }
+
+    .vs__actions > svg {
+        @apply fill-blue-600 #{!important};
+    }
+}
+
+.vs__actions {
+    @apply px-1 py-2 #{!important};
+}
+
+.vs__dropdown-option {
+    @apply flex items-center px-2.5 py-1.5 gap-2 #{!important};
+}
+
+.vs__dropdown-option--disabled {
+    @apply hidden #{!important};
+}
+
+.v-popper--theme-tooltip {
+    @apply text-sm #{!important};
+}
+
+.v-popper__inner {
+    @apply py-1 px-3 rounded-md border-none max-w-[300px] #{!important};
+}
+
+.vs__search {
+    @apply my-0.5 text-gray-400 placeholder:text-sm focus:placeholder:text-blue-500 #{!important};
+}
+
+.vs__no-options {
+    @apply text-sm py-2 px-3 text-gray-400 #{!important};
+}

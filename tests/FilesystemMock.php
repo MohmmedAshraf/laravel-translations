@@ -1,6 +1,6 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Tests;
+namespace Outhebox\TranslationsUI\Tests;
 
 use Illuminate\Filesystem\Filesystem;
 use SplFileInfo;
