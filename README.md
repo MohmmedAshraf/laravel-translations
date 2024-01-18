@@ -5,7 +5,6 @@
     <a href="#roadmap">Roadmap</a> |
     <a href="#installation">Installation</a> |
     <a href="#usage">Usage</a> |
-    <a href="#authorization">Authorization</a> |
     <a href="#upgrading">Upgrade</a> |
     <a href="#changelog">Changelog</a>
 </p>
@@ -39,7 +38,7 @@ Laravel Translations UI package provides a user-friendly interface for managing 
 - Benefit from Google Translate API integration for accurate and automated language translation.
 - Explore additional features that enhance your translation workflow and more.
 
-### Package Roadmap
+### Roadmap
 - [x] Add tests.
 - [x] Improve the UI.
 - [ ] Vendor translations support.
@@ -57,8 +56,13 @@ I would like to inform you that this version brings about substantial breaking c
 To seamlessly adapt to these changes, please follow the steps below:
 
 #### Uninstall the Previous Version
+I've added a new command to help you uninstall the package and remove all its assets and configuration files and clean up the database, but please make sure to double-check that everything has been removed before proceeding with the installation of the new version, as this command is still in beta. To uninstall the package, run the following command:
 
-Completely remove the existing package from your Laravel application, including all assets and configuration files, and then perform a fresh installation of the new version, as described below.
+```bash
+php artisan translations:clean
+```
+
+Alternatively, you can manually remove the package by following these steps:
 
 ```bash
 composer remove outhebox/laravel-translations
@@ -112,23 +116,6 @@ You can export your translations from the translations UI dashboard or by runnin
 
 ```bash
 php artisan translations:export
-```
-
-### Authorization
-
-By default, the Translations UI dashboard can only be accessed in the local environment. The authorization gate in the `app/Providers/TranslationsServiceProvider.php` file controls access to the Translations UI dashboard in non-local environments. You can modify this gate as needed to restrict access to your Translations UI installation.
-
-To customize the authorization gate, you can define a closure in the gate method of the TranslationsServiceProvider class:
-
-```php
-protected function gate()
-{
-    Gate::define('viewLaravelTranslationsUI', function ($user) {
-        return in_array($user->email, [
-            // return true or false based on your authorization logic
-        ]);
-    });
-}
 ```
 
 ### Upgrading
