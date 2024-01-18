@@ -4,7 +4,6 @@ namespace Outhebox\TranslationsUI\Tests;
 
 use Brick\VarExporter\VarExporter;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File;
 use Outhebox\TranslationsUI\Models\Language;
 use Outhebox\TranslationsUI\Models\Phrase;
