@@ -39,7 +39,7 @@ class SourcePhraseControllerTest extends TestCase
     /** @test */
     public function it_can_render_source_translation_page()
     {
-        $this->actingAs($this->translator, 'translations')
+        $this->actingAs($this->owner, 'translations')
             ->get(route('ltu.source_translation'))
             ->assertStatus(200);
     }
@@ -47,7 +47,7 @@ class SourcePhraseControllerTest extends TestCase
     /** @test */
     public function it_can_render_source_translation_edit_page()
     {
-        $this->actingAs($this->translator, 'translations')
+        $this->actingAs($this->owner, 'translations')
             ->get(route('ltu.source_translation.edit', $this->source_phrase->first()->uuid))
             ->assertStatus(200);
     }
@@ -64,7 +64,7 @@ class SourcePhraseControllerTest extends TestCase
             'translation_file_id' => $file->id,
         ]);
 
-        $this->actingAs($this->translator, 'translations')
+        $this->actingAs($this->owner, 'translations')
             ->post(route('ltu.source_translation.store'), [
                 'file' => $file->id,
                 'key' => $phrase->key,
@@ -75,7 +75,7 @@ class SourcePhraseControllerTest extends TestCase
     /** @test */
     public function phrase_can_be_updated()
     {
-        $this->actingAs($this->translator, 'translations')
+        $this->actingAs($this->owner, 'translations')
             ->post(route('ltu.source_translation.update', $this->source_phrase->first()->uuid), [
                 'note' => $this->faker->sentence,
                 'phrase' => $this->faker->sentence,
@@ -86,7 +86,7 @@ class SourcePhraseControllerTest extends TestCase
     /** @test */
     public function phrase_can_be_deleted()
     {
-        $this->actingAs($this->translator, 'translations')
+        $this->actingAs($this->owner, 'translations')
             ->delete(route('ltu.source_translation.delete_phrase', $this->source_phrase->first()->uuid))
             ->assertRedirect(route('ltu.source_translation'));
     }
@@ -94,7 +94,7 @@ class SourcePhraseControllerTest extends TestCase
     /** @test */
     public function multiple_phrases_can_be_deleted()
     {
-        $this->actingAs($this->translator, 'translations')
+        $this->actingAs($this->owner, 'translations')
             ->post(route('ltu.source_translation.delete_phrases', [
                 'selected_ids' => [$this->source_phrase->pluck('id')->first()],
             ]))->assertRedirect(route('ltu.source_translation'));

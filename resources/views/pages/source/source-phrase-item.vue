@@ -30,12 +30,6 @@ watch(
                 <InputCheckbox v-model="selected" :value="phrase.id" />
             </div>
 
-            <div class="hidden w-20 items-center justify-center px-4 md:flex" :class="{ 'bg-green-50': phrase.state, 'hover:bg-green-100': phrase.state }">
-                <IconCheck v-if="phrase.state" class="size-5 text-green-600" />
-
-                <IconLanguage v-else class="size-5 text-gray-500" />
-            </div>
-
             <Link :href="route('ltu.source_translation.edit', phrase.uuid)" class="grid w-full grid-cols-2 divide-x">
                 <div class="flex w-full items-center justify-start px-4">
                     <div class="truncate rounded-md border bg-white px-1.5 py-0.5 text-sm font-medium text-gray-600 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-600">

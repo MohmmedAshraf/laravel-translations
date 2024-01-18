@@ -12,6 +12,7 @@ use Outhebox\TranslationsUI\Http\Controllers\SourcePhraseController;
 use Outhebox\TranslationsUI\Http\Controllers\TranslationController;
 use Outhebox\TranslationsUI\Http\Middleware\Authenticate;
 use Outhebox\TranslationsUI\Http\Middleware\HandleInertiaRequests;
+use Outhebox\TranslationsUI\Http\Middleware\RedirectIfNotOwner;
 
 Route::middleware(['web', HandleInertiaRequests::class])->prefix('translations')->name('ltu.')->group(function () {
     Route::prefix('auth')->group(function () {
@@ -36,23 +37,32 @@ Route::middleware(['web', HandleInertiaRequests::class])->prefix('translations')
     Route::middleware(Authenticate::class)->group(function () {
         // Translation Routes
         Route::get('/', [TranslationController::class, 'index'])->name('translation.index');
-        Route::get('publish', [TranslationController::class, 'publish'])->name('translation.publish');
-        Route::post('publish', [TranslationController::class, 'export'])->name('translation.export');
+
+        Route::middleware(RedirectIfNotOwner::class)->group(function () {
+            Route::get('publish', [TranslationController::class, 'publish'])->name('translation.publish');
+            Route::post('publish', [TranslationController::class, 'export'])->name('translation.export');
+        });
+
         Route::get('add-translation', [TranslationController::class, 'create'])->name('translation.create');
         Route::post('add-translation', [TranslationController::class, 'store'])->name('translation.store');
 
         // Source Phrase Routes
         Route::prefix('source-translation')->group(function () {
             Route::get('/', [SourcePhraseController::class, 'index'])->name('source_translation');
-            Route::post('import', [SourcePhraseController::class, 'import'])->name('source_translation.import');
             Route::get('create', [SourcePhraseController::class, 'create'])->name('source_translation.add_source_key');
             Route::post('create', [SourcePhraseController::class, 'store'])->name('source_translation.store');
-            Route::post('delete-phrases', [SourcePhraseController::class, 'destroy_multiple'])->name('source_translation.delete_phrases');
+
+            Route::post('delete-phrases', [SourcePhraseController::class, 'destroy_multiple'])
+                ->middleware(RedirectIfNotOwner::class)
+                ->name('source_translation.delete_phrases');
 
             Route::prefix('{phrase:uuid}')->group(function () {
                 Route::get('/', [SourcePhraseController::class, 'edit'])->name('source_translation.edit');
                 Route::post('/', [SourcePhraseController::class, 'update'])->name('source_translation.update');
-                Route::delete('delete', [SourcePhraseController::class, 'destroy'])->name('source_translation.delete_phrase');
+
+                Route::delete('delete', [SourcePhraseController::class, 'destroy'])
+                    ->middleware(RedirectIfNotOwner::class)
+                    ->name('source_translation.delete_phrase');
             });
         });
 
@@ -62,15 +72,20 @@ Route::middleware(['web', HandleInertiaRequests::class])->prefix('translations')
                 Route::get('/', [PhraseController::class, 'index'])->name('phrases.index');
                 Route::get('/edit/{phrase:uuid}', [PhraseController::class, 'edit'])->name('phrases.edit');
                 Route::post('/edit/{phrase:uuid}', [PhraseController::class, 'update'])->name('phrases.update');
-                Route::delete('delete', [TranslationController::class, 'destroy'])->name('translation.destroy');
+
+                Route::delete('delete', [TranslationController::class, 'destroy'])
+                    ->middleware(RedirectIfNotOwner::class)
+                    ->name('translation.delete');
             });
 
-            Route::post('delete-multiple', [TranslationController::class, 'destroy_multiple'])->name('translation.destroy.multiple');
+            Route::post('delete-multiple', [TranslationController::class, 'destroy_multiple'])
+                ->middleware(RedirectIfNotOwner::class)
+                ->name('translation.delete_multiple');
         });
 
         // Contributors Routes
         Route::prefix('contributors')->group(function () {
-            Route::prefix('invite')->group(function () {
+            Route::prefix('invite')->middleware(RedirectIfNotOwner::class)->group(function () {
                 Route::get('/', [ContributorController::class, 'create'])->name('contributors.invite');
                 Route::post('/', [ContributorController::class, 'store'])->name('contributors.invite.store');
 
@@ -78,7 +93,10 @@ Route::middleware(['web', HandleInertiaRequests::class])->prefix('translations')
             });
 
             Route::get('/', [ContributorController::class, 'index'])->name('contributors.index');
-            Route::delete('{contributor}/delete', [ContributorController::class, 'destroy'])->name('contributors.delete');
+
+            Route::delete('{contributor}/delete', [ContributorController::class, 'destroy'])
+                ->middleware(RedirectIfNotOwner::class)
+                ->name('contributors.delete');
         });
 
         // Profile Routes

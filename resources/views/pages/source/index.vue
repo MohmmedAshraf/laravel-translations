@@ -3,6 +3,7 @@ import { computed, ref, watch } from "vue"
 import { Phrase, Translation } from "../../../scripts/types"
 import SourcePhraseItem from "./source-phrase-item.vue"
 import useConfirmationDialog from "../../../scripts/composables/use-confirmation-dialog"
+import { debounce } from "lodash"
 
 const props = defineProps<{
     phrases: {
@@ -11,21 +12,26 @@ const props = defineProps<{
         meta: Record<string, string>
     }
     translation: Translation
+
+    filter: {
+        keyword?: string,
+        status?: string,
+    },
 }>()
 
-const form = useForm({
-    search: ref(""),
-    status: ref(""),
-})
+const searchField = ref(props.filter?.keyword || "");
 
-watch(form, () => {
-    form.get(route("ltu.source_translation", { translation: props.translation.id }), {
-        replace: true,
-        onSuccess: () => {
-            form.reset()
-        },
-    })
-})
+watch([searchField], debounce(() => {
+    router.get(route("ltu.source_translation"), {
+        filter: {
+            keyword: searchField.value || undefined,
+        }
+    }, {
+        preserveState: true,
+        preserveScroll: true,
+        only: ['phrases'],
+    });
+}, 300));
 
 const selectedIds = ref<number[]>([])
 
@@ -47,10 +53,11 @@ const deletePhrases = async () => {
 }
 
 function toggleSelection() {
-    if (selectedIds.value.length === Object.keys(props.phrases.data).length) {
+    if (selectedIds.value.length === props.phrases.data.length) {
         selectedIds.value = []
+
     } else {
-        selectedIds.value = Object.keys(props.phrases.data).map((key) => parseInt(key, 10))
+        selectedIds.value = props.phrases.data.map((phrase: Phrase) => phrase.id)
     }
 }
 
@@ -64,7 +71,7 @@ const isAllSelected = computed(() => selectedIds.value.length === Object.keys(pr
             <div class="mx-auto flex w-full max-w-7xl items-center justify-between px-6 lg:px-8">
                 <div class="flex w-full items-center">
                     <div class="flex w-full items-center gap-3 py-4">
-                        <Link href="#" class="flex items-center gap-2 rounded-md border border-transparent bg-gray-50 px-2 py-1 hover:border-blue-400 hover:bg-blue-100">
+                        <Link :href="route('ltu.source_translation')" class="flex items-center gap-2 rounded-md border border-transparent bg-gray-50 px-2 py-1 hover:border-blue-400 hover:bg-blue-100">
                             <div class="h-5 shrink-0">
                                 <Flag :country-code="translation.language.code" width="w-5" />
                             </div>
@@ -86,24 +93,9 @@ const isAllSelected = computed(() => selectedIds.value.length === Object.keys(pr
 
         <div class="mx-auto max-w-7xl px-6 py-10 lg:px-8">
             <div class="w-full divide-y overflow-hidden rounded-md bg-white shadow">
-                <div class="grid w-full grid-cols-8 justify-between px-4 py-3">
-                    <div class="col-span-2">
-                        <InputText v-model="form.search" placeholder="Search" size="md" />
-                    </div>
-
-                    <div class="col-span-4"></div>
-
-                    <div class="col-span-2">
-                        <InputNativeSelect
-                            id="status"
-                            v-model="form.status"
-                            size="md"
-                            placeholder="Filter by status"
-                            :error="form.errors.status"
-                            :items="[
-                                { value: 'translated', label: 'Translated' },
-                                { value: 'untranslated', label: 'Untranslated' },
-                            ]" />
+                <div class="flex w-full flex-wrap items-center justify-between gap-4 px-4 py-3 sm:flex-nowrap">
+                    <div class="w-full max-w-full md:max-w-sm">
+                        <InputText v-model="searchField" placeholder="Search by key or value" size="md" />
                     </div>
                 </div>
 
@@ -111,10 +103,6 @@ const isAllSelected = computed(() => selectedIds.value.length === Object.keys(pr
                     <div class="flex h-14 w-full divide-x">
                         <div class="flex w-12 items-center justify-center p-4">
                             <InputCheckbox :disabled="!phrases.data.length" :checked="isAllSelected" @click="toggleSelection" />
-                        </div>
-
-                        <div class="hidden w-20 items-center justify-center px-4 md:flex">
-                            <span class="text-sm font-medium text-gray-400">State</span>
                         </div>
 
                         <div class="grid w-full grid-cols-2 divide-x">

@@ -2,6 +2,7 @@
 
 namespace Outhebox\TranslationsUI\Http\Controllers;
 
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Mail;
@@ -33,7 +34,7 @@ class ContributorController extends BaseController
         ])->baseRoute('ltu.contributors.index');
     }
 
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         $request->validate([
             'role' => 'required|integer',
@@ -58,7 +59,7 @@ class ContributorController extends BaseController
         ]);
     }
 
-    public function destroy(Contributor $contributor)
+    public function destroy(Contributor $contributor): RedirectResponse
     {
         $contributor->delete();
 

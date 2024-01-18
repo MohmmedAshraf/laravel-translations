@@ -2,11 +2,10 @@
 
 namespace Outhebox\TranslationsUI\Http\Controllers;
 
-use Exception;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
-use Illuminate\Support\Facades\Artisan;
 use Inertia\Inertia;
 use Inertia\Response;
 use Momentum\Modal\Modal;
@@ -17,41 +16,30 @@ use Outhebox\TranslationsUI\Http\Resources\TranslationResource;
 use Outhebox\TranslationsUI\Models\Phrase;
 use Outhebox\TranslationsUI\Models\Translation;
 use Outhebox\TranslationsUI\Models\TranslationFile;
-use Spatie\QueryBuilder\QueryBuilder;
 
 class SourcePhraseController extends BaseController
 {
-    public function import(): RedirectResponse
-    {
-        try {
-            Artisan::call('translations:import', [
-                '--force' => true,
-            ]);
-
-            return redirect()->route('ltu.translation.index');
-        } catch (Exception $e) {
-            report($e);
-
-            return redirect()->back()->withErrors([
-                'message' => $e->getMessage(),
-            ]);
-        }
-    }
-
     public function index(Request $request): Response
     {
         $source = Translation::where('source', true)->first();
 
-        $phrases = QueryBuilder::for(Phrase::class)
-            ->orderBy('key')
-            ->allowedFilters(['key', 'value', 'status'])
-            ->where('translation_id', $source->id)
+        $phrases = $source->phrases()->newQuery();
+
+        if ($request->has('filter.keyword')) {
+            $phrases->where(function (Builder $query) use ($request) {
+                $query->where('key', 'LIKE', "%{$request->input('filter.keyword')}%")
+                    ->orWhere('value', 'LIKE', "%{$request->input('filter.keyword')}%");
+            });
+        }
+
+        $phrases = $phrases->orderBy('key')
             ->paginate($request->input('perPage') ?? 12)
-            ->appends(request()->query());
+            ->withQueryString();
 
         return Inertia::render('source/index', [
             'phrases' => PhraseResource::collection($phrases),
             'translation' => TranslationResource::make($source),
+            'filter' => $request->input('filter', collect()),
         ]);
     }
 
@@ -78,8 +66,12 @@ class SourcePhraseController extends BaseController
         return redirect()->route('ltu.source_translation');
     }
 
-    public function edit(Phrase $phrase): Response
+    public function edit(Phrase $phrase): Response|RedirectResponse
     {
+        if (! $phrase->translation->source) {
+            return redirect()->route('ltu.phrases.edit', $phrase->uuid);
+        }
+
         return Inertia::render('source/edit', [
             'phrase' => PhraseResource::make($phrase),
             'translation' => TranslationResource::make($phrase->translation),

@@ -30,7 +30,7 @@ class TranslationControllerTest extends TestCase
     /** @test */
     public function it_can_render_translations_page()
     {
-        $this->actingAs($this->translator, 'translations')
+        $this->actingAs($this->owner, 'translations')
             ->get(route('ltu.translation.index'))
             ->assertStatus(200);
     }
@@ -38,7 +38,7 @@ class TranslationControllerTest extends TestCase
     /** @test */
     public function it_can_store_new_translation()
     {
-        $this->actingAs($this->translator, 'translations')
+        $this->actingAs($this->owner, 'translations')
             ->post(route('ltu.translation.store'), [
                 'languages' => [Language::inRandomOrder()->first()->id],
             ])
@@ -50,8 +50,8 @@ class TranslationControllerTest extends TestCase
     /** @test */
     public function translation_can_be_deleted()
     {
-        $this->actingAs($this->translator, 'translations')
-            ->delete(route('ltu.translation.destroy', $this->translation->id))
+        $this->actingAs($this->owner, 'translations')
+            ->delete(route('ltu.translation.delete', $this->translation->id))
             ->assertRedirect(route('ltu.translation.index'));
 
         $this->assertCount(1, Translation::all());
@@ -60,8 +60,8 @@ class TranslationControllerTest extends TestCase
     /** @test */
     public function multiple_translations_can_be_deleted()
     {
-        $this->actingAs($this->translator, 'translations')
-            ->post(route('ltu.translation.destroy.multiple', [
+        $this->actingAs($this->owner, 'translations')
+            ->post(route('ltu.translation.delete_multiple', [
                 'selected_ids' => [$this->translation->id],
             ]))
             ->assertRedirect(route('ltu.translation.index'));

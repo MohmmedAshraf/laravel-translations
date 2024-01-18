@@ -26,4 +26,14 @@ class Contributor extends Authenticatable
     protected $casts = [
         'role' => RoleEnum::class,
     ];
+
+    public function isOwner(): bool
+    {
+        return $this->role === RoleEnum::owner;
+    }
+
+    public function isTranslator(): bool
+    {
+        return $this->role === RoleEnum::translator;
+    }
 }

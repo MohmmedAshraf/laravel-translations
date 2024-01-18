@@ -61,6 +61,7 @@ declare module 'vue' {
     MachineTranslateItem: typeof import('./../../views/components/phrase/suggestions/machine-translate-item.vue')['default']
     Modal: typeof import('./../../views/components/modal.vue')['default']
     Pagination: typeof import('./../../views/components/pagination.vue')['default']
+    PhrasesFilter: typeof import('./../../views/components/phrase/phrases-filter.vue')['default']
     PhraseWithParameters: typeof import('./../../views/components/phrase/phrase-with-parameters.vue')['default']
     SimilarPhrases: typeof import('./../../views/components/phrase/similar/similar-phrases.vue')['default']
     SimilarPhrasesItem: typeof import('./../../views/components/phrase/similar/similar-phrases-item.vue')['default']

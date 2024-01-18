@@ -22,7 +22,7 @@ const { loading, showDialog, openDialog, performAction, closeDialog } = useConfi
 const deleteTranslations = async (id: number) => {
     await performAction(() =>
         router.post(
-            route("ltu.translation.destroy.multiple"),
+            route("ltu.translation.delete_multiple"),
             { selected_ids: selectedIds.value },
             {
                 preserveScroll: true,
@@ -48,10 +48,11 @@ const filteredTranslations = computed(() => {
 
 
 function toggleSelection() {
-    if (selectedIds.value.length === Object.keys(props.translations.data).length) {
+    if (selectedIds.value.length === props.translations.data.length) {
         selectedIds.value = []
+
     } else {
-        selectedIds.value = Object.keys(props.translations.data).map((key) => parseInt(key, 10))
+        selectedIds.value = props.translations.data.map((language: Translation) => language.id)
     }
 }
 
@@ -73,7 +74,7 @@ const isAllSelected = computed(() => selectedIds.value.length === Object.keys(pr
                 <div class="relative z-10 flex w-full divide-x shadow">
                     <div class="flex w-14 shrink-0 items-center justify-center">
                         <div class="flex shrink-0 items-center">
-                            <InputCheckbox :disabled="!translations.data.length" :checked="isAllSelected" @click="toggleSelection" />
+                            <InputCheckbox :disabled="!translations.data.length" :checked="isAllSelected" @input="toggleSelection" />
                         </div>
                     </div>
 

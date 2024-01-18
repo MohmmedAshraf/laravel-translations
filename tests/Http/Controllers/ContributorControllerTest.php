@@ -16,7 +16,7 @@ class ContributorControllerTest extends TestCase
     /** @test */
     public function it_can_render_the_contributor_page()
     {
-        $this->actingAs($this->translator, 'translations')->get(route('ltu.contributors.index'))
+        $this->actingAs($this->owner, 'translations')->get(route('ltu.contributors.index'))
             ->assertStatus(200);
     }
 

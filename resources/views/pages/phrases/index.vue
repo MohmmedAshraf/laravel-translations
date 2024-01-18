@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref, watch } from "vue"
+import _, {debounce} from 'lodash';
+import { ref, watch, watchEffect } from "vue"
 import PhraseItem from "./phrase-item.vue"
-import { Invite, Phrase, Translation } from "../../../scripts/types"
+import { Phrase, Translation } from "../../../scripts/types"
 
 const props = defineProps<{
     phrases: {
@@ -10,21 +11,35 @@ const props = defineProps<{
         meta: Record<string, string>
     }
     translation: Translation
+
+    filter: {
+        keyword?: string,
+        status?: string,
+    },
 }>()
 
-const form = useForm({
-    search: ref(""),
-    status: ref(""),
-})
+const searchField = ref(props.filter?.keyword || "");
+const phraseStatus = ref(props.filter?.status || "");
 
-watch(form, () => {
-    form.get(route("ltu.phrases.index", { translation: props.translation.id }), {
-        replace: true,
-        onSuccess: () => {
-            form.reset()
-        },
-    })
-})
+const statusEnum = [
+    { label: "Translated", value: "translated" },
+    { label: "Untranslated", value: "untranslated" },
+];
+
+watch([searchField, phraseStatus], debounce(() => {
+    router.get(route("ltu.phrases.index", {
+        translation: props.translation.id
+    }), {
+        filter: {
+            keyword: searchField.value || undefined,
+            status: phraseStatus.value || undefined,
+        }
+    }, {
+        preserveState: true,
+        preserveScroll: true,
+        only: ['phrases'],
+    });
+}, 300));
 </script>
 <template>
     <Head title="Phrases" />
@@ -56,24 +71,19 @@ watch(form, () => {
 
         <div class="mx-auto max-w-7xl px-6 py-10 lg:px-8">
             <div class="w-full divide-y overflow-hidden rounded-md bg-white shadow">
-                <div class="grid w-full grid-cols-8 justify-between px-4 py-3">
-                    <div class="col-span-2">
-                        <InputText v-model="form.search" placeholder="Search" size="md" />
+                <div class="flex w-full flex-wrap items-center justify-between gap-4 px-4 py-3 sm:flex-nowrap">
+                    <div class="w-full max-w-full md:max-w-sm">
+                        <InputText v-model="searchField" placeholder="Search by key or value" size="md" />
                     </div>
 
-                    <div class="col-span-4"></div>
-
-                    <div class="col-span-2">
+                    <div class="w-full max-w-full md:max-w-sm">
                         <InputNativeSelect
                             id="status"
-                            v-model="form.status"
+                            v-model="phraseStatus"
                             size="md"
                             placeholder="Filter by status"
-                            :error="form.errors.status"
-                            :items="[
-                                { value: 'translated', label: 'Translated' },
-                                { value: 'untranslated', label: 'Untranslated' },
-                            ]" />
+                            :items="statusEnum"
+                        />
                     </div>
                 </div>
 
@@ -105,7 +115,7 @@ watch(form, () => {
                     </div>
                 </div>
 
-                <PhraseItem v-for="phrase in phrases.data" :key="phrase.id" :phrase="phrase" :translation="translation" />
+                <PhraseItem v-for="phrase in phrases.data" :key="phrase.uuid" :phrase="phrase" :translation="translation" />
 
                 <Pagination :links="phrases.links" :meta="phrases.meta" />
             </div>

@@ -1,7 +1,9 @@
 <?php
 
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
+use Outhebox\TranslationsUI\Models\Contributor;
 
 if (! function_exists('translationsUIAssets')) {
     function translationsUIAssets(): HtmlString
@@ -62,5 +64,12 @@ if (! function_exists('buildPhrasesTree')) {
         }
 
         return $tree;
+    }
+}
+
+if (! function_exists('currentUser')) {
+    function currentUser(): null|Authenticatable|Contributor
+    {
+        return auth('translations')->user();
     }
 }

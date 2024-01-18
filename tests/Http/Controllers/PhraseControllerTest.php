@@ -38,7 +38,7 @@ class PhraseControllerTest extends TestCase
     /** @test */
     public function it_can_render_phrases_page()
     {
-        $this->actingAs($this->translator, 'translations')
+        $this->actingAs($this->owner, 'translations')
             ->get(route('ltu.phrases.index', $this->translation))
             ->assertStatus(200);
     }
@@ -46,7 +46,7 @@ class PhraseControllerTest extends TestCase
     /** @test */
     public function edit_phrase_page_can_be_rendered()
     {
-        $this->actingAs($this->translator, 'translations')
+        $this->actingAs($this->owner, 'translations')
             ->get(route('ltu.phrases.edit', [
                 'phrase' => $this->phrase->uuid,
                 'translation' => $this->translation->id,
@@ -57,7 +57,7 @@ class PhraseControllerTest extends TestCase
     /** @test */
     public function phrase_can_be_updated()
     {
-        $this->actingAs($this->translator, 'translations')
+        $this->actingAs($this->owner, 'translations')
             ->post(route('ltu.phrases.update', [
                 'phrase' => $this->phrase->uuid,
                 'translation' => $this->translation->id,

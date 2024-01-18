@@ -11,7 +11,7 @@ const props = defineProps<{
 const { loading, showDialog, openDialog, performAction, closeDialog } = useConfirmationDialog()
 
 const deleteTranslation = async (id: number) => {
-    await performAction(() => router.delete(route("ltu.translation.destroy", id)))
+    await performAction(() => router.delete(route("ltu.translation.delete", id)))
 }
 
 const selected = ref(props.selectedIds.includes(props.translation.id))
