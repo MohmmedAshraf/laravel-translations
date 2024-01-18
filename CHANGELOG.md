@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-translations` will be documented in this file.
 
+## v1.0.1 - 2024-01-18
+
+Fix installation issue `brick/varexporter`
+
 ## v1.0.0 - 2024-01-18
 
 🚀 **Exciting News: Version 1.0 Release!** 🚀
@@ -40,11 +44,13 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
      ```bash
      php artisan translations:clean
      
+     
      ```
    - Alternatively, manually uninstall using:
      
      ```bash
      composer remove outhebox/laravel-translations
+     
      
      ```
    
@@ -52,6 +58,7 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
    
      ```bash
      composer require outhebox/laravel-translations
+   
    
      ```
 3. **Configuration Update:**
