@@ -3,6 +3,7 @@
 namespace Outhebox\TranslationsUI;
 
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Outhebox\TranslationsUI\Console\Commands\CleanOldVersionCommand;
 use Outhebox\TranslationsUI\Console\Commands\ContributorCommand;
 use Outhebox\TranslationsUI\Console\Commands\ExportTranslationsCommand;
 use Outhebox\TranslationsUI\Console\Commands\ImportTranslationsCommand;
@@ -32,8 +33,9 @@ class TranslationsUIServiceProvider extends PackageServiceProvider
                 'create_invites_table',
             ])
             ->hasCommands([
-                ContributorCommand::class,
                 PublishCommand::class,
+                ContributorCommand::class,
+                CleanOldVersionCommand::class,
                 ImportTranslationsCommand::class,
                 ExportTranslationsCommand::class,
             ])->hasInstallCommand(function (InstallCommand $command) {
