@@ -1,12 +1,12 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Models;
+namespace Outhebox\TranslationsUI\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Outhebox\LaravelTranslations\Models\Concerns\HasDatabaseConnection;
+use Outhebox\TranslationsUI\Traits\HasDatabaseConnection;
 
 class Language extends Model
 {

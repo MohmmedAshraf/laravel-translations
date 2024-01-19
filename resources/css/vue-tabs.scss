@@ -1,0 +1,25 @@
+.tabs-component {
+    @apply mt-12 overflow-hidden rounded-md bg-white shadow;
+
+    .tabs-component-tabs {
+        @apply flex border-b bg-gray-100;
+
+        .tabs-component-tab {
+            @apply flex items-center gap-2 text-sm font-medium text-gray-500 cursor-pointer hover:bg-gray-100 uppercase transition-colors duration-200 ease-in-out;
+
+            &:hover {
+                @apply text-blue-600;
+            }
+
+            &.is-active {
+                @apply text-blue-600 bg-white;
+            }
+
+            .tabs-component-tab-a {
+                @apply flex items-center px-4 py-3 gap-2;
+            }
+        }
+    }
+}
+
+

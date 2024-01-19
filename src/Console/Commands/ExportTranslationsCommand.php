@@ -1,9 +1,9 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Console\Commands;
+namespace Outhebox\TranslationsUI\Console\Commands;
 
 use Illuminate\Console\Command;
-use Outhebox\LaravelTranslations\TranslationsManager;
+use Outhebox\TranslationsUI\TranslationsManager;
 
 class ExportTranslationsCommand extends Command
 {

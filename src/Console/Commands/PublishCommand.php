@@ -1,8 +1,9 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Console\Commands;
+namespace Outhebox\TranslationsUI\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\File;
 
 class PublishCommand extends Command
 {
@@ -10,16 +11,24 @@ class PublishCommand extends Command
 
     public $description = 'Publish all of the Translations UI resources';
 
-    public function handle(): void
+    public function handle(): int
     {
-        $this->call('vendor:publish', [
-            '--tag' => 'translations-config',
-            '--force' => $this->option('force'),
-        ]);
+        $force = boolval($this->option('force'));
 
-        $this->call('vendor:publish', [
-            '--tag' => 'translations-assets',
-            '--force' => true,
-        ]);
+        if (! $force && File::exists(public_path('vendor/translations-ui'))) {
+            $this->line('Your application already have the Translations UI assets');
+
+            if (! $this->confirm('Do you want to rewrite?')) {
+                return self::FAILURE;
+            }
+        }
+
+        File::deleteDirectory(public_path('vendor/translations-ui'));
+        File::copyDirectory(__DIR__.'/../../../resources/dist/vendor', public_path('vendor'));
+        File::copy(__DIR__.'/../../../resources/favicon.ico', public_path('vendor/translations-ui/favicon.ico'));
+
+        $this->info('Assets was published to [public/vendor/translations-ui]');
+
+        return self::SUCCESS;
     }
 }

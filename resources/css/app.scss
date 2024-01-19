@@ -1,0 +1,30 @@
+@import "buttons";
+@import "vue-select";
+@import "vue-tabs";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+    #app {
+        @apply h-full;
+    }
+}
+
+@layer components {
+    .headless-toggle {
+        @apply relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out;
+
+        &:focus {
+            @apply outline-none ring-2 ring-indigo-600 ring-offset-2;
+        }
+
+        .handle {
+            @apply pointer-events-none relative inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out;
+        }
+
+        .icon-holder {
+            @apply absolute inset-0 flex h-full w-full items-center justify-center transition-opacity;
+        }
+    }
+}

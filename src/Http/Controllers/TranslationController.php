@@ -1,40 +1,117 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Http\Controllers;
+namespace Outhebox\TranslationsUI\Http\Controllers;
 
-use Illuminate\Contracts\View\View;
+use Exception;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
-use Outhebox\LaravelTranslations\Http\Middleware\Authorize;
-use Outhebox\LaravelTranslations\Models\Language;
-use Outhebox\LaravelTranslations\Models\Phrase;
-use Outhebox\LaravelTranslations\Models\Translation;
+use Inertia\Inertia;
+use Inertia\Response;
+use Momentum\Modal\Modal;
+use Outhebox\TranslationsUI\Actions\CreateTranslationForLanguageAction;
+use Outhebox\TranslationsUI\Http\Resources\LanguageResource;
+use Outhebox\TranslationsUI\Http\Resources\TranslationResource;
+use Outhebox\TranslationsUI\Models\Language;
+use Outhebox\TranslationsUI\Models\Translation;
+use Outhebox\TranslationsUI\TranslationsManager;
 
 class TranslationController extends BaseController
 {
-    public function __construct()
+    public function publish(): Modal
     {
-        $this->middleware(Authorize::class);
+        return Inertia::modal('translations/modals/publish-translations')
+            ->baseRoute('ltu.translation.index');
     }
 
-    public function index(): View
+    public function export(): RedirectResponse
     {
-        return view('translations::index', [
-            'installed' => Language::count() > 0 && Translation::count() > 0,
+        try {
+            app(TranslationsManager::class)->export();
+
+            return redirect()->route('ltu.translation.index')->with('notification', [
+                'type' => 'success',
+                'body' => 'Translations have been exported successfully',
+            ]);
+        } catch (Exception $e) {
+            return redirect()->route('ltu.translation.index')->with('notification', [
+                'type' => 'error',
+                'body' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function index(): Response
+    {
+        $translations = Translation::with('language')
+            ->withCount('phrases')
+            ->withProgress()
+            ->get();
+
+        $allTranslations = $translations->where('source', false);
+        $sourceTranslation = $translations->firstWhere('source', true);
+
+        return Inertia::render('translations/index', [
+            'translations' => TranslationResource::collection($allTranslations),
+            'sourceTranslation' => $sourceTranslation ? TranslationResource::make($sourceTranslation) : null,
         ]);
     }
 
-    public function phrases(Translation $translation): View
+    public function create(): Modal
     {
-        return view('translations::phrases', [
-            'translation' => $translation,
+        return Inertia::modal('translations/modals/add-translation', [
+            'languages' => LanguageResource::collection(
+                Language::whereNotIn('id', Translation::pluck('language_id')->toArray())->get()
+            )->toArray(request()),
+        ])->baseRoute('ltu.translation.index');
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'languages' => 'required|array',
+        ]);
+
+        $selectedLanguageIds = $request->input('languages');
+        $languages = Language::whereIn('id', $selectedLanguageIds)->get();
+
+        foreach ($languages as $language) {
+            CreateTranslationForLanguageAction::execute($language);
+        }
+
+        return redirect()->route('ltu.translation.index')->with('notification', [
+            'type' => 'success',
+            'body' => 'Translations have been added successfully',
+        ]);
+
+    }
+
+    public function destroy(Translation $translation): RedirectResponse
+    {
+        $translation->delete();
+
+        return redirect()->route('ltu.translation.index')->with('notification', [
+            'type' => 'success',
+            'body' => 'Translation has been deleted successfully',
         ]);
     }
 
-    public function phrase(Translation $translation, Phrase $phrase): View
+    public function destroy_multiple(Request $request): RedirectResponse
     {
-        return view('translations::phrase', [
-            'phrase' => $phrase,
-            'translation' => $translation,
+        $request->validate([
+            'selected_ids' => 'required|array',
+        ]);
+
+        $selectedTranslationIds = $request->input('selected_ids');
+        $translations = Translation::whereIn('id', $selectedTranslationIds)->get();
+
+        foreach ($translations as $translation) {
+            $translation->delete();
+        }
+
+        return redirect()->route('ltu.translation.index')->with('notification', [
+            'type' => 'success',
+            'body' => 'Selected translations have been deleted successfully',
         ]);
     }
 }

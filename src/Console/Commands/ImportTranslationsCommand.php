@@ -1,16 +1,18 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Console\Commands;
+namespace Outhebox\TranslationsUI\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
-use Outhebox\LaravelTranslations\Models\Language;
-use Outhebox\LaravelTranslations\Models\Phrase;
-use Outhebox\LaravelTranslations\Models\Translation;
-use Outhebox\LaravelTranslations\Models\TranslationFile;
-use Outhebox\LaravelTranslations\TranslationsManager;
+use Outhebox\TranslationsUI\Actions\SyncPhrasesAction;
+use Outhebox\TranslationsUI\Database\Seeders\LanguagesTableSeeder;
+use Outhebox\TranslationsUI\Models\Language;
+use Outhebox\TranslationsUI\Models\Phrase;
+use Outhebox\TranslationsUI\Models\Translation;
+use Outhebox\TranslationsUI\Models\TranslationFile;
+use Outhebox\TranslationsUI\TranslationsManager;
 
 class ImportTranslationsCommand extends Command
 {
@@ -27,6 +29,38 @@ class ImportTranslationsCommand extends Command
         $this->manager = $manager;
     }
 
+    public function handle(): void
+    {
+        $this->importLanguages();
+
+        if ($this->option('fresh') && $this->confirm('Are you sure you want to truncate all translations and phrases?')) {
+            $this->info('Truncating translations and phrases...'.PHP_EOL);
+
+            $this->truncateTables();
+        }
+
+        $translation = $this->createOrGetSourceLanguage();
+
+        $this->info('Importing translations...'.PHP_EOL);
+
+        $this->withProgressBar($this->manager->getLocales(), function ($locale) use ($translation) {
+            $this->syncTranslations($translation, $locale);
+        });
+    }
+
+    protected function importLanguages(): void
+    {
+        if (! Schema::hasTable('ltu_languages') || Language::count() === 0) {
+            if ($this->confirm('The ltu_languages table does not exist or is empty, would you like to install the default languages?', true)) {
+                $this->callSilent('db:seed', ['--class' => LanguagesTableSeeder::class]);
+            } else {
+                $this->error('The ltu_languages table does not exist or is empty, please run the translations:install command first.');
+
+                exit;
+            }
+        }
+    }
+
     protected function truncateTables(): void
     {
         Schema::withoutForeignKeyConstraints(function () {
@@ -36,31 +70,12 @@ class ImportTranslationsCommand extends Command
         });
     }
 
-    public function handle(): void
-    {
-        $this->importLanguages();
-
-        if ($this->option('fresh') && $this->confirm('Are you sure you want to truncate all translations and phrases?')) {
-            $this->info('Truncating translations and phrases...' . PHP_EOL);
-
-            $this->truncateTables();
-        }
-
-        $translation = $this->createOrGetSourceLanguage();
-
-        $this->info('Importing translations...' . PHP_EOL);
-
-        $this->withProgressBar($this->manager->getLocales(), function ($locale) use ($translation) {
-            $this->syncTranslations($translation, $locale);
-        });
-    }
-
     public function createOrGetSourceLanguage(): Translation
     {
         $language = Language::where('code', config('translations.source_language'))->first();
 
         if (! $language) {
-            $this->error('Language with code ' . config('translations.source_language') . ' not found' . PHP_EOL);
+            $this->error('Language with code '.config('translations.source_language').' not found'.PHP_EOL);
 
             exit;
         }
@@ -89,7 +104,7 @@ class ImportTranslationsCommand extends Command
     {
         foreach ($this->manager->getTranslations($locale) as $file => $translations) {
             foreach (Arr::dot($translations) as $key => $value) {
-                $this->syncPhrases($translation, $key, $value, $locale, $file);
+                SyncPhrasesAction::execute($translation, $key, $value, $locale, $file);
             }
         }
 
@@ -103,6 +118,7 @@ class ImportTranslationsCommand extends Command
     public function syncMissingTranslations(Translation $source, string $locale): void
     {
         $language = Language::where('code', $locale)->first();
+
         $translation = Translation::firstOrCreate([
             'language_id' => $language->id,
             'source' => false,
@@ -112,68 +128,16 @@ class ImportTranslationsCommand extends Command
 
         $source->phrases->each(function ($phrase) use ($translation, $locale) {
             if (! $translation->phrases()->where('key', $phrase->key)->first()) {
-                $fileName = $phrase->file->name . '.' . $phrase->file->extension;
+                $fileName = $phrase->file->name.'.'.$phrase->file->extension;
 
                 if ($phrase->file->name === config('translations.source_language')) {
-                    $fileName = Str::replaceStart(config('translations.source_language') . '.', "{$locale}.", $fileName);
+                    $fileName = Str::replaceStart(config('translations.source_language').'.', "{$locale}.", $fileName);
                 } else {
-                    $fileName = Str::replaceStart(config('translations.source_language') . '/', "{$locale}/", $fileName);
+                    $fileName = Str::replaceStart(config('translations.source_language').'/', "{$locale}/", $fileName);
                 }
 
-                $this->syncPhrases($phrase->translation, $phrase->key, '', $locale, $fileName);
+                SyncPhrasesAction::execute($phrase->translation, $phrase->key, '', $locale, $fileName);
             }
         });
-    }
-
-    public function syncPhrases(Translation $source, $key, $value, $locale, $file): void
-    {
-        if (is_array($value) && empty($value)) {
-            return;
-        }
-
-        $language = Language::where('code', $locale)->first();
-
-        if (! $language) {
-            $this->error(PHP_EOL . "Language with code {$locale} not found");
-
-            exit;
-        }
-
-        $translation = Translation::firstOrCreate([
-            'language_id' => $language->id,
-            'source' => config('translations.source_language') === $locale,
-        ]);
-
-        $isRoot = $file === $locale . '.json' || $file === $locale . '.php';
-        $translationFile = TranslationFile::firstOrCreate([
-            'name' => pathinfo($file, PATHINFO_FILENAME),
-            'extension' => pathinfo($file, PATHINFO_EXTENSION),
-            'is_root' => $isRoot,
-        ]);
-
-        $key = config('translations.include_file_in_key') && ! $isRoot ? "{$translationFile->name}.{$key}" : $key;
-
-        $translation->phrases()->updateOrCreate([
-            'key' => $key,
-            'group' => $translationFile->name,
-            'translation_file_id' => $translationFile->id,
-        ], [
-            'value' => $value,
-            'parameters' => $this->manager->getPhraseParameters($value),
-            'phrase_id' => $translation->source ? null : $source->phrases()->where('key', $key)->first()?->id,
-        ]);
-    }
-
-    protected function importLanguages(): void
-    {
-        if (! Schema::hasTable('ltu_languages') || Language::count() === 0) {
-            if ($this->confirm('The ltu_languages table does not exist or is empty, would you like to install the default languages?', true)) {
-                $this->call('translations:install');
-            } else {
-                $this->error('The ltu_languages table does not exist or is empty, please run the translations:install command first.');
-
-                exit;
-            }
-        }
     }
 }

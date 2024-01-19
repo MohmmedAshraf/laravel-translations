@@ -1,12 +1,12 @@
 <?php
 
-namespace Outhebox\LaravelTranslations\Models;
+namespace Outhebox\TranslationsUI\Models;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Outhebox\LaravelTranslations\Models\Concerns\HasDatabaseConnection;
+use Outhebox\TranslationsUI\Traits\HasDatabaseConnection;
 
 class TranslationFile extends Model
 {
