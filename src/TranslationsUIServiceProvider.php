@@ -31,6 +31,7 @@ class TranslationsUIServiceProvider extends PackageServiceProvider
                 'create_contributors_table',
                 'create_contributor_languages_table',
                 'create_invites_table',
+                'add_is_root_to_translation_files_table',
             ])
             ->hasCommands([
                 PublishCommand::class,

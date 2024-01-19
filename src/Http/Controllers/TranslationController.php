@@ -72,8 +72,7 @@ class TranslationController extends BaseController
             'languages' => 'required|array',
         ]);
 
-        $selectedLanguageIds = $request->input('languages');
-        $languages = Language::whereIn('id', $selectedLanguageIds)->get();
+        $languages = Language::whereIn('id', $request->input('languages'))->get();
 
         foreach ($languages as $language) {
             CreateTranslationForLanguageAction::execute($language);

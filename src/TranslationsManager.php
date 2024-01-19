@@ -12,7 +12,7 @@ use Outhebox\TranslationsUI\Models\Translation;
 class TranslationsManager
 {
     public function __construct(
-        protected Filesystem $filesystem,
+        protected Filesystem $filesystem
     ) {
     }
 
@@ -106,10 +106,10 @@ class TranslationsManager
 
             foreach ($phrasesTree as $locale => $groups) {
                 foreach ($groups as $file => $phrases) {
-                    $path = lang_path($file);
+                    $path = lang_path("$locale/$file");
 
                     if (! $this->filesystem->isDirectory(dirname($path))) {
-                        $this->filesystem->makeDirectory(dirname($path), 0o755, true);
+                        $this->filesystem->makeDirectory(dirname($path), 0755, true);
                     }
 
                     if (! $this->filesystem->exists($path)) {

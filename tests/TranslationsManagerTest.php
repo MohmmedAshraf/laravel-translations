@@ -87,8 +87,6 @@ it('it excludes the correct files', function () {
 });
 
 test('export creates a new translation file with the correct content', function () {
-    $this->markTestSkipped();
-
     $filesystem = new Filesystem();
     createDirectoryIfNotExits(lang_path('en/auth.php'));
 
@@ -110,6 +108,7 @@ test('export creates a new translation file with the correct content', function 
     $translationsManager->export();
 
     $fileName = lang_path('en/'.$translation->phrases[0]->file->name.'.'.$translation->phrases[0]->file->extension);
+
     $fileNameInDisk = File::allFiles(lang_path($translation->language->code))[0]->getPathname();
 
     expect($fileName)->toBe($fileNameInDisk)

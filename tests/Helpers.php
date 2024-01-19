@@ -1,10 +1,10 @@
 <?php
 
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\File;
 use Brick\VarExporter\VarExporter;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
-function createDirectoryIfNotExits($path)
+function createDirectoryIfNotExits($path): void
 {
     // check if $path is a filename or a directory
     if (Str::contains($path, '.')) {
@@ -16,16 +16,16 @@ function createDirectoryIfNotExits($path)
     }
 }
 
-function createPhpLanguageFile($path, array $content)
+function createPhpLanguageFile($path, array $content): void
 {
     $path = lang_path($path);
 
     createDirectoryIfNotExits($path);
 
-    File::put($path, "<?php\n\nreturn " . VarExporter::export($content, VarExporter::TRAILING_COMMA_IN_ARRAY) . ';' . PHP_EOL);
+    File::put($path, "<?php\n\nreturn ".VarExporter::export($content, VarExporter::TRAILING_COMMA_IN_ARRAY).';'.PHP_EOL);
 }
 
-function createJsonLangaueFile($path, array $content)
+function createJsonLanguageFile($path, array $content): void
 {
     $path = lang_path($path);
 
