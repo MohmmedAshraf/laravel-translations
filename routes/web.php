@@ -50,7 +50,7 @@ Route::middleware(['web', HandleInertiaRequests::class])->prefix('translations')
         Route::prefix('source-translation')->group(function () {
             Route::get('/', [SourcePhraseController::class, 'index'])->name('source_translation');
             Route::get('create', [SourcePhraseController::class, 'create'])->name('source_translation.add_source_key');
-            Route::post('create', [SourcePhraseController::class, 'store'])->name('source_translation.store');
+            Route::post('create', [SourcePhraseController::class, 'store'])->name('source_translation.store_source_key');
 
             Route::post('delete-phrases', [SourcePhraseController::class, 'destroy_multiple'])
                 ->middleware(RedirectIfNotOwner::class)

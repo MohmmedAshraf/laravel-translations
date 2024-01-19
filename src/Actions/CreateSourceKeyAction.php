@@ -7,17 +7,17 @@ use Outhebox\TranslationsUI\Models\TranslationFile;
 
 class CreateSourceKeyAction
 {
-    public static function execute(string $key, string $file, string $key_translation): void
+    public static function execute(string $key, string $file, string $content): void
     {
         $sourceTranslation = Translation::where('source', true)->first();
 
         $sourceKey = $sourceTranslation->phrases()->create([
             'key' => $key,
             'phrase_id' => null,
-            'parameters' => null,
-            'value' => $key_translation,
-            'translation_file_id' => $file,
+            'value' => $content,
             'uuid' => str()->uuid(),
+            'translation_file_id' => $file,
+            'parameters' => getPhraseParameters($content),
             'group' => TranslationFile::find($file)?->name,
         ]);
 
