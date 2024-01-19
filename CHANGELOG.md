@@ -2,6 +2,19 @@
 
 All notable changes to `laravel-translations` will be documented in this file.
 
+## v1.0.2 - 2024-01-19
+
+### What's Changed
+
+* Add: Missing Source key modal by @MohmmedAshraf in https://github.com/MohmmedAshraf/laravel-translations/pull/51
+* Translation Strings as Keys support and adding file name in key option by @benaja in https://github.com/MohmmedAshraf/laravel-translations/pull/49
+
+### New Contributors
+
+* @benaja made their first contribution in https://github.com/MohmmedAshraf/laravel-translations/pull/49
+
+**Full Changelog**: https://github.com/MohmmedAshraf/laravel-translations/compare/1.0.1...1.0.2
+
 ## v1.0.1 - 2024-01-18
 
 - Update the Readme
@@ -47,11 +60,13 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
      
      
      
+     
      ```
    - Alternatively, manually uninstall using:
      
      ```bash
      composer remove outhebox/laravel-translations
+     
      
      
      
@@ -61,6 +76,7 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
    
      ```bash
      composer require outhebox/laravel-translations
+   
    
    
    
