@@ -1,9 +1,9 @@
 <?php
 
-namespace Outhebox\TranslationsUI\Tests;
-
 use Brick\VarExporter\VarExporter;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File;
 use Outhebox\TranslationsUI\Models\Language;
 use Outhebox\TranslationsUI\Models\Phrase;
@@ -11,124 +11,174 @@ use Outhebox\TranslationsUI\Models\Translation;
 use Outhebox\TranslationsUI\Models\TranslationFile;
 use Outhebox\TranslationsUI\TranslationsManager;
 
-class TranslationsManagerTest extends TestCase
-{
-    /** @test */
-    public function it_returns_the_correct_list_of_locales(): void
-    {
-        $filesystem = new FilesystemMock();
+beforeEach(function () {
+    App::useLangPath(__DIR__.'lang_test');
+    createDirectoryIfNotExits(lang_path());
+});
 
-        $translationsManager = new TranslationsManager($filesystem);
-        $locales = $translationsManager->getLocales();
+it('returns the correct list of locales', function () {
+    createPhpLanguageFile('en/auth.php', []);
+    createJsonLanguageFile('en.json', []);
 
-        $this->assertEquals(['en'], $locales);
-    }
+    createJsonLanguageFile('fr.json', []);
 
-    /** @test */
-    public function export_creates_a_new_translation_file_with_the_correct_content(): void
-    {
-        $filesystem = new FilesystemMock();
+    createPhpLanguageFile('de/validation.php', []);
 
-        $translation = Translation::factory([
-            'source' => true,
-            'language_id' => Language::factory([
-                'code' => 'en',
-                'name' => 'English',
-            ]),
-        ])->has(Phrase::factory()->state([
-            'phrase_id' => null,
-            'translation_file_id' => TranslationFile::factory([
-                'name' => 'auth',
-                'extension' => 'php',
-            ]),
-        ]))->create();
+    $translationsManager = new TranslationsManager(new Filesystem());
+    $locales = $translationsManager->getLocales();
 
-        $translationsManager = new TranslationsManager($filesystem);
-        $translationsManager->export();
+    expect($locales)->toBe(['de', 'en', 'fr']);
+});
 
-        $fileName = $translation->phrases[0]->file->name.'.'.$translation->phrases[0]->file->extension;
-        $fileNameInDisk = File::allFiles(lang_path($translation->language->code))[0]->getFilename();
+it('returns the correct translations for a given locale', function () {
+    createPhpLanguageFile('en/auth.php', [
+        'test' => 'Test',
+    ]);
+    createPhpLanguageFile('en/validation.php', [
+        'test' => 'Test1',
+    ]);
+    createJsonLanguageFile('en.json', [
+        'title' => 'My title',
+    ]);
 
-        $this->assertEquals($fileName, $fileNameInDisk);
-        $this->assertEquals("<?php\n\nreturn ".VarExporter::export($translation->phrases->pluck('value', 'key')->toArray(), VarExporter::TRAILING_COMMA_IN_ARRAY).';'.PHP_EOL, File::get(lang_path($translation->language->code.DIRECTORY_SEPARATOR.$fileName)));
+    Config::set('translations.exclude_files', ['validation.php']);
+    Config::set('translations.source_language', 'en');
+    $filesystem = new Filesystem();
 
-        File::deleteDirectory(lang_path());
-    }
+    $translationsManager = new TranslationsManager($filesystem);
+    $translations = $translationsManager->getTranslations('en');
+    expect($translations)->toBe([
+        'en.json' => ['title' => 'My title'],
+        'en/auth.php' => ['test' => 'Test'],
+    ]);
 
-    /** @test */
-    public function export_can_handle_php_translation_files(): void
-    {
-        App::useLangPath(__DIR__.'lang_test');
+    $translations = $translationsManager->getTranslations('');
+    expect($translations)->toBe([
+        'en.json' => ['title' => 'My title'],
+        'en/auth.php' => ['test' => 'Test'],
+    ]);
+});
 
-        if (! File::exists(lang_path('en'.DIRECTORY_SEPARATOR.'test.php'))) {
-            File::makeDirectory(lang_path('en'), 0755, true);
-            File::put(lang_path('en'.DIRECTORY_SEPARATOR.'test.php'), "<?php\n\nreturn ".VarExporter::export(['accepted' => 'The :attribute must be accepted.'], VarExporter::TRAILING_COMMA_IN_ARRAY).';'.PHP_EOL);
-        }
+it('it excludes the correct files', function () {
+    createPhpLanguageFile('en/auth.php', [
+        'test' => 'Test',
+    ]);
+    createPhpLanguageFile('en/validation.php', [
+        'test' => 'Test1',
+    ]);
+    createJsonLanguageFile('en.json', [
+        'title' => 'My title',
+    ]);
 
-        $filesystem = new FilesystemMock();
+    Config::set('translations.exclude_files', ['*.php']);
+    Config::set('translations.source_language', 'en');
+    $filesystem = new Filesystem();
 
-        $translation = Translation::factory()
-            ->has(Phrase::factory()
-                ->for(TranslationFile::factory()->state(['name' => 'test', 'extension' => 'php']), 'file')
-                ->state([
-                    'key' => 'accepted',
-                    'value' => 'The :attribute must be accepted.',
-                    'phrase_id' => null,
-                ]))
-            ->has(Language::factory(['code' => 'en']))
-            ->create();
+    $translationsManager = new TranslationsManager($filesystem);
+    $translations = $translationsManager->getTranslations('en');
+    expect($translations)->toBe([
+        'en.json' => ['title' => 'My title'],
+    ]);
 
-        $translationsManager = new TranslationsManager($filesystem);
-        $translationsManager->export();
+    $translations = $translationsManager->getTranslations('');
+    expect($translations)->toBe([
+        'en.json' => ['title' => 'My title'],
+    ]);
+});
 
-        $path = lang_path('en'.DIRECTORY_SEPARATOR.'test.php');
-        $pathInDisk = lang_path($translation->language->code.DIRECTORY_SEPARATOR.'test.php');
+test('export creates a new translation file with the correct content', function () {
+    $filesystem = new Filesystem();
+    createDirectoryIfNotExits(lang_path('en/auth.php'));
 
-        $this->assertEquals(File::get($path), File::get($pathInDisk));
+    $translation = Translation::factory([
+        'source' => true,
+        'language_id' => Language::factory([
+            'code' => 'en',
+            'name' => 'English',
+        ]),
+    ])->has(Phrase::factory()->state([
+        'phrase_id' => null,
+        'translation_file_id' => TranslationFile::factory([
+            'name' => 'auth',
+            'extension' => 'php',
+        ]),
+    ]))->create();
 
-        File::deleteDirectory(lang_path());
-    }
+    $translationsManager = new TranslationsManager($filesystem);
+    $translationsManager->export();
 
-    /** @test */
-    public function export_can_handle_json_translation_files(): void
-    {
-        App::useLangPath(__DIR__.'lang_test');
+    $fileName = lang_path('en/'.$translation->phrases[0]->file->name.'.'.$translation->phrases[0]->file->extension);
 
-        if (! File::exists(lang_path('en'.DIRECTORY_SEPARATOR.'test.json'))) {
-            File::makeDirectory(lang_path('en'), 0755, true);
-            File::put(lang_path('en'.DIRECTORY_SEPARATOR.'test.json'), json_encode(['accepted' => 'The :attribute must be accepted.'], JSON_PRETTY_PRINT));
-        }
-        $filesystem = new FilesystemMock();
+    $fileNameInDisk = File::allFiles(lang_path($translation->language->code))[0]->getPathname();
 
-        $translation = Translation::factory()
-            ->has(Phrase::factory()
-                ->for(TranslationFile::factory()->state(['name' => 'test', 'extension' => 'json']), 'file')
-                ->state([
-                    'key' => 'accepted',
-                    'value' => 'The :attribute must be accepted.',
-                    'phrase_id' => null,
-                ]))
-            ->has(Language::factory(['code' => 'en']))
-            ->create();
+    expect($fileName)->toBe($fileNameInDisk)
+        ->and(File::get($fileName))
+        ->toBe("<?php\n\nreturn ".VarExporter::export($translation->phrases->pluck('value', 'key')->toArray(), VarExporter::TRAILING_COMMA_IN_ARRAY).';'.PHP_EOL);
 
-        $translationsManager = new TranslationsManager($filesystem);
-        $translationsManager->export();
+    File::deleteDirectory(lang_path());
+});
 
-        $path = lang_path('en'.DIRECTORY_SEPARATOR.'test.json');
-        $pathInDisk = lang_path($translation->language->code.DIRECTORY_SEPARATOR.'test.json');
+test('export can handle PHP translation files', function () {
+    createPhpLanguageFile('en/test.php', ['accepted' => 'The :attribute must be accepted.']);
 
-        $this->assertEquals(File::get($path), File::get($pathInDisk));
+    $filesystem = new Filesystem();
 
-        File::deleteDirectory(lang_path());
-    }
+    $translation = Translation::factory()
+        ->has(Phrase::factory()
+            ->for(TranslationFile::factory()->state(['name' => 'test', 'extension' => 'php']), 'file')
+            ->state([
+                'key' => 'accepted',
+                'value' => 'The :attribute must be accepted.',
+                'phrase_id' => null,
+            ]))
+        ->for(Language::factory()->state(['code' => 'en']))
+        ->create();
 
-    /** @test */
-    public function it_returns_the_correct_list_of_parameters_for_a_given_phrase(): void
-    {
-        $parameters = getPhraseParameters('The :attribute must be accepted when :other is :value.');
-        $this->assertEquals(['attribute', 'other', 'value'], $parameters);
+    $translationsManager = new TranslationsManager($filesystem);
+    $translationsManager->export();
 
-        $parametersEmpty = getPhraseParameters('');
-        $this->assertEquals(null, $parametersEmpty);
-    }
-}
+    $path = lang_path('en'.DIRECTORY_SEPARATOR.'test.php');
+    $pathInDisk = lang_path($translation->language->code.DIRECTORY_SEPARATOR.'test.php');
+
+    expect(File::get($path))->toBe(File::get($pathInDisk));
+
+    File::deleteDirectory(lang_path());
+});
+
+test('export can handle JSON translation files', function () {
+    createJsonLanguageFile('en/test.json', ['accepted' => 'The :attribute must be accepted.']);
+    $filesystem = new Filesystem();
+
+    $translation = Translation::factory()
+        ->has(Phrase::factory()
+            ->for(TranslationFile::factory()->state(['name' => 'test', 'extension' => 'json']), 'file')
+            ->state([
+                'key' => 'accepted',
+                'value' => 'The :attribute must be accepted.',
+                'phrase_id' => null,
+            ]))
+        ->for(Language::factory()->state(['code' => 'en']))
+        ->create();
+
+    $translationsManager = new TranslationsManager($filesystem);
+    $translationsManager->export();
+
+    $path = lang_path('en'.DIRECTORY_SEPARATOR.'test.json');
+    $pathInDisk = lang_path($translation->language->code.DIRECTORY_SEPARATOR.'test.json');
+
+    expect(File::get($path))->toBe(File::get($pathInDisk));
+
+    File::deleteDirectory(lang_path());
+});
+
+it('returns the correct list of parameters for a given phrase', function () {
+    $parameters = getPhraseParameters('The :attribute must be accepted when :other is :value.');
+    expect($parameters)->toBe(['attribute', 'other', 'value']);
+
+    $parametersEmpty = getPhraseParameters('');
+    expect($parametersEmpty)->toBe(null);
+});
+
+afterEach(function () {
+    File::deleteDirectory(lang_path());
+});

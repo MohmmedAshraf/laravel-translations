@@ -8,13 +8,11 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Outhebox\TranslationsUI\Models\Translation;
-use SplFileInfo;
 
 class TranslationsManager
 {
     public function __construct(
-        protected Filesystem $filesystem,
-        private array $translations = []
+        protected Filesystem $filesystem
     ) {
     }
 
@@ -30,38 +28,73 @@ class TranslationsManager
             $locales->push(basename($dir));
         }
 
+        collect($this->filesystem->files(lang_path()))->each(function ($file) use ($locales) {
+            if ($this->filesystem->extension($file) != 'json') {
+                return;
+            }
+
+            if (! $locales->contains($file->getFilenameWithoutExtension())) {
+                $locales->push($file->getFilenameWithoutExtension());
+            }
+        });
+
         return $locales->toArray();
     }
 
-    public function getTranslations(string $local): array
+    public function getTranslations(string $locale): array
     {
-        if (blank($local)) {
-            $local = config('translations.source_language');
+        if (blank($locale)) {
+            $locale = config('translations.source_language');
         }
 
-        collect($this->filesystem->allFiles(lang_path($local)))
-            ->merge(collect($this->filesystem->glob(lang_path()."/$local.*"))->map(fn ($file) => new SplFileInfo($file)))
+        $translations = [];
+        $rootFileName = "$locale.json";
+
+        $files = [];
+
+        if ($this->filesystem->exists(lang_path($locale))) {
+            $files = $this->filesystem->allFiles(lang_path($locale));
+        }
+
+        collect($files)
+            ->map(function ($file) use ($locale) {
+                return $locale.DIRECTORY_SEPARATOR.$file->getFilename();
+            })
+            ->when($this->filesystem->exists(lang_path($rootFileName)), function ($collection) use ($rootFileName) {
+                return $collection->prepend($rootFileName);
+            })
             ->filter(function ($file) {
-                return ! in_array($file->getFilename(), config('translations.exclude_files'));
+                foreach (config('translations.exclude_files') as $excludeFile) {
+                    if (fnmatch($excludeFile, $file)) {
+                        return false;
+                    }
+                    if (fnmatch($excludeFile, basename($file))) {
+                        return false;
+                    }
+
+                    return true;
+                }
+
+                return ! in_array($file, config('translations.exclude_files'));
             })
             ->filter(function ($file) {
                 return $this->filesystem->extension($file) == 'php' || $this->filesystem->extension($file) == 'json';
             })
-            ->each(function ($file) {
+            ->each(function ($file) use (&$translations) {
                 try {
                     if ($this->filesystem->extension($file) == 'php') {
-                        $this->translations[$file->getFilename()] = $this->filesystem->getRequire($file->getPathname());
+                        $translations[$file] = $this->filesystem->getRequire(lang_path($file));
                     }
 
                     if ($this->filesystem->extension($file) == 'json') {
-                        $this->translations[$file->getFilename()] = json_decode($this->filesystem->get($file), true);
+                        $translations[$file] = json_decode($this->filesystem->get(lang_path($file)), true);
                     }
                 } catch (FileNotFoundException $e) {
-                    $this->translations[$file->getFilename()] = [];
+                    $translations[$file] = [];
                 }
             });
 
-        return $this->translations;
+        return $translations;
     }
 
     public function export(): void
@@ -92,7 +125,7 @@ class TranslationsManager
                     }
 
                     if ($this->filesystem->extension($path) == 'json') {
-                        $this->filesystem->put($path, json_encode($phrases, JSON_PRETTY_PRINT));
+                        $this->filesystem->put($path, json_encode($phrases, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
                     }
                 }
             }

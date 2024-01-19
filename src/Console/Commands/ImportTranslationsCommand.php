@@ -5,6 +5,7 @@ namespace Outhebox\TranslationsUI\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Outhebox\TranslationsUI\Actions\SyncPhrasesAction;
 use Outhebox\TranslationsUI\Database\Seeders\LanguagesTableSeeder;
 use Outhebox\TranslationsUI\Models\Language;
@@ -106,5 +107,37 @@ class ImportTranslationsCommand extends Command
                 SyncPhrasesAction::execute($translation, $key, $value, $locale, $file);
             }
         }
+
+        if ($locale === config('translations.source_language')) {
+            return;
+        }
+
+        $this->syncMissingTranslations($translation, $locale);
+    }
+
+    public function syncMissingTranslations(Translation $source, string $locale): void
+    {
+        $language = Language::where('code', $locale)->first();
+
+        $translation = Translation::firstOrCreate([
+            'language_id' => $language->id,
+            'source' => false,
+        ]);
+
+        $source->load('phrases.translation', 'phrases.file');
+
+        $source->phrases->each(function ($phrase) use ($translation, $locale) {
+            if (! $translation->phrases()->where('key', $phrase->key)->first()) {
+                $fileName = $phrase->file->name.'.'.$phrase->file->extension;
+
+                if ($phrase->file->name === config('translations.source_language')) {
+                    $fileName = Str::replaceStart(config('translations.source_language').'.', "{$locale}.", $fileName);
+                } else {
+                    $fileName = Str::replaceStart(config('translations.source_language').'/', "{$locale}/", $fileName);
+                }
+
+                SyncPhrasesAction::execute($phrase->translation, $phrase->key, '', $locale, $fileName);
+            }
+        });
     }
 }

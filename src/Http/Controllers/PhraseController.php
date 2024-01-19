@@ -78,9 +78,6 @@ class PhraseController extends BaseController
                         ->setTarget($translation->language->code)
                         ->translate($phrase->source->value),
                 ],
-                // 'deepl' => 'DeepL',
-                // 'microsoft' => 'Microsoft Translator',
-                // 'amazon' => 'Amazon Translate',
             ],
         ]);
     }

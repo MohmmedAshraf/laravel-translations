@@ -10,7 +10,6 @@ use Illuminate\Foundation\Testing\RefreshDatabaseState;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Outhebox\TranslationsUI\Database\Seeders\LanguagesTableSeeder;
 use Outhebox\TranslationsUI\Enums\RoleEnum;
 use Outhebox\TranslationsUI\Models\Contributor;
 use Outhebox\TranslationsUI\TranslationsUIServiceProvider;
@@ -50,8 +49,6 @@ class TestCase extends Orchestra
             $this->artisan('vendor:publish', ['--tag' => 'mixpost-migrations', '--force' => true])->run();
             $this->artisan('migrate:fresh', $this->migrateFreshUsing());
 
-            //$this->artisan('db:seed', ['--class' => LanguagesTableSeeder::class]);
-
             $this->app[Kernel::class]->setArtisan(null);
 
             RefreshDatabaseState::$migrated = true;
@@ -81,6 +78,9 @@ class TestCase extends Orchestra
 
         $migration = include __DIR__.'/../database/migrations/create_invites_table.php';
         $migration->up();
+
+        $migration = include __DIR__.'/../database/migrations/add_is_root_to_translation_files_table.php';
+        $migration->up();
     }
 
     protected function getPackageProviders($app): array
@@ -89,10 +89,5 @@ class TestCase extends Orchestra
             TranslationsUIServiceProvider::class,
             RouteServiceProvider::class,
         ];
-    }
-
-    public function publishAssets(): void
-    {
-        $this->artisan('translations:publish', ['--force' => true])->run();
     }
 }

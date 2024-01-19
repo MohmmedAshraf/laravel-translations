@@ -1,74 +1,55 @@
 <?php
 
-namespace Outhebox\TranslationsUI\Tests\Http\Controllers\Auth;
-
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Outhebox\TranslationsUI\Enums\RoleEnum;
 use Outhebox\TranslationsUI\Models\Contributor;
-use Outhebox\TranslationsUI\Tests\TestCase;
 
-class AuthenticatedSessionControllerTest extends TestCase
-{
-    /** @test */
-    public function login_page_can_be_rendered()
-    {
-        $this->get(route('ltu.login'))
-            ->assertStatus(200);
+it('login page can be rendered', function () {
+    $this->get(route('ltu.login'))
+        ->assertStatus(200);
+});
 
-    }
+it('login request will validate email', function () {
+    $response = $this->post(route('ltu.login.attempt'), [
+        'email' => 'not-an-email',
+        'password' => 'password',
+    ])->assertRedirect(route('ltu.login'));
 
-    /** @test */
-    public function login_request_will_validate_email(): void
-    {
-        $response = $this->post(route('ltu.login.attempt'), [
-            'email' => 'not-an-email',
-            'password' => 'password',
-        ])->assertRedirect(route('ltu.login'));
+    expect($response->exception)->toBeInstanceOf(ValidationException::class);
+});
 
-        $this->assertInstanceOf(ValidationException::class, $response->exception);
-    }
+it('login request will validate password', function () {
+    $response = $this->post(route('ltu.login.attempt'), [
+        'email' => $this->owner->email,
+        'password' => 'what-is-my-password',
+    ])->assertSessionHasErrors();
 
-    /** @test */
-    public function login_request_will_validate_password(): void
-    {
-        $response = $this->post(route('ltu.login.attempt'), [
-            'email' => $this->owner->email,
-            'password' => 'what-is-my-password',
-        ])->assertSessionHasErrors();
+    expect($response->exception)->toBeInstanceOf(ValidationException::class);
+});
 
-        $this->assertInstanceOf(ValidationException::class, $response->exception);
-    }
+it('login request will authenticate user', function () {
+    $this->withoutExceptionHandling();
 
-    /** @test */
-    public function login_request_will_authenticate_user(): void
-    {
-        $this->withoutExceptionHandling();
+    $user = Contributor::factory([
+        'role' => RoleEnum::owner,
+        'password' => Hash::make('password'),
+    ])->create();
 
-        $user = Contributor::factory([
-            'role' => RoleEnum::owner,
-            'password' => Hash::make('password'),
-        ])->create();
+    $this->post(route('ltu.login.attempt'), [
+        'email' => $user->email,
+        'password' => 'password',
+    ])->assertRedirect(route('ltu.translation.index'));
+});
 
-        $this->post(route('ltu.login.attempt'), [
-            'email' => $user->email,
-            'password' => 'password',
-        ])->assertRedirect(route('ltu.translation.index'));
-    }
+it('authenticated users can access dashboard', function () {
+    $this->actingAs($this->owner, 'translations')
+        ->get(route('ltu.login'))
+        ->assertRedirect(route('ltu.translation.index'));
+});
 
-    /** @test */
-    public function authenticated_users_can_access_dashboard(): void
-    {
-        $this->actingAs($this->owner, 'translations')
-            ->get(route('ltu.login'))
-            ->assertRedirect(route('ltu.translation.index'));
-    }
-
-    /** @test */
-    public function authenticated_users_can_logout(): void
-    {
-        $this->actingAs($this->owner, 'translations')
-            ->get(route('ltu.logout'))
-            ->assertRedirect(route('ltu.login'));
-    }
-}
+it('authenticated users can logout', function () {
+    $this->actingAs($this->owner, 'translations')
+        ->get(route('ltu.logout'))
+        ->assertRedirect(route('ltu.login'));
+});
