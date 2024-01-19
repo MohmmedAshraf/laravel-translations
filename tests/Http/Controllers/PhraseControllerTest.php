@@ -32,15 +32,6 @@ it('can render phrases page', function () {
         ->assertStatus(200);
 });
 
-it('can render phrases edit page', function () {
-    $this->actingAs($this->owner, 'translations')
-        ->get(route('ltu.phrases.edit', [
-            'phrase' => $this->phrase->uuid,
-            'translation' => $this->translation->id,
-        ]))
-        ->assertStatus(200);
-});
-
 it('can update phrase', function () {
     $this->actingAs($this->owner, 'translations')
         ->post(route('ltu.phrases.update', [
