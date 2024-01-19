@@ -41,7 +41,8 @@ class PhraseController extends BaseController
             );
         }
 
-        $phrases = $phrases->orderBy('key')
+        $phrases = $phrases
+            ->orderBy('key')
             ->paginate($request->input('perPage') ?? 12)
             ->withQueryString();
 

@@ -32,7 +32,8 @@ class SourcePhraseController extends BaseController
             });
         }
 
-        $phrases = $phrases->orderBy('key')
+        $phrases = $phrases
+            ->orderBy('key')
             ->paginate($request->input('perPage') ?? 12)
             ->withQueryString();
 
@@ -45,22 +46,23 @@ class SourcePhraseController extends BaseController
 
     public function create(): Modal
     {
-        return Inertia::modal('source/modals/add-source-key')
-            ->baseRoute('ltu.source_translation');
+        return Inertia::modal('source/modals/add-source-key', [
+            'files' => TranslationFileResource::collection(TranslationFile::get()),
+        ])->baseRoute('ltu.source_translation');
     }
 
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'key' => 'required',
-            'file' => 'required',
-            'key_translation' => 'required',
+            'key' => ['required', 'regex:/^[a-zA-Z_]+$/'],
+            'file' => ['required', 'integer', 'exists:ltu_translation_files,id'],
+            'content' => ['required', 'string'],
         ]);
 
         CreateSourceKeyAction::execute(
             key: $request->input('key'),
             file: $request->input('file'),
-            key_translation: $request->input('key_translation'),
+            content: $request->input('content'),
         );
 
         return redirect()->route('ltu.source_translation');
