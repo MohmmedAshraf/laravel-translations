@@ -3,7 +3,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Outhebox\TranslationsUI\Models\Language;
 
 return new class extends Migration
 {
@@ -11,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('ltu_translations', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Language::class)->constrained('ltu_languages')->cascadeOnDelete();
+            $table->foreignId('language_id');
             $table->boolean('source')->default(false);
             $table->timestamps();
         });

@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Collection;
-use Outhebox\TranslationsUI\Enums\StatusEnum;
 use Outhebox\TranslationsUI\Traits\HasDatabaseConnection;
 use Outhebox\TranslationsUI\Traits\HasUuid;
 
@@ -22,7 +21,6 @@ class Phrase extends Model
 
     protected $casts = [
         'parameters' => 'array',
-        'status' => StatusEnum::class,
     ];
 
     protected $with = [

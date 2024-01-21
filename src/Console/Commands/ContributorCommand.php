@@ -85,7 +85,7 @@ class ContributorCommand extends Command
             fn () => Contributor::create([
                 'name' => $name,
                 'email' => $email,
-                'role' => RoleEnum::from($role),
+                'role' => $role ?? RoleEnum::owner->value,
                 'password' => Hash::make($password),
             ]),
             'Creating contributor...'
