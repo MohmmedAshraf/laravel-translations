@@ -50,10 +50,6 @@ export type SourcePhrase = {
     updated_at: string
     state: boolean
     note: string
-    status: Array<{
-        value: string
-        label: string
-    }>
     value_html: Array<{
         parameter: boolean
         value: string
