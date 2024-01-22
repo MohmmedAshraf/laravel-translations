@@ -1,6 +1,5 @@
 <script setup lang="ts">
 defineProps<{
-    canResetPassword?: boolean
     status?: string
 }>()
 

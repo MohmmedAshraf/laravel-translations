@@ -24,10 +24,6 @@ class PhraseResource extends JsonResource
             'updated_at' => $this->updated_at,
             'state' => (bool) $this->value,
             'note' => $this->note,
-            'status' => [
-                'value' => $this->status->value,
-                'label' => $this->status->label(),
-            ],
             'value_html' => $this->splitParameters(),
             'translation_id' => $this->translation_id,
             'translation_file_id' => $this->translation_file_id,
