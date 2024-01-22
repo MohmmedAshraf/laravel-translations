@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('key');
             $table->string('group');
             $table->text('value')->nullable();
-            $table->text('status')->default(StatusEnum::active->value);
+            $table->string('status')->default(StatusEnum::active->value);
             $table->json('parameters')->nullable();
             $table->text('note')->nullable();
             $table->timestamps();
