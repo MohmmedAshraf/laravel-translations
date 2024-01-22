@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Outhebox\TranslationsUI\Enums\StatusEnum;
 use Outhebox\TranslationsUI\Models\Phrase;
 use Outhebox\TranslationsUI\Models\Translation;
 use Outhebox\TranslationsUI\Models\TranslationFile;
@@ -20,6 +21,7 @@ return new class extends Migration
             $table->string('key');
             $table->string('group');
             $table->text('value')->nullable();
+            $table->string('status')->default(StatusEnum::active->value);
             $table->json('parameters')->nullable();
             $table->text('note')->nullable();
             $table->timestamps();
