@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
 use Outhebox\TranslationsUI\Models\Contributor;
 
@@ -101,7 +100,7 @@ if (! function_exists('setArrayValue')) {
 
         $lastKey = array_shift($keys);
 
-        if (!blank($lastKey)) {
+        if (! blank($lastKey)) {
             $array[$lastKey] = $value;
         }
 
