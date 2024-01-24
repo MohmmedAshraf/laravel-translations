@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-translations` will be documented in this file.
 
+## v1.0.4 - 2024-01-24
+
+### What's Changed
+
+* Fix Export Issue for Keys with Dots by @MohmmedAshraf in #57 #58
+
+**Full Changelog**: https://github.com/MohmmedAshraf/laravel-translations/compare/1.0.3...1.0.4
+
 ## v1.0.3 - 2024-01-22
 
 ### What's Changed
@@ -75,11 +83,13 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
      
      
      
+     
      ```
    - Alternatively, manually uninstall using:
      
      ```bash
      composer remove outhebox/laravel-translations
+     
      
      
      
@@ -91,6 +101,7 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
    
      ```bash
      composer require outhebox/laravel-translations
+   
    
    
    
