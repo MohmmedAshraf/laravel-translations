@@ -59,11 +59,53 @@ if (! function_exists('buildPhrasesTree')) {
     {
         $tree = [];
 
+        /** @var \Outhebox\TranslationsUI\Models\Phrase $phrase */
         foreach ($phrases as $phrase) {
-            Arr::set($tree[$locale][$phrase->file->file_name], $phrase->key, $phrase->value);
+            setArrayValue(
+                array: $tree[$locale][$phrase->file->file_name],
+                key: $phrase->key,
+                value: ! blank($phrase->value) ? $phrase->value : $phrase->source->value
+            );
         }
 
         return $tree;
+    }
+}
+
+if (! function_exists('setArrayValue')) {
+    function setArrayValue(&$array, $key, $value)
+    {
+        if (is_null($key)) {
+            return $array = $value;
+        }
+
+        $keys = preg_split('/\.(?=[^.]*[^.])/', $key);
+
+        foreach ($keys as $i => $key) {
+            if (blank($value)) {
+                dd($key, $value);
+            }
+
+            if (count($keys) === 1) {
+                break;
+            }
+
+            unset($keys[$i]);
+
+            if (! isset($array[$key]) || ! is_array($array[$key])) {
+                $array[$key] = [];
+            }
+
+            $array = &$array[$key];
+        }
+
+        $lastKey = array_shift($keys);
+
+        if (!blank($lastKey)) {
+            $array[$lastKey] = $value;
+        }
+
+        return $array;
     }
 }
 
