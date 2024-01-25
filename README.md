@@ -112,6 +112,15 @@ You can export your translations from the translations UI dashboard or by runnin
 php artisan translations:export
 ```
 
+### Configuration
+You can configure the package and set your base language by publishing the configuration file:
+
+```bash
+php artisan vendor:publish --tag=translations-config
+```
+
+This will publish the `translations.php` configuration file to your `config` directory.
+
 ### Upgrading
 
 When upgrading to a new major version of Laravel Translations UI, it's important that you carefully review the upgrade guide.
