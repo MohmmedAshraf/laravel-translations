@@ -31,8 +31,16 @@ class TranslationsManager
         }
 
         collect($this->filesystem->files(lang_path()))->each(function ($file) use ($locales) {
-            if ($this->filesystem->extension($file) != 'json') {
+            if ($this->filesystem->extension($file) !== 'json') {
                 return;
+            }
+            foreach (config('translations.exclude_files') as $excludeFile) {
+                if (fnmatch($excludeFile, $file)) {
+                    return;
+                }
+                if (fnmatch($excludeFile, basename($file))) {
+                    return;
+                }
             }
 
             if (! $locales->contains($file->getFilenameWithoutExtension())) {
