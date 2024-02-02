@@ -30,7 +30,10 @@ class CleanOldVersionCommand extends Command
 
         // clean migrations
         if (Schema::hasTable('migrations')) {
-            DB::table('migrations')->where('migration', 'like', '%create_translations_tables%')->delete();
+            DB::table('migrations')
+                ->where('migration', 'like', '%create_translations_tables%')
+                ->orWhere('migration', 'like', '%add_is_root_to_translation_files_table%')
+                ->delete();
         }
 
         // remove old config file
