@@ -108,7 +108,11 @@ class TranslationsManager
 
             foreach ($phrasesTree as $locale => $groups) {
                 foreach ($groups as $file => $phrases) {
-                    $langPath = $download ? storage_path("app/translations/$locale/$file") : lang_path("$locale/$file");
+                    if ($file === "$locale.json") {
+                        $langPath = $download ? storage_path("app/translations/$file") : lang_path("$file");
+                    } else {
+                        $langPath = $download ? storage_path("app/translations/$locale/$file") : lang_path("$locale/$file");
+                    }
 
                     if (! $this->filesystem->isDirectory(dirname($langPath))) {
                         $this->filesystem->makeDirectory(dirname($langPath), 0755, true);
