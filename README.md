@@ -23,6 +23,15 @@ Laravel Translations UI package provides a user-friendly interface for managing 
 
 > 📺 **[Watch a 4-minute video by Povilas Korop](https://www.youtube.com/watch?v=lYkgXnwnVbw)** showcasing the package.
 
+---
+### Support
+
+Thank you for considering supporting the development of this package! If you'd like to contribute, you can buy me a coffee or sponsor me to help keep me motivated to continue improving this package. You can also support the project by starring ⭐ the repository.
+
+To buy me a coffee, click the button below:
+
+<a href="https://www.buymeacoffee.com/outhebox" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" style="height: 51px !important;width: 217px !important;" ></a>
+
 ### Requirements
 
 - PHP `8.1` or higher
@@ -143,6 +152,24 @@ To keep the assets up-to-date and avoid issues in future updates, you may add th
 }
 ```
 
+### Screenshots
+
+![login](screenshots/login.png)
+
+![add_translations_modal](screenshots/add_translations_modal.png)
+
+![translations_list](screenshots/translations_list.png)
+
+![add_source_key](screenshots/add_source_key.png)
+
+![edit_source_key](screenshots/edit_source_key.png)
+
+![edit_translation_phrase](screenshots/edit_translation_phrase.png)
+
+![invite_contributor](screenshots/invite_contributor.png)
+
+![publish_translations_files](screenshots/publish_translations_files.png)
+
 ### Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
@@ -150,16 +177,6 @@ Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed re
 ### Contributing
 
 Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
-
----
-### Support
-
-Thank you for considering supporting the development of this package! If you'd like to contribute, you can buy me a coffee or sponsor me to help keep me motivated to continue improving this package. You can also support the project by starring ⭐ the repository.
-
-To buy me a coffee, click the button below:
-
-<a href="https://www.buymeacoffee.com/outhebox" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" style="height: 51px !important;width: 217px !important;" ></a>
-
 
 ## Credits
 

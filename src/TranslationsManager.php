@@ -4,10 +4,12 @@ namespace Outhebox\TranslationsUI;
 
 use Brick\VarExporter\ExportException;
 use Brick\VarExporter\VarExporter;
+use Exception;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Outhebox\TranslationsUI\Models\Translation;
+use ZipArchive;
 
 class TranslationsManager
 {
@@ -97,7 +99,7 @@ class TranslationsManager
         return $translations;
     }
 
-    public function export(): void
+    public function export($download = false): void
     {
         $translations = Translation::with('phrases')->get();
 
@@ -106,29 +108,59 @@ class TranslationsManager
 
             foreach ($phrasesTree as $locale => $groups) {
                 foreach ($groups as $file => $phrases) {
-                    $path = lang_path("$locale/$file");
+                    $langPath = $download ? storage_path("app/translations/$locale/$file") : lang_path("$locale/$file");
 
-                    if (! $this->filesystem->isDirectory(dirname($path))) {
-                        $this->filesystem->makeDirectory(dirname($path), 0755, true);
+                    if (! $this->filesystem->isDirectory(dirname($langPath))) {
+                        $this->filesystem->makeDirectory(dirname($langPath), 0755, true);
                     }
 
-                    if (! $this->filesystem->exists($path)) {
-                        $this->filesystem->put($path, "<?php\n\nreturn [\n\n]; ".PHP_EOL);
+                    if (! $this->filesystem->exists($langPath)) {
+                        $this->filesystem->put($langPath, "<?php\n\nreturn [\n\n]; ".PHP_EOL);
                     }
 
-                    if ($this->filesystem->extension($path) == 'php') {
+                    if ($this->filesystem->extension($langPath) == 'php') {
                         try {
-                            $this->filesystem->put($path, "<?php\n\nreturn ".VarExporter::export($phrases, VarExporter::TRAILING_COMMA_IN_ARRAY).';'.PHP_EOL);
+                            $this->filesystem->put($langPath, "<?php\n\nreturn ".VarExporter::export($phrases, VarExporter::TRAILING_COMMA_IN_ARRAY).';'.PHP_EOL);
                         } catch (ExportException $e) {
                             logger()->error($e->getMessage());
                         }
                     }
 
-                    if ($this->filesystem->extension($path) == 'json') {
-                        $this->filesystem->put($path, json_encode($phrases, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+                    if ($this->filesystem->extension($langPath) == 'json') {
+                        $this->filesystem->put($langPath, json_encode($phrases, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
                     }
                 }
             }
+        }
+    }
+
+    public function download(): ?string
+    {
+        try {
+            $this->export(download: true);
+
+            $zip = new ZipArchive();
+
+            $zipPath = storage_path('app/lang.zip');
+            $zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+
+            $baseDir = storage_path('app/translations');
+            $zip->addEmptyDir('lang');
+
+            $files = $this->filesystem->allFiles($baseDir);
+
+            foreach ($files as $file) {
+                $relativePath = str_replace($baseDir.DIRECTORY_SEPARATOR, '', $file->getPathname());
+                $zip->addFile($file->getPathname(), 'lang/'.$relativePath);
+            }
+
+            $zip->close();
+
+            return $zipPath;
+        } catch (Exception $e) {
+            logger()->error($e->getMessage());
+
+            return null;
         }
     }
 }

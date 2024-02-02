@@ -6,12 +6,12 @@ import { SourceTranslation, Translation } from "../../../scripts/types"
 import useConfirmationDialog from "../../../scripts/composables/use-confirmation-dialog"
 
 const props = defineProps<{
-    translations: {
+    translations?: {
         data: Record<string, Translation>
         links: Record<string, string>
         meta: Record<string, string>
     }
-    sourceTranslation: SourceTranslation
+    sourceTranslation?: SourceTranslation
 }>()
 
 const searchQuery = ref("")

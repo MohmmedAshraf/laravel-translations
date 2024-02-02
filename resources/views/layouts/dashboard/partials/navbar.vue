@@ -105,7 +105,7 @@ const navigation = [
                     </Link>
                 </div>
 
-                <Link as="button" method="POST" href="{{ route('ltu.logout') }}" class="flex items-center text-white hover:text-gray-900">
+                <Link :href="route('ltu.logout')" v-tooltip="'Logout'" class="flex items-center text-white hover:text-gray-900">
                     <ArrowRightEndOnRectangleIcon class="size-6" />
                 </Link>
             </div>
