@@ -2,6 +2,15 @@
 
 All notable changes to `laravel-translations` will be documented in this file.
 
+## v1.0.5 - 2024-02-02
+
+### What's Changed
+
+* Fix: Dot Notation for Nested Key Not Working by @MohmmedAshraf in https://github.com/MohmmedAshraf/laravel-translations/pull/63
+* Add download translations option for production by @MohmmedAshraf in https://github.com/MohmmedAshraf/laravel-translations/pull/64
+
+**Full Changelog**: https://github.com/MohmmedAshraf/laravel-translations/compare/1.0.4...1.0.5
+
 ## v1.0.4 - 2024-01-24
 
 ### What's Changed
@@ -84,11 +93,13 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
      
      
      
+     
      ```
    - Alternatively, manually uninstall using:
      
      ```bash
      composer remove outhebox/laravel-translations
+     
      
      
      
@@ -101,6 +112,7 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
    
      ```bash
      composer require outhebox/laravel-translations
+   
    
    
    
