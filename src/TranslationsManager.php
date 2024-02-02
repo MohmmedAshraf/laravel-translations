@@ -7,7 +7,6 @@ use Brick\VarExporter\VarExporter;
 use Exception;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Outhebox\TranslationsUI\Models\Translation;
 use ZipArchive;
@@ -151,8 +150,8 @@ class TranslationsManager
             $files = $this->filesystem->allFiles($baseDir);
 
             foreach ($files as $file) {
-                $relativePath = str_replace($baseDir . DIRECTORY_SEPARATOR, '', $file->getPathname());
-                $zip->addFile($file->getPathname(), 'lang/' . $relativePath);
+                $relativePath = str_replace($baseDir.DIRECTORY_SEPARATOR, '', $file->getPathname());
+                $zip->addFile($file->getPathname(), 'lang/'.$relativePath);
             }
 
             $zip->close();
@@ -160,6 +159,7 @@ class TranslationsManager
             return $zipPath;
         } catch (Exception $e) {
             logger()->error($e->getMessage());
+
             return null;
         }
     }

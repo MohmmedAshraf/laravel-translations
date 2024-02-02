@@ -43,7 +43,8 @@ class TranslationController extends BaseController
         }
     }
 
-    public function download(){
+    public function download()
+    {
         $downloadPath = app(TranslationsManager::class)->download();
 
         if (! $downloadPath) {
