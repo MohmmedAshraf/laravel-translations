@@ -6,7 +6,7 @@ const props = withDefaults(
     defineProps<{
         size?: "xs" | "sm" | "md" | "lg"
         type?: "button" | "submit" | "reset"
-        variant?: "primary" | "secondary" | "success" | "danger" | "warning"
+        variant?: "primary" | "secondary" | "success" | "danger" | "warning" | "dark"
         fullWidth?: boolean
         isLoading?: boolean
     }>(),
@@ -25,7 +25,7 @@ const { variantClass } = useButtonVariant(props.variant)
 
 <template>
     <button :type="type" class="btn" :class="[sizeClass, variantClass, { 'w-full': fullWidth }]" :disabled="isLoading">
-        <span class="flex gap-1" :class="{ 'opacity-0': isLoading }">
+        <span class="flex items-center gap-2" :class="{ 'opacity-0': isLoading }">
             <slot />
         </span>
 

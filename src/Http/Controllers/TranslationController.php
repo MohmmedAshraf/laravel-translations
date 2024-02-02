@@ -20,8 +20,10 @@ class TranslationController extends BaseController
 {
     public function publish(): Modal
     {
-        return Inertia::modal('translations/modals/publish-translations')
-            ->baseRoute('ltu.translation.index');
+        return Inertia::modal('translations/modals/publish-translations', [
+            'canPublish' => (bool) Translation::count() > 0,
+            'isProductionEnv' => (bool) app()->environment('production'),
+        ])->baseRoute('ltu.translation.index');
     }
 
     public function export(): RedirectResponse
@@ -39,6 +41,19 @@ class TranslationController extends BaseController
                 'body' => $e->getMessage(),
             ]);
         }
+    }
+
+    public function download(){
+        $downloadPath = app(TranslationsManager::class)->download();
+
+        if (! $downloadPath) {
+            return redirect()->route('ltu.translation.index')->with('notification', [
+                'type' => 'error',
+                'body' => 'Translations could not be downloaded',
+            ]);
+        }
+
+        return response()->download($downloadPath, 'lang.zip');
     }
 
     public function index(): Response

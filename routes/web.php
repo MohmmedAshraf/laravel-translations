@@ -41,6 +41,7 @@ Route::middleware(['web', HandleInertiaRequests::class])->prefix('translations')
         Route::middleware(RedirectIfNotOwner::class)->group(function () {
             Route::get('publish', [TranslationController::class, 'publish'])->name('translation.publish');
             Route::post('publish', [TranslationController::class, 'export'])->name('translation.export');
+            Route::get('download', [TranslationController::class, 'download'])->name('translation.download');
         });
 
         Route::get('add-translation', [TranslationController::class, 'create'])->name('translation.create');
