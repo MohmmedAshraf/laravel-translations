@@ -54,7 +54,7 @@ class SourcePhraseController extends BaseController
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'key' => ['required', 'regex:/^[a-zA-Z_]+$/'],
+            'key' => ['required', 'regex:/^[a-zA-Z0-9_.]+$/'],
             'file' => ['required', 'integer', 'exists:ltu_translation_files,id'],
             'content' => ['required', 'string'],
         ]);
