@@ -62,6 +62,7 @@ if (! function_exists('buildPhrasesTree')) {
         foreach ($phrases as $phrase) {
             if ($phrase->file->file_name === "$locale.json") {
                 $tree[$locale][$phrase->file->file_name][$phrase->key] = ! blank($phrase->value) ? $phrase->value : $phrase->source->value;
+
                 continue;
             }
             setArrayValue(
