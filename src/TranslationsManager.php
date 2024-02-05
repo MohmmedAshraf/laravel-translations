@@ -31,8 +31,16 @@ class TranslationsManager
         }
 
         collect($this->filesystem->files(lang_path()))->each(function ($file) use ($locales) {
-            if ($this->filesystem->extension($file) != 'json') {
+            if ($this->filesystem->extension($file) !== 'json') {
                 return;
+            }
+            foreach (config('translations.exclude_files') as $excludeFile) {
+                if (fnmatch($excludeFile, $file)) {
+                    return;
+                }
+                if (fnmatch($excludeFile, basename($file))) {
+                    return;
+                }
             }
 
             if (! $locales->contains($file->getFilenameWithoutExtension())) {
@@ -108,7 +116,11 @@ class TranslationsManager
 
             foreach ($phrasesTree as $locale => $groups) {
                 foreach ($groups as $file => $phrases) {
-                    $langPath = $download ? storage_path("app/translations/$locale/$file") : lang_path("$locale/$file");
+                    if ($file === "$locale.json") {
+                        $langPath = $download ? storage_path("app/translations/$file") : lang_path("$file");
+                    } else {
+                        $langPath = $download ? storage_path("app/translations/$locale/$file") : lang_path("$locale/$file");
+                    }
 
                     if (! $this->filesystem->isDirectory(dirname($langPath))) {
                         $this->filesystem->makeDirectory(dirname($langPath), 0755, true);
@@ -127,7 +139,7 @@ class TranslationsManager
                     }
 
                     if ($this->filesystem->extension($langPath) == 'json') {
-                        $this->filesystem->put($langPath, json_encode($phrases, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+                        $this->filesystem->put($langPath, json_encode($phrases, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
                     }
                 }
             }
