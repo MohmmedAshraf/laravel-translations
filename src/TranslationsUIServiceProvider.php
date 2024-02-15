@@ -2,7 +2,7 @@
 
 namespace Outhebox\TranslationsUI;
 
-use App\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Outhebox\TranslationsUI\Console\Commands\CleanOldVersionCommand;
 use Outhebox\TranslationsUI\Console\Commands\ContributorCommand;
 use Outhebox\TranslationsUI\Console\Commands\ExportTranslationsCommand;

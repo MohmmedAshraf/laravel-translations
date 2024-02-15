@@ -2,7 +2,7 @@
 
 namespace Outhebox\TranslationsUI\Exceptions;
 
-use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use App\Exceptions\Handler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -11,7 +11,7 @@ use Inertia\Inertia;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Throwable;
 
-class TranslationsUIExceptionHandler extends ExceptionHandler
+class TranslationsUIExceptionHandler extends Handler
 {
     public static function isTranslationsUIRequest(Request $request): bool
     {

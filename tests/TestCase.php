@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Gate;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Outhebox\TranslationsUI\Enums\RoleEnum;
 use Outhebox\TranslationsUI\Models\Contributor;
+use Outhebox\TranslationsUI\Tests\Mocks\HandlerMock;
 use Outhebox\TranslationsUI\TranslationsUIServiceProvider;
 
 class TestCase extends Orchestra
@@ -21,6 +22,13 @@ class TestCase extends Orchestra
     protected Contributor $owner;
 
     protected Contributor $translator;
+
+    protected function getPackageAliases($app): array
+    {
+        return [
+            'App\Exceptions\Handler' => HandlerMock::class,
+        ];
+    }
 
     protected function setUp(): void
     {
