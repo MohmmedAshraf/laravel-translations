@@ -2,7 +2,8 @@
 
 namespace Outhebox\TranslationsUI\Exceptions;
 
-use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Foundation\Exceptions\Handler as BaseHandler;
+use App\Exceptions\Handler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -11,7 +12,18 @@ use Inertia\Inertia;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Throwable;
 
-class TranslationsUIExceptionHandler extends ExceptionHandler
+if (class_exists('App\Exceptions\Handler')) {
+    class ExtendedHandler extends Handler
+    {
+        // Extend the custom handler
+    }
+} else {
+    class ExtendedHandler extends BaseHandler {
+        // Extend the default handler
+    }
+}
+
+class TranslationsUIExceptionHandler extends ExtendedHandler
 {
     public static function isTranslationsUIRequest(Request $request): bool
     {
