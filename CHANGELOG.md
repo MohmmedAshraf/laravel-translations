@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-translations` will be documented in this file.
 
+## v1.0.7 - 2024-02-19
+
+### What's Changed
+
+* Extend the ExceptionHandler set in the project by @ahtinurme in https://github.com/MohmmedAshraf/laravel-translations/pull/75
+
+**Full Changelog**: https://github.com/MohmmedAshraf/laravel-translations/compare/v1.0.6...1.0.7
+
 ## v1.0.6 - 2024-02-13
 
 ### What's Changed
@@ -109,11 +117,13 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
      
      
      
+     
      ```
    - Alternatively, manually uninstall using:
      
      ```bash
      composer remove outhebox/laravel-translations
+     
      
      
      
@@ -128,6 +138,7 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
    
      ```bash
      composer require outhebox/laravel-translations
+   
    
    
    
