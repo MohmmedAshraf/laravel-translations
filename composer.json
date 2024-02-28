@@ -24,18 +24,18 @@
         "based/momentum-lock": "^0.2.0",
         "based/momentum-modal": "^0.2.0",
         "brick/varexporter": "^0.3.7|^0.4.0",
-        "illuminate/contracts": "^10.0",
+        "illuminate/contracts": "^10.0|^11.0",
         "inertiajs/inertia-laravel": "^0.6.11",
         "spatie/laravel-package-tools": "^1.0",
         "spatie/laravel-query-builder": "^5.7",
         "stichoza/google-translate-php": "^5.1",
         "tightenco/ziggy": "^1.8",
-        "ext-zip" : "*"
+        "ext-zip": "*"
     },
     "require-dev": {
         "laravel/pint": "^1.0",
         "nunomaduro/collision": "^7.0",
-        "orchestra/testbench": "^8.0",
+        "orchestra/testbench": "^8.0|^9.0",
         "pestphp/pest": "^2.18",
         "pestphp/pest-plugin-faker": "^2.0",
         "pestphp/pest-plugin-laravel": "^2.2",
