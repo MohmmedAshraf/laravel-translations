@@ -2,6 +2,19 @@
 
 All notable changes to `laravel-translations` will be documented in this file.
 
+## v1.0.8 - 2024-03-07
+
+### What's Changed
+
+* Added duplicate email validation by @amshehzad in https://github.com/MohmmedAshraf/laravel-translations/pull/85
+* Fixed issue with create contributor command by @amshehzad in https://github.com/MohmmedAshraf/laravel-translations/pull/86
+
+### New Contributors
+
+* @amshehzad made their first contribution in https://github.com/MohmmedAshraf/laravel-translations/pull/85
+
+**Full Changelog**: https://github.com/MohmmedAshraf/laravel-translations/compare/1.0.7...1.0.8
+
 ## v1.0.7 - 2024-02-19
 
 ### What's Changed
@@ -118,11 +131,13 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
      
      
      
+     
      ```
    - Alternatively, manually uninstall using:
      
      ```bash
      composer remove outhebox/laravel-translations
+     
      
      
      
@@ -138,6 +153,7 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
    
      ```bash
      composer require outhebox/laravel-translations
+   
    
    
    
