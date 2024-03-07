@@ -43,6 +43,7 @@ class ContributorCommand extends Command
                 required: 'The email of the contributor is required.',
                 validate: fn (string $value) => match (true) {
                     ! filter_var($value, FILTER_VALIDATE_EMAIL) => 'The email address must be valid.',
+                    Contributor::where('email', $value)->count() > 0 => 'A contributor with this email already exists',
                     default => null
                 },
                 hint: 'The email address must be valid.',
