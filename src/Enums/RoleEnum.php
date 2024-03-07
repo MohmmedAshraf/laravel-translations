@@ -15,6 +15,14 @@ enum RoleEnum: int
         };
     }
 
+    public static function fromLabel($label): self
+    {
+        return match ($label) {
+            'Owner' => self::owner,
+            'Translator' => self::translator,
+        };
+    }
+
     public function description(): string
     {
         return match ($this) {
