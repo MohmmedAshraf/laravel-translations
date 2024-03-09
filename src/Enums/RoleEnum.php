@@ -18,8 +18,9 @@ enum RoleEnum: int
     public static function fromLabel($label): self
     {
         return match ($label) {
-            'Owner' => self::owner,
-            'Translator' => self::translator,
+            'Owner', 'owner' => self::owner,
+            'Translator', 'translator' => self::translator,
+            default => self::owner,
         };
     }
 

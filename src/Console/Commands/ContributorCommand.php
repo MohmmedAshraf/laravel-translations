@@ -54,10 +54,10 @@ class ContributorCommand extends Command
             $input->setArgument('role', select(
                 label: 'What role should the contributor have?',
                 options: [
-                    RoleEnum::owner->value => RoleEnum::owner->label(),
-                    RoleEnum::translator->value => RoleEnum::translator->label(),
+                    RoleEnum::owner->label() => RoleEnum::owner->label(),
+                    RoleEnum::translator->label() => RoleEnum::translator->label(),
                 ],
-                default: 'Owner',
+                default: RoleEnum::owner->label(),
                 hint: 'The role may be changed at any time.'
             ));
         }
@@ -86,7 +86,7 @@ class ContributorCommand extends Command
             fn () => Contributor::create([
                 'name' => $name,
                 'email' => $email,
-                'role' => RoleEnum::fromLabel($role) ?? RoleEnum::owner->value,
+                'role' => RoleEnum::fromLabel($role),
                 'password' => Hash::make($password),
             ]),
             'Creating contributor...'
