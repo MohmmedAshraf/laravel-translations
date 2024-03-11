@@ -29,7 +29,7 @@
         "spatie/laravel-package-tools": "^1.0",
         "spatie/laravel-query-builder": "^5.7",
         "stichoza/google-translate-php": "^5.1",
-        "tightenco/ziggy": "^1.8",
+        "tightenco/ziggy": "^2.0",
         "ext-zip": "*"
     },
     "require-dev": {
