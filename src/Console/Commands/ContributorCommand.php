@@ -43,6 +43,7 @@ class ContributorCommand extends Command
                 required: 'The email of the contributor is required.',
                 validate: fn (string $value) => match (true) {
                     ! filter_var($value, FILTER_VALIDATE_EMAIL) => 'The email address must be valid.',
+                    Contributor::where('email', $value)->count() > 0 => 'A contributor with this email already exists',
                     default => null
                 },
                 hint: 'The email address must be valid.',
@@ -53,10 +54,10 @@ class ContributorCommand extends Command
             $input->setArgument('role', select(
                 label: 'What role should the contributor have?',
                 options: [
-                    RoleEnum::owner->value => RoleEnum::owner->label(),
-                    RoleEnum::translator->value => RoleEnum::translator->label(),
+                    RoleEnum::owner->label() => RoleEnum::owner->label(),
+                    RoleEnum::translator->label() => RoleEnum::translator->label(),
                 ],
-                default: 'Owner',
+                default: RoleEnum::owner->label(),
                 hint: 'The role may be changed at any time.'
             ));
         }
@@ -85,7 +86,7 @@ class ContributorCommand extends Command
             fn () => Contributor::create([
                 'name' => $name,
                 'email' => $email,
-                'role' => $role ?? RoleEnum::owner->value,
+                'role' => RoleEnum::fromLabel($role),
                 'password' => Hash::make($password),
             ]),
             'Creating contributor...'

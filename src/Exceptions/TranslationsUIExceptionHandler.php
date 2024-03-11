@@ -2,8 +2,8 @@
 
 namespace Outhebox\TranslationsUI\Exceptions;
 
-use Illuminate\Foundation\Exceptions\Handler as BaseHandler;
 use App\Exceptions\Handler;
+use Illuminate\Foundation\Exceptions\Handler as BaseHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -18,7 +18,8 @@ if (class_exists('App\Exceptions\Handler')) {
         // Extend the custom handler
     }
 } else {
-    class ExtendedHandler extends BaseHandler {
+    class ExtendedHandler extends BaseHandler
+    {
         // Extend the default handler
     }
 }
