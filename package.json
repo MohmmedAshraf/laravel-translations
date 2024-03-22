@@ -28,7 +28,6 @@
         "laravel-vite-plugin": "^0.8.1",
         "lodash": "^4.17.21",
         "mitt": "^3.0.1",
-        "momentum-lock": "^0.1.2",
         "momentum-modal": "^0.2.1",
         "os": "^0.1.2",
         "path": "^0.12.7",
