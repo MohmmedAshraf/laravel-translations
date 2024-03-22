@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Middleware;
 use Outhebox\TranslationsUI\Http\Resources\ContributorResource;
 use Outhebox\TranslationsUI\Models\Contributor;
-use Tightenco\Ziggy\Ziggy;
+use Tighten\Ziggy\Ziggy;
 
 class HandleInertiaRequests extends Middleware
 {
