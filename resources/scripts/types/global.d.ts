@@ -1,6 +1,6 @@
 import { PageProps as InertiaPageProps } from '@inertiajs/core';
 import { AxiosInstance } from 'axios';
-import ziggyRoute from 'ziggy-js';
+import { route } from 'ziggy-js';
 import { PageProps as AppPageProps } from './';
 
 declare global {
@@ -8,12 +8,12 @@ declare global {
         axios: AxiosInstance;
     }
 
-    let route: typeof ziggyRoute
+    let route: typeof route
 }
 
 declare module 'vue' {
     interface ComponentCustomProperties {
-        route: typeof ziggyRoute;
+        route: typeof route;
     }
 }
 

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\App;
 use Inertia\Inertia;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Throwable;
+use Illuminate\Auth\AuthenticationException;
 
 if (class_exists('App\Exceptions\Handler')) {
     class ExtendedHandler extends Handler
@@ -35,7 +36,7 @@ class TranslationsUIExceptionHandler extends ExtendedHandler
 
     public function render($request, Throwable $e): Response|JsonResponse|\Symfony\Component\HttpFoundation\Response
     {
-        if ($this->isTranslationsUIRequest($request)) {
+        if (self::isTranslationsUIRequest($request)) {
             return $this->renderInertiaException($request, $this->prepareException($e));
         }
 
@@ -67,7 +68,7 @@ class TranslationsUIExceptionHandler extends ExtendedHandler
             ])->toResponse($request)->setStatusCode($statusCode);
         }
 
-        if ($statusCode === 500 && ! App::hasDebugModeEnabled()) {
+        if ($statusCode === 500 && !$e instanceof AuthenticationException && ! App::hasDebugModeEnabled()) {
             return Inertia::render('error', [
                 'code' => '500',
                 'title' => 'Internal server error',
