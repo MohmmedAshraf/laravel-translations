@@ -14,7 +14,7 @@
 <a href="https://github.com/MohmmedAshraf/laravel-translations/actions?query=workflow%3Arun-tests"><img src="https://github.com/MohmmedAshraf/laravel-translations/workflows/run-tests/badge.svg" alt="Tests"></a>
 <a href="https://packagist.org/packages/outhebox/laravel-translations"><img src="https://img.shields.io/packagist/dt/outhebox/laravel-translations" alt="Total Downloads"></a>
 <a href="https://packagist.org/packages/outhebox/laravel-translations"><img src="https://img.shields.io/packagist/php-v/outhebox/laravel-translations.svg" alt="PHP from Packagist"></a>
-<a href="https://packagist.org/packages/outhebox/laravel-translations"><img src="https://img.shields.io/badge/Laravel-10.x-brightgreen.svg" alt="Laravel Version"></a>
+<a href="https://packagist.org/packages/outhebox/laravel-translations"><img src="https://img.shields.io/badge/Laravel-11.x-brightgreen.svg" alt="Laravel Version"></a>
 </p>
 
 ### Introduction
@@ -33,9 +33,7 @@ To buy me a coffee, click the button below:
 <a href="https://www.buymeacoffee.com/outhebox" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" style="height: 51px !important;width: 217px !important;" ></a>
 
 ### Requirements
-
-- PHP `8.1` or higher
-- Laravel `v10.x` or higher
+> **Requires [PHP 8.2+](https://php.net/releases/) and [Laravel 11.x](https://laravel.com/docs/11.x/installation)**
 
 ### Features
 - Easily view, create, and delete translations with an intuitive interface.

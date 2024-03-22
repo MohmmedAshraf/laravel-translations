@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-translations` will be documented in this file.
 
+## v1.1.0 - 2024-03-22
+
+### What's Changed
+
+* Add Support for Laravel 11 by @MohmmedAshraf in https://github.com/MohmmedAshraf/laravel-translations/pull/81
+
+**Full Changelog**: https://github.com/MohmmedAshraf/laravel-translations/compare/1.0.9...1.1.0
+
 ## v1.0.9 - 2024-03-09
 
 ### What's Changed
@@ -145,11 +153,13 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
      
      
      
+     
      ```
    - Alternatively, manually uninstall using:
      
      ```bash
      composer remove outhebox/laravel-translations
+     
      
      
      
@@ -167,6 +177,7 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
    
      ```bash
      composer require outhebox/laravel-translations
+   
    
    
    
