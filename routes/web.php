@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
 use Outhebox\TranslationsUI\Http\Controllers\Auth\AuthenticatedSessionController;
 use Outhebox\TranslationsUI\Http\Controllers\Auth\InvitationAcceptController;
@@ -14,7 +15,7 @@ use Outhebox\TranslationsUI\Http\Middleware\Authenticate;
 use Outhebox\TranslationsUI\Http\Middleware\HandleInertiaRequests;
 use Outhebox\TranslationsUI\Http\Middleware\RedirectIfNotOwner;
 
-Route::middleware(['web', HandleInertiaRequests::class])->prefix('translations')->name('ltu.')->group(function () {
+Route::domain(Config::get('translations.domain'))->middleware(['web', HandleInertiaRequests::class])->prefix(Config::get('translations.path'))->name('ltu.')->group(function () {
     Route::prefix('auth')->group(function () {
         Route::prefix('invite')->group(function () {
             Route::get('accept/{token}', [InvitationAcceptController::class, 'create'])->name('invitation.accept');
