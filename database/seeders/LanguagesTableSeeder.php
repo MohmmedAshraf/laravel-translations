@@ -491,6 +491,11 @@ class LanguagesTableSeeder extends Seeder
                 'rtl' => false,
             ],
             [
+                'code' => 'tk',
+                'name' => 'Turkmen',
+                'rtl' => false,
+            ],
+            [
                 'code' => 'uk',
                 'name' => 'Ukrainian',
                 'rtl' => false,
