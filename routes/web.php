@@ -14,7 +14,6 @@ use Outhebox\TranslationsUI\Http\Middleware\Authenticate;
 use Outhebox\TranslationsUI\Http\Middleware\HandleInertiaRequests;
 use Outhebox\TranslationsUI\Http\Middleware\RedirectIfNotOwner;
 
-// ['web', HandleInertiaRequests::class]
 Route::domain(config('translations.domain'))->group(function () {
     Route::middleware(array_merge(config('translations.middleware'), [HandleInertiaRequests::class]))->prefix(config('translations.path'))->name('ltu.')->group(function () {
         Route::prefix('auth')->group(function () {
