@@ -9,6 +9,7 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Outhebox\TranslationsUI\Models\Translation;
+use Symfony\Component\Finder\SplFileInfo;
 use ZipArchive;
 
 class TranslationsManager
@@ -67,8 +68,11 @@ class TranslationsManager
         }
 
         collect($files)
-            ->map(function ($file) use ($locale) {
-                return $locale.DIRECTORY_SEPARATOR.$file->getFilename();
+            ->map(function (SplFileInfo $file) use ($locale) {
+                if ($file->getRelativePath() === '') {
+                    return $locale.DIRECTORY_SEPARATOR.$file->getFilename();
+                }
+                return $locale.DIRECTORY_SEPARATOR.$file->getRelativePath().DIRECTORY_SEPARATOR.$file->getFilename();
             })
             ->when($this->filesystem->exists(lang_path($rootFileName)), function ($collection) use ($rootFileName) {
                 return $collection->prepend($rootFileName);
@@ -103,7 +107,6 @@ class TranslationsManager
                     $translations[$file] = [];
                 }
             });
-
         return $translations;
     }
 
