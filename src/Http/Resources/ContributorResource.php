@@ -8,8 +8,6 @@ use Outhebox\TranslationsUI\Models\Contributor;
 /** @mixin Contributor */
 class ContributorResource extends JsonResource
 {
-    public static $wrap = null;
-
     public function toArray($request): array
     {
         return [

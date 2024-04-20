@@ -113,9 +113,15 @@ class PhraseController extends BaseController
             return redirect()->route('ltu.phrases.edit', [
                 'translation' => $translation,
                 'phrase' => $nextPhrase,
+            ])->with('notification', [
+                'type' => 'success',
+                'body' => 'Phrase has been updated successfully',
             ]);
         }
 
-        return redirect()->route('ltu.phrases.index', $translation);
+        return redirect()->route('ltu.phrases.index', $translation)->with('notification', [
+            'type' => 'success',
+            'body' => 'Phrase has been updated successfully',
+        ]);
     }
 }

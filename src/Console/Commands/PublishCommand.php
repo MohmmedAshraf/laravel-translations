@@ -13,7 +13,7 @@ class PublishCommand extends Command
 
     public function handle(): int
     {
-        $force = (bool)$this->option('force');
+        $force = (bool) $this->option('force');
 
         if (! $force && File::exists(public_path('vendor/translations-ui'))) {
             $this->line('Your application already have the Translations UI assets');

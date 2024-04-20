@@ -8,8 +8,8 @@ defineProps<{
 </script>
 
 <template>
-    <div v-if="similarPhrases.data.length > 0" class="flex flex-col divide-y">
-        <SimilarPhrasesItem v-for="phrase in similarPhrases.data" :key="phrase.uuid" :phrase="phrase" />
+    <div v-if="similarPhrases.length > 0" class="flex flex-col divide-y">
+        <SimilarPhrasesItem v-for="phrase in similarPhrases" :key="phrase.uuid" :phrase="phrase" />
     </div>
 
     <div v-else class="relative flex size-full min-h-[250px]">

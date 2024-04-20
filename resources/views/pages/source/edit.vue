@@ -10,7 +10,7 @@ const props = defineProps<{
     translation: Translation
     source: SourceTranslation
     similarPhrases: SourcePhrase
-    files: { data: Record<string, TranslationFile> }
+    files: Record<string, TranslationFile>
 }>()
 
 const form = useForm({
@@ -28,7 +28,7 @@ const submit = () => {
 }
 
 const translationFiles = computed(() => {
-    return props.files.data.map((fileType: TranslationFile) => {
+    return props.files.map((fileType: TranslationFile) => {
         return {
             value: fileType.id,
             label: fileType.nameWithExtension,
