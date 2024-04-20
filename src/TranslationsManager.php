@@ -72,6 +72,7 @@ class TranslationsManager
                 if ($file->getRelativePath() === '') {
                     return $locale.DIRECTORY_SEPARATOR.$file->getFilename();
                 }
+
                 return $locale.DIRECTORY_SEPARATOR.$file->getRelativePath().DIRECTORY_SEPARATOR.$file->getFilename();
             })
             ->when($this->filesystem->exists(lang_path($rootFileName)), function ($collection) use ($rootFileName) {
@@ -107,6 +108,7 @@ class TranslationsManager
                     $translations[$file] = [];
                 }
             });
+
         return $translations;
     }
 

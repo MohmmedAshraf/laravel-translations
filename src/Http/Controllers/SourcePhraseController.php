@@ -65,7 +65,10 @@ class SourcePhraseController extends BaseController
             content: $request->input('content'),
         );
 
-        return redirect()->route('ltu.source_translation');
+        return redirect()->route('ltu.source_translation')->with('notification', [
+            'type' => 'success',
+            'body' => 'Phrase has been added successfully',
+        ]);
     }
 
     public function edit(Phrase $phrase): Response|RedirectResponse
@@ -104,8 +107,14 @@ class SourcePhraseController extends BaseController
             ->first();
 
         return $nextPhrase
-            ? redirect()->route('ltu.source_translation.edit', ['translation' => $phrase->translation, 'phrase' => $nextPhrase])
-            : redirect()->route('ltu.source_translation');
+            ? redirect()->route('ltu.source_translation.edit', ['translation' => $phrase->translation, 'phrase' => $nextPhrase])->with('notification', [
+                'type' => 'success',
+                'body' => 'Phrase has been updated successfully',
+            ])
+            : redirect()->route('ltu.source_translation')->with('notification', [
+                'type' => 'success',
+                'body' => 'Phrase has been updated successfully',
+            ]);
     }
 
     public function destroy(Phrase $phrase): RedirectResponse

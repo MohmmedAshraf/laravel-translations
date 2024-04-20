@@ -6,12 +6,8 @@ import { SourceTranslation, Translation } from "../../../scripts/types"
 import useConfirmationDialog from "../../../scripts/composables/use-confirmation-dialog"
 
 const props = defineProps<{
-    translations?: {
-        data: Record<string, Translation>
-        links: Record<string, string>
-        meta: Record<string, string>
-    }
-    sourceTranslation?: SourceTranslation
+    translations?: Record<string, Translation>
+    sourceTranslation?: Record<string, SourceTranslation>
 }>()
 
 const searchQuery = ref("")
@@ -35,8 +31,8 @@ const deleteTranslations = async (id: number) => {
 }
 
 const filteredTranslations = computed(() => {
-    return Object.keys(props.translations.data).map((key) => {
-        return props.translations.data[key];
+    return Object.keys(props.translations).map((key) => {
+        return props.translations[key];
     }).filter((translation: Translation | undefined) => {
         return (
             translation &&
@@ -48,15 +44,15 @@ const filteredTranslations = computed(() => {
 
 
 function toggleSelection() {
-    if (selectedIds.value.length === props.translations.data.length) {
+    if (selectedIds.value.length === props.translations.length) {
         selectedIds.value = []
 
     } else {
-        selectedIds.value = props.translations.data.map((language: Translation) => language.id)
+        selectedIds.value = props.translations.map((language: Translation) => language.id)
     }
 }
 
-const isAllSelected = computed(() => selectedIds.value.length === Object.keys(props.translations.data).length)
+const isAllSelected = computed(() => selectedIds.value.length === Object.keys(props.translations).length)
 </script>
 
 <template>
@@ -74,7 +70,7 @@ const isAllSelected = computed(() => selectedIds.value.length === Object.keys(pr
                 <div class="relative z-10 flex w-full divide-x shadow">
                     <div class="flex w-14 shrink-0 items-center justify-center">
                         <div class="flex shrink-0 items-center">
-                            <InputCheckbox :disabled="!translations.data.length" :checked="isAllSelected" @input="toggleSelection" />
+                            <InputCheckbox :disabled="!translations.length" :checked="isAllSelected" @input="toggleSelection" />
                         </div>
                     </div>
 

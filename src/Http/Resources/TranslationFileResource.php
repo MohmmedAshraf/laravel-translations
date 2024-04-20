@@ -9,8 +9,6 @@ use Outhebox\TranslationsUI\Models\TranslationFile;
 /** @mixin TranslationFile */
 class TranslationFileResource extends JsonResource
 {
-    public static $wrap = null;
-
     public function toArray(Request $request): array
     {
         return [
