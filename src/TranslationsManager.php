@@ -16,8 +16,7 @@ class TranslationsManager
 {
     public function __construct(
         protected Filesystem $filesystem
-    )
-    {
+    ) {
     }
 
     public function getLocales(): array
@@ -45,7 +44,7 @@ class TranslationsManager
                 }
             }
 
-            if (!$locales->contains($file->getFilenameWithoutExtension())) {
+            if (! $locales->contains($file->getFilenameWithoutExtension())) {
                 $locales->push($file->getFilenameWithoutExtension());
             }
         });
@@ -71,10 +70,10 @@ class TranslationsManager
         collect($files)
             ->map(function (SplFileInfo $file) use ($locale) {
                 if ($file->getRelativePath() === '') {
-                    return $locale . DIRECTORY_SEPARATOR . $file->getFilename();
+                    return $locale.DIRECTORY_SEPARATOR.$file->getFilename();
                 }
 
-                return $locale . DIRECTORY_SEPARATOR . $file->getRelativePath() . DIRECTORY_SEPARATOR . $file->getFilename();
+                return $locale.DIRECTORY_SEPARATOR.$file->getRelativePath().DIRECTORY_SEPARATOR.$file->getFilename();
             })
             ->when($this->filesystem->exists(lang_path($rootFileName)), function ($collection) use ($rootFileName) {
                 return $collection->prepend($rootFileName);
@@ -87,11 +86,11 @@ class TranslationsManager
                      * <h3>$file is with language like <code>en/book/create.php</code> while $excludedFile contains only wildcards or path like <code>book/create.php</code></h3>
                      * <h3>So, we need to remove the language part from $file before comparing with $excludeFile</h3>
                      */
-
-                    if (fnmatch($excludeFile, str_replace($locale . '/', '', $file))) {
+                    if (fnmatch($excludeFile, str_replace($locale.'/', '', $file))) {
                         return false;
                     }
                 }
+
                 return true;
             })
             ->filter(function ($file) {
@@ -130,8 +129,8 @@ class TranslationsManager
             $files = $this->filesystem->allFiles($baseDir);
 
             foreach ($files as $file) {
-                $relativePath = str_replace($baseDir . DIRECTORY_SEPARATOR, '', $file->getPathname());
-                $zip->addFile($file->getPathname(), 'lang/' . $relativePath);
+                $relativePath = str_replace($baseDir.DIRECTORY_SEPARATOR, '', $file->getPathname());
+                $zip->addFile($file->getPathname(), 'lang/'.$relativePath);
             }
 
             $zip->close();
@@ -159,17 +158,17 @@ class TranslationsManager
                         $langPath = $download ? storage_path("app/translations/$locale/$file") : lang_path("$locale/$file");
                     }
 
-                    if (!$this->filesystem->isDirectory(dirname($langPath))) {
+                    if (! $this->filesystem->isDirectory(dirname($langPath))) {
                         $this->filesystem->makeDirectory(dirname($langPath), 0755, true);
                     }
 
-                    if (!$this->filesystem->exists($langPath)) {
-                        $this->filesystem->put($langPath, "<?php\n\nreturn [\n\n]; " . PHP_EOL);
+                    if (! $this->filesystem->exists($langPath)) {
+                        $this->filesystem->put($langPath, "<?php\n\nreturn [\n\n]; ".PHP_EOL);
                     }
 
                     if ($this->filesystem->extension($langPath) == 'php') {
                         try {
-                            $this->filesystem->put($langPath, "<?php\n\nreturn " . VarExporter::export($phrases, VarExporter::TRAILING_COMMA_IN_ARRAY) . ';' . PHP_EOL);
+                            $this->filesystem->put($langPath, "<?php\n\nreturn ".VarExporter::export($phrases, VarExporter::TRAILING_COMMA_IN_ARRAY).';'.PHP_EOL);
                         } catch (ExportException $e) {
                             logger()->error($e->getMessage());
                         }
