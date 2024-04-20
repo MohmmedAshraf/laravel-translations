@@ -146,7 +146,7 @@ test('export creates a new translation file with the correct content', function 
     $nestedFileName = lang_path('en/' . $nestedTranslation->phrases[0]->file->name . '.' . $nestedTranslation->phrases[0]->file->extension);
 
     $fileNameInDisk = File::allFiles(lang_path($translation->language->code))[0]->getPathname();
-    $nestedFileNameInDisk = File::allFiles(lang_path($nestedTranslation->language->code))[0]->getPathname();
+    $nestedFileNameInDisk = File::allFiles(lang_path($nestedTranslation->language->code))[1]->getPathname();
 
     expect($fileName)->toBe($fileNameInDisk)
         ->and(File::get($fileName))
