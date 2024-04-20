@@ -2,6 +2,22 @@
 
 All notable changes to `laravel-translations` will be documented in this file.
 
+## v1.1.2 - 2024-04-20
+
+### What's Changed
+
+* Respect turkmen language by @nurmuhammet-ali in https://github.com/MohmmedAshraf/laravel-translations/pull/94
+* various fixes by @adereksisusanto in https://github.com/MohmmedAshraf/laravel-translations/pull/93
+* nested-folders-support by @kha333n in https://github.com/MohmmedAshraf/laravel-translations/pull/99
+
+### New Contributors
+
+* @nurmuhammet-ali made their first contribution in https://github.com/MohmmedAshraf/laravel-translations/pull/94
+* @adereksisusanto made their first contribution in https://github.com/MohmmedAshraf/laravel-translations/pull/93
+* @kha333n made their first contribution in https://github.com/MohmmedAshraf/laravel-translations/pull/99
+
+**Full Changelog**: https://github.com/MohmmedAshraf/laravel-translations/compare/1.1.1...1.1.2
+
 ## v1.1.1 - 2024-03-22
 
 ### What's Changed
@@ -163,11 +179,13 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
      
      
      
+     
      ```
    - Alternatively, manually uninstall using:
      
      ```bash
      composer remove outhebox/laravel-translations
+     
      
      
      
@@ -187,6 +205,7 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
    
      ```bash
      composer require outhebox/laravel-translations
+   
    
    
    
