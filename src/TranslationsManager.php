@@ -78,19 +78,20 @@ class TranslationsManager
             ->when($this->filesystem->exists(lang_path($rootFileName)), function ($collection) use ($rootFileName) {
                 return $collection->prepend($rootFileName);
             })
-            ->filter(function ($file) {
+            ->filter(function ($file) use ($locale) {
                 foreach (config('translations.exclude_files') as $excludeFile) {
-                    if (fnmatch($excludeFile, $file)) {
-                        return false;
-                    }
-                    if (fnmatch($excludeFile, basename($file))) {
-                        return false;
-                    }
 
-                    return true;
+                    /**
+                     * <h1>File exclusion by wildcard</h1>
+                     * <h3>$file is with language like <code>en/book/create.php</code> while $excludedFile contains only wildcards or path like <code>book/create.php</code></h3>
+                     * <h3>So, we need to remove the language part from $file before comparing with $excludeFile</h3>
+                     */
+                    if (fnmatch($excludeFile, str_replace($locale.'/', '', $file))) {
+                        return false;
+                    }
                 }
 
-                return ! in_array($file, config('translations.exclude_files'));
+                return true;
             })
             ->filter(function ($file) {
                 return $this->filesystem->extension($file) == 'php' || $this->filesystem->extension($file) == 'json';
@@ -110,6 +111,36 @@ class TranslationsManager
             });
 
         return $translations;
+    }
+
+    public function download(): ?string
+    {
+        try {
+            $this->export(download: true);
+
+            $zip = new ZipArchive();
+
+            $zipPath = storage_path('app/lang.zip');
+            $zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+
+            $baseDir = storage_path('app/translations');
+            $zip->addEmptyDir('lang');
+
+            $files = $this->filesystem->allFiles($baseDir);
+
+            foreach ($files as $file) {
+                $relativePath = str_replace($baseDir.DIRECTORY_SEPARATOR, '', $file->getPathname());
+                $zip->addFile($file->getPathname(), 'lang/'.$relativePath);
+            }
+
+            $zip->close();
+
+            return $zipPath;
+        } catch (Exception $e) {
+            logger()->error($e->getMessage());
+
+            return null;
+        }
     }
 
     public function export($download = false): void
@@ -148,36 +179,6 @@ class TranslationsManager
                     }
                 }
             }
-        }
-    }
-
-    public function download(): ?string
-    {
-        try {
-            $this->export(download: true);
-
-            $zip = new ZipArchive();
-
-            $zipPath = storage_path('app/lang.zip');
-            $zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
-
-            $baseDir = storage_path('app/translations');
-            $zip->addEmptyDir('lang');
-
-            $files = $this->filesystem->allFiles($baseDir);
-
-            foreach ($files as $file) {
-                $relativePath = str_replace($baseDir.DIRECTORY_SEPARATOR, '', $file->getPathname());
-                $zip->addFile($file->getPathname(), 'lang/'.$relativePath);
-            }
-
-            $zip->close();
-
-            return $zipPath;
-        } catch (Exception $e) {
-            logger()->error($e->getMessage());
-
-            return null;
         }
     }
 }
