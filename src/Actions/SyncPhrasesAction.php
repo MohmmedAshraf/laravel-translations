@@ -26,10 +26,12 @@ class SyncPhrasesAction
         ]);
 
         $isRoot = $file === $locale.'.json' || $file === $locale.'.php';
+        $extension = pathinfo($file, PATHINFO_EXTENSION);
+        $filePath = str_replace('.'.$extension, '', str_replace($locale.DIRECTORY_SEPARATOR, '', $file));
 
         $translationFile = TranslationFile::firstOrCreate([
-            'name' => pathinfo($file, PATHINFO_FILENAME),
-            'extension' => pathinfo($file, PATHINFO_EXTENSION),
+            'name' => $filePath,
+            'extension' => $extension,
             'is_root' => $isRoot,
         ]);
 
