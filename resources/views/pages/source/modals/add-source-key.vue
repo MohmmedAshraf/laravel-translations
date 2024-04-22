@@ -4,7 +4,7 @@ import { ExclamationCircleIcon } from "@heroicons/vue/20/solid"
 import { TranslationFile } from "../../../../scripts/types"
 
 const props = defineProps<{
-    files: { data: Record<string, TranslationFile> }
+    files: Record<string, TranslationFile>
 }>()
 
 const { close } = useModal()
@@ -16,7 +16,7 @@ const form = useForm({
 })
 
 const translationFiles = computed(() => {
-    return props.files.data.map((fileType: TranslationFile) => {
+    return props.files.map((fileType: TranslationFile) => {
         return {
             value: fileType.id,
             label: fileType.nameWithExtension,
@@ -58,14 +58,7 @@ const submit = () => {
             <div class="w-full space-y-1">
                 <InputLabel for="file" value="Select file" />
 
-                <InputNativeSelect
-                    id="file"
-                    v-model="form.file"
-                    :error="form.errors.file"
-                    :items="translationFiles"
-                    size="md"
-                    placeholder="Select translation file"
-                />
+                <InputNativeSelect id="file" v-model="form.file" :error="form.errors.file" :items="translationFiles" size="md" placeholder="Select translation file" />
 
                 <InputError :message="form.errors.file" />
             </div>
@@ -73,12 +66,7 @@ const submit = () => {
             <div class="space-y-1">
                 <InputLabel for="key" value="Source key" />
 
-                <InputText
-                    id="key"
-                    v-model="form.key"
-                    :error="form.errors.key"
-                    placeholder="Enter key"
-                />
+                <InputText id="key" v-model="form.key" :error="form.errors.key" placeholder="Enter key" />
 
                 <InputError :message="form.errors.key" />
 
@@ -92,12 +80,7 @@ const submit = () => {
             <div class="space-y-1">
                 <InputLabel for="content" value="Source content" />
 
-                <InputTextarea
-                    id="content"
-                    v-model="form.content"
-                    :error="form.errors.content"
-                    placeholder="Enter translation content for this key."
-                />
+                <InputTextarea id="content" v-model="form.content" :error="form.errors.content" placeholder="Enter translation content for this key." />
 
                 <InputError :message="form.errors.content" />
             </div>
@@ -106,9 +89,7 @@ const submit = () => {
         <div class="grid grid-cols-1 gap-6 border-t px-6 py-4 md:grid-cols-2">
             <BaseButton variant="secondary" type="button" size="lg" @click="close"> Close </BaseButton>
 
-            <BaseButton variant="primary" type="button" size="lg" :disabled="form.processing" :is-loading="form.processing" @click="submit">
-                Create
-            </BaseButton>
+            <BaseButton variant="primary" type="button" size="lg" :disabled="form.processing" :is-loading="form.processing" @click="submit"> Create </BaseButton>
         </div>
     </Dialog>
 </template>

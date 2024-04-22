@@ -6,6 +6,13 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    public function getConnection()
+    {
+        $connection = config('translations.database_connection');
+
+        return $connection ?? $this->connection;
+    }
+
     public function up(): void
     {
         Schema::create('ltu_translation_files', function (Blueprint $table) {

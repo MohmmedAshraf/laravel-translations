@@ -7,6 +7,13 @@ use Outhebox\TranslationsUI\Enums\RoleEnum;
 
 return new class extends Migration
 {
+    public function getConnection()
+    {
+        $connection = config('translations.database_connection');
+
+        return $connection ?? $this->connection;
+    }
+
     public function up(): void
     {
         Schema::create('ltu_invites', function (Blueprint $table) {
