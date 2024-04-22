@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import _, {debounce} from 'lodash';
+import _, { debounce } from "lodash"
 import { ref, watch, watchEffect } from "vue"
 import PhraseItem from "./phrase-item.vue"
-import { Phrase, Translation } from "../../../scripts/types"
+import { Phrase, Translation, TranslationFile } from "../../../scripts/types"
 
 const props = defineProps<{
     phrases: {
@@ -11,35 +11,55 @@ const props = defineProps<{
         meta: Record<string, string>
     }
     translation: Translation
+    files: Record<string, TranslationFile>
 
     filter: {
-        keyword?: string,
-        status?: string,
-    },
+        keyword?: string
+        status?: string
+        translationFile?: string
+    }
 }>()
 
-const searchField = ref(props.filter?.keyword || "");
-const phraseStatus = ref(props.filter?.status || "");
+const searchField = ref(props.filter?.keyword || "")
+const phraseStatus = ref(props.filter?.status || "")
+const phraseTranslationFile = ref(props.filter?.translationFile || "")
 
 const statusEnum = [
     { label: "Translated", value: "translated" },
     { label: "Untranslated", value: "untranslated" },
-];
+]
 
-watch([searchField, phraseStatus], debounce(() => {
-    router.get(route("ltu.phrases.index", {
-        translation: props.translation.id
-    }), {
-        filter: {
-            keyword: searchField.value || undefined,
-            status: phraseStatus.value || undefined,
+const translationFiles = computed(() => {
+    return props.files.map((fileType: TranslationFile) => {
+        return {
+            value: fileType.id,
+            label: fileType.nameWithExtension,
         }
-    }, {
-        preserveState: true,
-        preserveScroll: true,
-        only: ['phrases'],
-    });
-}, 300));
+    })
+})
+
+watch(
+    [searchField, phraseStatus, phraseTranslationFile],
+    debounce(() => {
+        router.get(
+            route("ltu.phrases.index", {
+                translation: props.translation.id,
+            }),
+            {
+                filter: {
+                    keyword: searchField.value || undefined,
+                    status: phraseStatus.value || undefined,
+                    translationFile: phraseTranslationFile.value || undefined,
+                },
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                only: ["phrases"],
+            },
+        )
+    }, 300),
+)
 </script>
 <template>
     <Head title="Phrases" />
@@ -77,13 +97,11 @@ watch([searchField, phraseStatus], debounce(() => {
                     </div>
 
                     <div class="w-full max-w-full md:max-w-sm">
-                        <InputNativeSelect
-                            id="status"
-                            v-model="phraseStatus"
-                            size="md"
-                            placeholder="Filter by status"
-                            :items="statusEnum"
-                        />
+                        <InputNativeSelect id="translationFile" v-model="phraseTranslationFile" size="md" placeholder="Filter by file" :items="translationFiles" />
+                    </div>
+
+                    <div class="w-full max-w-full md:max-w-sm">
+                        <InputNativeSelect id="status" v-model="phraseStatus" size="md" placeholder="Filter by status" :items="statusEnum" />
                     </div>
                 </div>
 

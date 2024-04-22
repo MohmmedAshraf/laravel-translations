@@ -2,20 +2,22 @@
 
 namespace Outhebox\TranslationsUI\Http\Controllers;
 
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Routing\Controller as BaseController;
 use Inertia\Inertia;
 use Inertia\Response;
-use Outhebox\TranslationsUI\Http\Resources\PhraseResource;
-use Outhebox\TranslationsUI\Http\Resources\TranslationResource;
+use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Database\Eloquent\Builder;
 use Outhebox\TranslationsUI\Models\Phrase;
+use Stichoza\GoogleTranslate\GoogleTranslate;
 use Outhebox\TranslationsUI\Models\Translation;
+use Outhebox\TranslationsUI\Models\TranslationFile;
+use Illuminate\Routing\Controller as BaseController;
+use Outhebox\TranslationsUI\Http\Resources\PhraseResource;
 use Stichoza\GoogleTranslate\Exceptions\LargeTextException;
 use Stichoza\GoogleTranslate\Exceptions\RateLimitException;
+use Outhebox\TranslationsUI\Http\Resources\TranslationResource;
+use Outhebox\TranslationsUI\Http\Resources\TranslationFileResource;
 use Stichoza\GoogleTranslate\Exceptions\TranslationRequestException;
-use Stichoza\GoogleTranslate\GoogleTranslate;
 
 class PhraseController extends BaseController
 {
@@ -27,6 +29,11 @@ class PhraseController extends BaseController
 
         $phrases = $translation->phrases()->newQuery();
 
+        $files = [];
+        foreach (collect($phrases->where('translation_id', $translation->id)->get())->unique('translation_file_id') as $value) {
+            $files[] = TranslationFile::where('id', $value->translation_file_id)->first();
+        }
+
         if ($request->has('filter.keyword')) {
             $phrases->where(function (Builder $query) use ($request) {
                 $query->where('key', 'LIKE', "%{$request->input('filter.keyword')}%")
@@ -34,10 +41,19 @@ class PhraseController extends BaseController
             });
         }
 
+        if ($request->has('filter.translationFile')) {
+            $phrases->where(
+                !is_null($request->input('filter.translationFile')) || !empty($request->input('filter.translationFile'))
+                    ? fn (Builder $query) => $query->where('translation_file_id', $request->input('filter.translationFile'))
+                    : fn (Builder $query) => $query->whereNull('translation_file_id')
+            );
+        }
+
         if ($request->has('filter.status')) {
-            $phrases->where($request->input('filter.status') === 'translated'
-                ? fn (Builder $query) => $query->whereNotNull('value')
-                : fn (Builder $query) => $query->whereNull('value')
+            $phrases->where(
+                $request->input('filter.status') === 'translated'
+                    ? fn (Builder $query) => $query->whereNotNull('value')
+                    : fn (Builder $query) => $query->whereNull('value')
             );
         }
 
@@ -49,6 +65,7 @@ class PhraseController extends BaseController
         return Inertia::render('phrases/index', [
             'phrases' => PhraseResource::collection($phrases),
             'translation' => TranslationResource::make($translation),
+            'files' => TranslationFileResource::collection(collect($files)),
             'filter' => $request->input('filter', collect()),
         ]);
     }
@@ -88,10 +105,10 @@ class PhraseController extends BaseController
             'phrase' => 'required|string',
         ]);
 
-        if (! $translation->source) {
+        if (!$translation->source) {
             if (is_array($phrase->source->parameters)) {
                 foreach ($phrase->source->parameters as $parameter) {
-                    if (! str_contains($request->input('phrase'), ":$parameter")) {
+                    if (!str_contains($request->input('phrase'), ":$parameter")) {
                         return redirect()->back()->withErrors([
                             'phrase' => 'Required parameters are missing.',
                         ]);
