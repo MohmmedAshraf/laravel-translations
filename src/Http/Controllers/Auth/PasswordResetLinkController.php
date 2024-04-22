@@ -21,8 +21,9 @@ class PasswordResetLinkController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        $connection = config('translations.database_connection');
         $request->validate([
-            'email' => 'required|email|exists:ltu_contributors,email',
+            'email' => 'required|email|exists:' . ($connection ? $connection . '.' : '') . 'ltu_contributors,email',
         ]);
 
         $token = Str::random();
@@ -30,7 +31,8 @@ class PasswordResetLinkController extends Controller
         $user = Contributor::firstWhere('email', $request->email);
 
         if ($user) {
-            cache(["password.reset.$user->id" => $token],
+            cache(
+                ["password.reset.$user->id" => $token],
                 now()->addMinutes(60)
             );
 

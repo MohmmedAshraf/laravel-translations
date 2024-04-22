@@ -21,9 +21,10 @@ class ProfileController extends BaseController
 
     public function update(Request $request): RedirectResponse
     {
+        $connection = config('translations.database_connection');
         $request->validate([
             'name' => ['required', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:ltu_contributors,email,'.$request->user()->id],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . ($connection ? $connection . '.' : '') . 'ltu_contributors,email,' . $request->user()->id],
         ]);
 
         $request->user()->update($request->only('name', 'email'));
