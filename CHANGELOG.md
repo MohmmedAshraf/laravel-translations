@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-translations` will be documented in this file.
 
+## v1.1.7 - 2024-04-23
+
+**Full Changelog**: https://github.com/MohmmedAshraf/laravel-translations/compare/1.1.6...1.1.7
+
 ## v1.1.6 - 2024-04-23
 
 ### What's Changed
@@ -214,11 +218,13 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
      
      
      
+     
      ```
    - Alternatively, manually uninstall using:
      
      ```bash
      composer remove outhebox/laravel-translations
+     
      
      
      
@@ -243,6 +249,7 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
    
      ```bash
      composer require outhebox/laravel-translations
+   
    
    
    
