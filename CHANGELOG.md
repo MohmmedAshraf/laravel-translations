@@ -2,6 +2,16 @@
 
 All notable changes to `laravel-translations` will be documented in this file.
 
+## v1.1.6 - 2024-04-23
+
+### What's Changed
+
+* Add feature to `filter by file` by @adereksisusanto in https://github.com/MohmmedAshraf/laravel-translations/pull/105
+* Fix file select dropdown by @adereksisusanto in https://github.com/MohmmedAshraf/laravel-translations/pull/105
+* Fix database_connection by @adereksisusanto in https://github.com/MohmmedAshraf/laravel-translations/pull/105
+
+**Full Changelog**: https://github.com/MohmmedAshraf/laravel-translations/compare/1.1.5...1.1.6
+
 ## v1.1.5 - 2024-04-22
 
 ### What's Changed
@@ -203,11 +213,13 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
      
      
      
+     
      ```
    - Alternatively, manually uninstall using:
      
      ```bash
      composer remove outhebox/laravel-translations
+     
      
      
      
@@ -231,6 +243,7 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
    
      ```bash
      composer require outhebox/laravel-translations
+   
    
    
    
