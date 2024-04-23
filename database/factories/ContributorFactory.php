@@ -12,8 +12,8 @@ class ContributorFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->name,
-            'email' => $this->faker->unique()->email,
+            'name' => $this->faker->name(),
+            'email' => $this->faker->unique()->safeEmail(),
             'role' => $this->faker->randomElement(['admin', 'translator']),
             'password' => bcrypt('password'),
             'remember_token' => null,
