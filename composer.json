@@ -23,7 +23,6 @@
         "php": "^8.2|^8.3",
         "based/momentum-modal": "^0.3.0",
         "brick/varexporter": "^0.4.0",
-        "illuminate/contracts": "^10.0|^11.0",
         "inertiajs/inertia-laravel": "^1.0",
         "spatie/laravel-package-tools": "^1.0",
         "stichoza/google-translate-php": "^5.1",
@@ -36,11 +35,7 @@
         "orchestra/testbench": "^9.0",
         "pestphp/pest": "^2.18",
         "pestphp/pest-plugin-faker": "^2.0",
-        "pestphp/pest-plugin-laravel": "^2.2",
-        "phpstan/extension-installer": "^1.1",
-        "phpstan/phpstan-deprecation-rules": "^1.0",
-        "phpstan/phpstan-phpunit": "^1.0",
-        "phpunit/phpunit": "^10.0"
+        "pestphp/pest-plugin-laravel": "^2.2"
     },
     "autoload": {
         "psr-4": {
@@ -65,10 +60,8 @@
         "format": "vendor/bin/pint"
     },
     "config": {
-        "sort-packages": true,
         "allow-plugins": {
-            "pestphp/pest-plugin": true,
-            "phpstan/extension-installer": true
+            "pestphp/pest-plugin": true
         }
     },
     "extra": {
