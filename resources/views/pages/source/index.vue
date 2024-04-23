@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue"
-import { Phrase, Translation } from "../../../scripts/types"
+import { Phrase, Translation, TranslationFile } from "../../../scripts/types"
 import SourcePhraseItem from "./source-phrase-item.vue"
 import useConfirmationDialog from "../../../scripts/composables/use-confirmation-dialog"
 import { debounce } from "lodash"
@@ -12,26 +12,45 @@ const props = defineProps<{
         meta: Record<string, string>
     }
     translation: Translation
+    files: Record<string, TranslationFile>
 
     filter: {
-        keyword?: string,
-        status?: string,
-    },
+        keyword?: string
+        translationFile?: string
+    }
 }>()
 
-const searchField = ref(props.filter?.keyword || "");
+const searchField = ref(props.filter?.keyword || "")
+const phraseTranslationFile = ref(props.filter?.translationFile || "")
 
-watch([searchField], debounce(() => {
-    router.get(route("ltu.source_translation"), {
-        filter: {
-            keyword: searchField.value || undefined,
+const translationFiles = computed(() => {
+    return props.files.map((fileType: TranslationFile) => {
+        return {
+            value: fileType.id,
+            label: fileType.nameWithExtension,
         }
-    }, {
-        preserveState: true,
-        preserveScroll: true,
-        only: ['phrases'],
-    });
-}, 300));
+    })
+})
+
+watch(
+    [searchField, phraseTranslationFile],
+    debounce(() => {
+        router.get(
+            route("ltu.source_translation"),
+            {
+                filter: {
+                    keyword: searchField.value || undefined,
+                    translationFile: phraseTranslationFile.value || undefined,
+                },
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                only: ["phrases"],
+            },
+        )
+    }, 300),
+)
 
 const selectedIds = ref<number[]>([])
 
@@ -55,7 +74,6 @@ const deletePhrases = async () => {
 function toggleSelection() {
     if (selectedIds.value.length === props.phrases.data.length) {
         selectedIds.value = []
-
     } else {
         selectedIds.value = props.phrases.data.map((phrase: Phrase) => phrase.id)
     }
@@ -96,6 +114,10 @@ const isAllSelected = computed(() => selectedIds.value.length === Object.keys(pr
                 <div class="flex w-full flex-wrap items-center justify-between gap-4 px-4 py-3 sm:flex-nowrap">
                     <div class="w-full max-w-full md:max-w-sm">
                         <InputText v-model="searchField" placeholder="Search by key or value" size="md" />
+                    </div>
+
+                    <div class="w-full max-w-full md:max-w-sm">
+                        <InputNativeSelect id="translationFile" v-model="phraseTranslationFile" size="md" placeholder="Filter by file" :items="translationFiles" />
                     </div>
                 </div>
 
