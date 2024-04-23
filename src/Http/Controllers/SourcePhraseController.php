@@ -25,11 +25,24 @@ class SourcePhraseController extends BaseController
 
         $phrases = $source->phrases()->newQuery();
 
+        $files = [];
+        foreach (collect($phrases->where('translation_id', $source->id)->get())->unique('translation_file_id') as $value) {
+            $files[] = TranslationFile::where('id', $value->translation_file_id)->first();
+        }
+
         if ($request->has('filter.keyword')) {
             $phrases->where(function (Builder $query) use ($request) {
                 $query->where('key', 'LIKE', "%{$request->input('filter.keyword')}%")
                     ->orWhere('value', 'LIKE', "%{$request->input('filter.keyword')}%");
             });
+        }
+
+        if ($request->has('filter.translationFile')) {
+            $phrases->where(
+                ! is_null($request->input('filter.translationFile')) || ! empty($request->input('filter.translationFile'))
+                    ? fn (Builder $query) => $query->where('translation_file_id', $request->input('filter.translationFile'))
+                    : fn (Builder $query) => $query->whereNull('translation_file_id')
+            );
         }
 
         $phrases = $phrases
@@ -40,22 +53,33 @@ class SourcePhraseController extends BaseController
         return Inertia::render('source/index', [
             'phrases' => PhraseResource::collection($phrases),
             'translation' => TranslationResource::make($source),
+            'files' => TranslationFileResource::collection(collect($files)),
             'filter' => $request->input('filter', collect()),
         ]);
     }
 
     public function create(): Modal
     {
+        $source = Translation::where('source', true)->first();
+
+        $phrases = $source->phrases()->newQuery();
+
+        $files = [];
+        foreach (collect($phrases->where('translation_id', $source->id)->get())->unique('translation_file_id') as $value) {
+            $files[] = TranslationFile::where('id', $value->translation_file_id)->first();
+        }
+
         return Inertia::modal('source/modals/add-source-key', [
-            'files' => TranslationFileResource::collection(TranslationFile::get()),
+            'files' => TranslationFileResource::collection(collect($files)),
         ])->baseRoute('ltu.source_translation');
     }
 
     public function store(Request $request): RedirectResponse
     {
+        $connection = config('translations.database_connection');
         $request->validate([
             'key' => ['required', 'regex:/^[\w. ]+$/u'],
-            'file' => ['required', 'integer', 'exists:ltu_translation_files,id'],
+            'file' => ['required', 'integer', 'exists:'.($connection ? $connection.'.' : '').'ltu_translation_files,id'],
             'content' => ['required', 'string'],
         ]);
 
@@ -88,10 +112,11 @@ class SourcePhraseController extends BaseController
 
     public function update(Phrase $phrase, Request $request): RedirectResponse
     {
+        $connection = config('translations.database_connection');
         $request->validate([
             'note' => 'nullable|string',
             'phrase' => 'required|string',
-            'file' => 'required|integer|exists:ltu_translation_files,id',
+            'file' => 'required|integer|exists:'.($connection ? $connection.'.' : '').'ltu_translation_files,id',
         ]);
 
         $phrase->update([
