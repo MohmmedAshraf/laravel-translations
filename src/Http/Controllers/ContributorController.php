@@ -36,9 +36,10 @@ class ContributorController extends BaseController
 
     public function store(Request $request): RedirectResponse
     {
+        $connection = config('translations.database_connection');
         $request->validate([
             'role' => 'required|integer',
-            'email' => 'required|email|unique:ltu_contributors,email',
+            'email' => 'required|email|unique:'.($connection ? $connection.'.' : '').'ltu_contributors,email',
         ]);
 
         do {

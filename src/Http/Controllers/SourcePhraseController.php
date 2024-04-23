@@ -76,9 +76,10 @@ class SourcePhraseController extends BaseController
 
     public function store(Request $request): RedirectResponse
     {
+        $connection = config('translations.database_connection');
         $request->validate([
             'key' => ['required', 'regex:/^[\w. ]+$/u'],
-            'file' => ['required', 'integer', 'exists:ltu_translation_files,id'],
+            'file' => ['required', 'integer', 'exists:'.($connection ? $connection.'.' : '').'ltu_translation_files,id'],
             'content' => ['required', 'string'],
         ]);
 
@@ -111,10 +112,11 @@ class SourcePhraseController extends BaseController
 
     public function update(Phrase $phrase, Request $request): RedirectResponse
     {
+        $connection = config('translations.database_connection');
         $request->validate([
             'note' => 'nullable|string',
             'phrase' => 'required|string',
-            'file' => 'required|integer|exists:ltu_translation_files,id',
+            'file' => 'required|integer|exists:'.($connection ? $connection.'.' : '').'ltu_translation_files,id',
         ]);
 
         $phrase->update([
