@@ -13,8 +13,8 @@ class InviteFactory extends Factory
     public function definition(): array
     {
         return [
-            'email' => $this->faker->email(),
             'token' => $this->faker->uuid(),
+            'email' => $this->faker->unique()->safeEmail(),
             'role' => $this->faker->randomElement(RoleEnum::cases()),
         ];
     }
