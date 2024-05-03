@@ -33,7 +33,7 @@ watch(
             <Link :href="route('ltu.source_translation.edit', phrase.uuid)" class="grid w-full grid-cols-2 divide-x">
                 <div class="flex w-full items-center justify-start px-4">
                     <div class="truncate rounded-md border bg-white px-1.5 py-0.5 text-sm font-medium text-gray-600 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-600">
-                        {{ phrase.key }}
+                        {{ phrase.group }}.{{ phrase.key }}
                     </div>
                 </div>
 
