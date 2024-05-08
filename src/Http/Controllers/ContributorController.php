@@ -56,7 +56,7 @@ class ContributorController extends BaseController
 
         return redirect()->route('ltu.contributors.index')->withFragment('#invited')->with('notification', [
             'type' => 'success',
-            'body' => 'Invite sent successfully',
+            'body' => ltu_trans('Invite sent successfully'),
         ]);
     }
 
@@ -66,7 +66,7 @@ class ContributorController extends BaseController
 
         return redirect()->route('ltu.contributors.index')->with('notification', [
             'type' => 'success',
-            'body' => 'Contributor deleted successfully',
+            'body' => ltu_trans('Contributor deleted successfully'),
         ]);
     }
 }

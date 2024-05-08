@@ -3,12 +3,12 @@
 namespace Outhebox\TranslationsUI\Http\Controllers\Auth;
 
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
+use Outhebox\TranslationsUI\Http\Requests\Auth\ForgotPasswordRequest;
 use Outhebox\TranslationsUI\Mail\ResetPassword;
 use Outhebox\TranslationsUI\Models\Contributor;
 
@@ -19,16 +19,13 @@ class PasswordResetLinkController extends Controller
         return Inertia::render('auth/forgot-password');
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(ForgotPasswordRequest $request): RedirectResponse
     {
-        $connection = config('translations.database_connection');
-        $request->validate([
-            'email' => 'required|email|exists:'.($connection ? $connection.'.' : '').'ltu_contributors,email',
-        ]);
+        $request->validated();
 
         $token = Str::random();
 
-        $user = Contributor::firstWhere('email', $request->email);
+        $user = Contributor::firstWhere('email', $request->input('email'));
 
         if ($user) {
             cache(
@@ -44,6 +41,6 @@ class PasswordResetLinkController extends Controller
 
         return redirect()
             ->route('ltu.password.request')
-            ->with('status', 'We have emailed your password reset link!');
+            ->with('status', ltu_trans('We have emailed your password reset link!'));
     }
 }

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from "@headlessui/vue"
 import { ChevronUpDownIcon } from "@heroicons/vue/24/outline"
+import { trans } from 'laravel-vue-i18n'
 
 const props = defineProps<{
     items: any[]
@@ -23,7 +24,7 @@ const { sizeClass } = useInputSize(props.size ?? "lg")
             <ListboxButton class="w-full rounded-md border border-gray-300 bg-white px-3 text-left shadow-sm focus:border-blue-500 focus:ring-blue-500" :class="[sizeClass, { 'border-red-300 text-red-900 placeholder:text-red-300 focus:border-red-500 focus:ring-red-500': error }]">
                 <span v-if="value" class="block truncate">{{ displayBy(value) }}</span>
 
-                <span v-else class="italic text-gray-500">Select from the list</span>
+                <span v-else class="italic text-gray-500">{{ trans('Select from the list') }}</span>
 
                 <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                     <ChevronUpDownIcon class="size-5 text-gray-400" aria-hidden="true" />

@@ -2,6 +2,7 @@
 import { useModal } from "momentum-modal"
 import { XMarkIcon } from "@heroicons/vue/24/outline"
 import { TransitionRoot, TransitionChild, Dialog, DialogPanel, DialogTitle } from "@headlessui/vue"
+import { trans } from 'laravel-vue-i18n'
 
 const props = withDefaults(
     defineProps<{
@@ -50,14 +51,14 @@ const maxWidthClass = computed(() => {
                                         <div class="border-b px-4 py-6 sm:px-6 sm:py-8">
                                             <div class="flex items-start justify-between">
                                                 <DialogTitle class="text-lg font-semibold text-gray-900">
-                                                    <slot name="title"> Panel title </slot>
+                                                    <slot name="title"> {{ trans('Panel title') }} </slot>
                                                 </DialogTitle>
 
                                                 <div class="ml-3 flex h-7 items-center">
                                                     <button type="button" class="relative rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" @click="close">
                                                         <span class="absolute -inset-2.5" />
 
-                                                        <span class="sr-only">Close panel</span>
+                                                        <span class="sr-only">{{ trans('Close panel') }}</span>
 
                                                         <XMarkIcon class="size-6" aria-hidden="true" />
                                                     </button>
@@ -72,7 +73,7 @@ const maxWidthClass = computed(() => {
 
                                     <div class="shrink-0 bg-gray-100 px-4 py-6 sm:px-6 sm:py-8">
                                         <div class="flex justify-between gap-6">
-                                            <baseButton type="button" size="lg" class="btn btn-secondary-darker !text-sm" @click="close"> Cancel </baseButton>
+                                            <baseButton type="button" size="lg" class="btn btn-secondary-darker !text-sm" @click="close"> {{ trans('Cancel') }} </baseButton>
 
                                             <slot name="slideover_submit" />
                                         </div>

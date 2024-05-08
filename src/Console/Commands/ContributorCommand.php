@@ -4,6 +4,8 @@ namespace Outhebox\TranslationsUI\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
+use Outhebox\TranslationsUI\Enums\LocaleEnum;
 use Outhebox\TranslationsUI\Enums\RoleEnum;
 use Outhebox\TranslationsUI\Models\Contributor;
 use Symfony\Component\Console\Command\Command as CommandAlias;
@@ -22,12 +24,18 @@ class ContributorCommand extends Command
                     { name : Name of the contributor }
                     { email : Email associated with the contributor }
                     { role : The role to be assigned to the contributor (owner, translator, reviewer, translator_manager) }
-                    { password : Password associated with the contributor }';
+                    { password : Password associated with the contributor }
+                    { language : Language associated with the contributor }';
 
     protected $description = 'Create a new contributor for the Laravel Translations UI';
 
     protected function interact(InputInterface $input, OutputInterface $output): void
     {
+        if (Schema::hasTable('ltu_contributors')) {
+            $this->error('The ltu_contributors table does not exist or is empty, please run the migrate command first.');
+            exit;
+        }
+
         if (! $input->getArgument('name')) {
             $input->setArgument('name', text(
                 label: 'Name of the contributor',
@@ -73,6 +81,18 @@ class ContributorCommand extends Command
                 hint: 'Minimum 8 characters.'
             ));
         }
+
+        if (! $input->getArgument('language')) {
+            $input->setArgument('language', select(
+                label: 'What language do you use in Laravel Translations UI?',
+                options: [
+                    LocaleEnum::english->label() => LocaleEnum::english->label(),
+                    LocaleEnum::indonesian->label() => LocaleEnum::indonesian->label(),
+                ],
+                default: LocaleEnum::english->label(),
+                hint: 'The language can be changed at any time.'
+            ));
+        }
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -81,6 +101,7 @@ class ContributorCommand extends Command
         $email = $input->getArgument('email');
         $role = $input->getArgument('role');
         $password = $input->getArgument('password');
+        $lang = $input->getArgument('language');
 
         $contributor = spin(
             fn () => Contributor::create([
@@ -88,6 +109,7 @@ class ContributorCommand extends Command
                 'email' => $email,
                 'role' => RoleEnum::fromLabel($role),
                 'password' => Hash::make($password),
+                'lang' => LocaleEnum::fromLabel($lang),
             ]),
             'Creating contributor...'
         );
@@ -98,13 +120,14 @@ class ContributorCommand extends Command
             return CommandAlias::FAILURE;
         }
 
-        table(['ID', 'Name', 'Email', 'Role', 'Password'], [
+        table(['ID', 'Name', 'Email', 'Role', 'Password', 'Language'], [
             [
                 $contributor->id,
                 $contributor->name,
                 $contributor->email,
                 $contributor->role->label(),
                 'Hidden for security reasons.',
+                $contributor->lang->label(),
             ],
         ]);
 

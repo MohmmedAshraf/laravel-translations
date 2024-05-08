@@ -3,14 +3,13 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Outhebox\TranslationsUI\Facades\TranslationsUI;
 
 return new class() extends Migration
 {
     public function getConnection()
     {
-        $connection = config('translations.database_connection');
-
-        return $connection ?? $this->connection;
+        return TranslationsUI::getConnection() ?? $this->connection;
     }
 
     public function up(): void

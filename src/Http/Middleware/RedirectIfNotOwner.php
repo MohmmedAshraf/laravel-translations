@@ -12,7 +12,7 @@ class RedirectIfNotOwner
         if (! currentUser()->isOwner()) {
             return redirect()->back()->with('notification', [
                 'type' => 'error',
-                'body' => 'You are not allowed to perform this action',
+                'body' => ltu_trans('You are not allowed to perform this action'),
             ]);
         }
 

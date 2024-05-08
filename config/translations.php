@@ -24,6 +24,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Laravel Translations Localization
+    |--------------------------------------------------------------------------
+    |
+    | The Laravel Translations determines the default locale that will be used
+    | This option can be set to any locale for which you plan to have translation strings.
+    |
+    */
+
+    'locale' => env('TRANSLATIONS_LOCALE', 'en'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Laravel Translations route middleware
     |--------------------------------------------------------------------------
     |

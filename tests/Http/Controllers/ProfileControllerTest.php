@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Hash;
+use Outhebox\TranslationsUI\Models\Language;
 
 use function Pest\Faker\fake;
 
@@ -43,6 +44,22 @@ it('can update the password', function () {
     $this->translator->refresh();
 
     expect(Hash::check('new-password', $this->translator->refresh()->password))->toBeTrue();
+});
+
+it('can update the language', function () {
+    $language = Language::factory(['code' => 'id'])->create();
+    $this->actingAs($this->translator, 'translations')
+        ->from(route('ltu.profile.edit'))
+        ->patch(route('ltu.profile.language.update'), [
+            'language' => $language,
+        ])
+        ->assertStatus(302)
+        ->assertSessionHasNoErrors('language')
+        ->assertRedirect(route('ltu.profile.edit'));
+
+    $this->translator->refresh();
+
+    expect($this->translator->lang)->toBe($language['code']);
 });
 
 it('can update profile information with password', function () {

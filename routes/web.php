@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Outhebox\TranslationsUI\Facades\TranslationsUI;
 use Outhebox\TranslationsUI\Http\Controllers\Auth\AuthenticatedSessionController;
 use Outhebox\TranslationsUI\Http\Controllers\Auth\InvitationAcceptController;
 use Outhebox\TranslationsUI\Http\Controllers\Auth\NewPasswordController;
@@ -12,10 +13,11 @@ use Outhebox\TranslationsUI\Http\Controllers\SourcePhraseController;
 use Outhebox\TranslationsUI\Http\Controllers\TranslationController;
 use Outhebox\TranslationsUI\Http\Middleware\Authenticate;
 use Outhebox\TranslationsUI\Http\Middleware\HandleInertiaRequests;
+use Outhebox\TranslationsUI\Http\Middleware\Locale;
 use Outhebox\TranslationsUI\Http\Middleware\RedirectIfNotOwner;
 
-Route::domain(config('translations.domain'))->group(function () {
-    Route::middleware(array_merge(config('translations.middleware'), [HandleInertiaRequests::class]))->prefix(config('translations.path'))->name('ltu.')->group(function () {
+Route::domain(TranslationsUI::getDomain())->group(function () {
+    Route::middleware(array_merge(TranslationsUI::getMiddleware(), [HandleInertiaRequests::class, Locale::class]))->prefix(TranslationsUI::getPath())->name('ltu.')->group(function () {
         Route::prefix('auth')->group(function () {
             Route::prefix('invite')->group(function () {
                 Route::get('accept/{token}', [InvitationAcceptController::class, 'create'])->name('invitation.accept');
@@ -105,6 +107,7 @@ Route::domain(config('translations.domain'))->group(function () {
             Route::get('profile', [ProfileController::class, 'edit'])->name('profile.edit');
             Route::patch('profile', [ProfileController::class, 'update'])->name('profile.update');
             Route::put('password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
+            Route::patch('language', [ProfileController::class, 'updateLanguage'])->name('profile.language.update');
         });
     });
 });

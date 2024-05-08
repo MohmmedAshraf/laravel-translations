@@ -4,7 +4,9 @@ namespace Outhebox\TranslationsUI\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 use Inertia\Middleware;
+use Outhebox\TranslationsUI\Facades\TranslationsUI;
 use Outhebox\TranslationsUI\Http\Resources\ContributorResource;
 use Outhebox\TranslationsUI\Models\Contributor;
 use Tighten\Ziggy\Ziggy;
@@ -33,6 +35,7 @@ class HandleInertiaRequests extends Middleware
             },
             'notification' => fn () => $request->session()->get('notification'),
             'status' => fn () => $request->session()->get('status'),
+            'locale' => Cookie::get('translations_locale', TranslationsUI::getLocale()),
         ]);
     }
 

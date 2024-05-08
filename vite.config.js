@@ -3,6 +3,7 @@ import laravel from "laravel-vite-plugin"
 import vue from "@vitejs/plugin-vue"
 import autoimport from "unplugin-auto-import/vite"
 import components from "unplugin-vue-components/vite"
+import i18n from "laravel-vue-i18n/vite";
 
 export default defineConfig({
     resolve: {
@@ -75,6 +76,12 @@ export default defineConfig({
                     }
                 },
             ],
+        }),
+        i18n({
+            langPath: 'resources/lang',
+            additionalLangPaths: [
+                'resources/lang'
+            ]
         }),
     ],
 })

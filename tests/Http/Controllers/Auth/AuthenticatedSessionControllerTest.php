@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Outhebox\TranslationsUI\Enums\LocaleEnum;
 use Outhebox\TranslationsUI\Enums\RoleEnum;
 use Outhebox\TranslationsUI\Models\Contributor;
 
@@ -34,12 +35,16 @@ it('login request will authenticate user', function () {
     $user = Contributor::factory([
         'role' => RoleEnum::owner,
         'password' => Hash::make('password'),
+        'lang' => LocaleEnum::english->value,
     ])->create();
 
-    $this->post(route('ltu.login.attempt'), [
+    $response = $this->post(route('ltu.login.attempt'), [
         'email' => $user->email,
         'password' => 'password',
-    ])->assertRedirect(route('ltu.translation.index'));
+    ]);
+
+    $response->assertRedirect(route('ltu.translation.index'))
+        ->withCookie('translations_locale_test', $user->lang);
 });
 
 it('authenticated users can access dashboard', function () {

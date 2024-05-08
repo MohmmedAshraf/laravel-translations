@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { trans } from 'laravel-vue-i18n'
+
 defineProps<{
     links: {
         prev: string | null
@@ -21,7 +23,9 @@ defineProps<{
             <IconArrowLeft class="size-6 text-gray-400" />
         </button>
 
-        <span class="text-sm font-medium text-gray-500 group-hover:text-blue-600"> {{ meta.current_page }} of {{ meta.last_page }} </span>
+        <span class="text-sm font-medium text-gray-500 group-hover:text-blue-600">
+             {{ trans(':page of :pages', {page: meta.current_page, pages: meta.last_page}) }}
+        </span>
 
         <Link v-if="links.next" :href="links.next" preserve-scroll>
             <IconArrowRight class="size-6 text-gray-400 group-hover:text-blue-600" />

@@ -8,25 +8,21 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Outhebox\TranslationsUI\Actions\SyncPhrasesAction;
 use Outhebox\TranslationsUI\Database\Seeders\LanguagesTableSeeder;
+use Outhebox\TranslationsUI\Facades\TranslationsUI;
 use Outhebox\TranslationsUI\Models\Language;
 use Outhebox\TranslationsUI\Models\Phrase;
 use Outhebox\TranslationsUI\Models\Translation;
 use Outhebox\TranslationsUI\Models\TranslationFile;
-use Outhebox\TranslationsUI\TranslationsManager;
 
 class ImportTranslationsCommand extends Command
 {
-    public TranslationsManager $manager;
-
     protected $signature = 'translations:import {--F|fresh : Truncate all translations and phrases before importing}';
 
     protected $description = 'Sync translation all keys from the translation files to the database';
 
-    public function __construct(TranslationsManager $manager)
+    public function __construct()
     {
         parent::__construct();
-
-        $this->manager = $manager;
     }
 
     public function handle(): void
@@ -43,7 +39,7 @@ class ImportTranslationsCommand extends Command
 
         $this->info('Importing translations...'.PHP_EOL);
 
-        $this->withProgressBar($this->manager->getLocales(), function ($locale) use ($translation) {
+        $this->withProgressBar(TranslationsUI::getLocales(), function ($locale) use ($translation) {
             $this->syncTranslations($translation, $locale);
         });
     }
@@ -72,10 +68,10 @@ class ImportTranslationsCommand extends Command
 
     public function createOrGetSourceLanguage(): Translation
     {
-        $language = Language::where('code', config('translations.source_language'))->first();
+        $language = Language::where('code', TranslationsUI::getSourceLanguage())->first();
 
         if (! $language) {
-            $this->error('Language with code '.config('translations.source_language').' not found'.PHP_EOL);
+            $this->error('Language with code '.TranslationsUI::getSourceLanguage().' not found'.PHP_EOL);
 
             exit;
         }
@@ -102,13 +98,13 @@ class ImportTranslationsCommand extends Command
 
     public function syncTranslations(Translation $translation, string $locale): void
     {
-        foreach ($this->manager->getTranslations($locale) as $file => $translations) {
+        foreach (TranslationsUI::getTranslations($locale) as $file => $translations) {
             foreach (Arr::dot($translations) as $key => $value) {
                 SyncPhrasesAction::execute($translation, $key, $value, $locale, $file);
             }
         }
 
-        if ($locale === config('translations.source_language')) {
+        if ($locale === TranslationsUI::getSourceLanguage()) {
             return;
         }
 
@@ -130,10 +126,10 @@ class ImportTranslationsCommand extends Command
             if (! $translation->phrases()->where('key', $phrase->key)->first()) {
                 $fileName = $phrase->file->name.'.'.$phrase->file->extension;
 
-                if ($phrase->file->name === config('translations.source_language')) {
-                    $fileName = Str::replaceStart(config('translations.source_language').'.', "{$locale}.", $fileName);
+                if ($phrase->file->name === TranslationsUI::getSourceLanguage()) {
+                    $fileName = Str::replaceStart(TranslationsUI::getSourceLanguage().'.', "{$locale}.", $fileName);
                 } else {
-                    $fileName = Str::replaceStart(config('translations.source_language').'/', "{$locale}/", $fileName);
+                    $fileName = Str::replaceStart(TranslationsUI::getSourceLanguage().'/', "{$locale}/", $fileName);
                 }
 
                 SyncPhrasesAction::execute($phrase->translation, $phrase->key, '', $locale, $fileName);

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { FaceFrownIcon } from "@heroicons/vue/24/outline"
 import { MachineTranslations } from "../../../../scripts/types"
+import { trans } from 'laravel-vue-i18n'
 
 defineProps<{
     language?: string
@@ -27,7 +28,7 @@ const useTranslation = (value: string) => {
         />
 
         <div class="flex h-20 w-full items-center justify-center px-4 py-6">
-            <span class="text-sm text-gray-500">More integrations coming in next releases...</span>
+            <span class="text-sm text-gray-500">{{ trans('More integrations coming in next releases...') }}</span>
         </div>
     </div>
 
@@ -35,7 +36,7 @@ const useTranslation = (value: string) => {
         <div class="absolute left-0 top-0 flex min-h-full w-full flex-col items-center justify-center backdrop-blur-sm">
             <FaceFrownIcon class="size-12 text-gray-200" />
 
-            <span class="mt-4 text-gray-500">No suggestions found...</span>
+            <span class="mt-4 text-gray-500">{{ trans('No suggestions found...') }}</span>
         </div>
     </div>
 </template>

@@ -10,6 +10,11 @@ export type Role = {
     label: string
 }
 
+export type Locale = {
+    code: string
+    name: string
+}
+
 export type NotificationType = "success" | "error" | "warning" | "info" | "default"
 
 export type Notification = {
@@ -28,6 +33,7 @@ export type Contributor = {
     name: string
     email: string
     role: Role
+    lang: Lang
     created_at: string
     updated_at: string
 }

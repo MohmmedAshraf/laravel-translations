@@ -3,6 +3,7 @@ import { onMounted, ref } from "vue"
 import { useSpeechSynthesis } from "@vueuse/core"
 import { MachineTranslations } from "../../../../scripts/types"
 import useLanguageCodeConversion from "../../../../scripts/composables/use-language-code-conversion"
+import { trans } from 'laravel-vue-i18n'
 
 const props = defineProps<{
     language?: string
@@ -60,7 +61,7 @@ onMounted(() => {
 
         <div class="flex divide-x">
             <button
-                v-tooltip="'Use this'"
+                v-tooltip="trans('Use this')"
                 class="flex w-14 items-center justify-center px-4 py-3 text-gray-400 transition-colors duration-100 hover:bg-blue-100 hover:text-blue-600"
                 @click="useTranslation(phrase.value)"
             >
@@ -68,7 +69,7 @@ onMounted(() => {
             </button>
 
             <button
-                v-tooltip="langCode ? 'Speak' : 'Language not supported'"
+                v-tooltip="langCode ? trans('Speak') : trans('Language not supported')"
                 class="flex w-14 items-center justify-center px-4 py-3 text-gray-400 transition-colors duration-100"
                 :class="{ 'cursor-not-allowed opacity-50': !langCode, ' hover:bg-blue-100 hover:text-blue-600': langCode }"
                 :disabled="!langCode"

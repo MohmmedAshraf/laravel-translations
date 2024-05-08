@@ -3,10 +3,10 @@
 namespace Outhebox\TranslationsUI\Http\Controllers\Auth;
 
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
+use Outhebox\TranslationsUI\Http\Requests\Auth\InvitationAcceptRequest;
 use Outhebox\TranslationsUI\Models\Contributor;
 use Outhebox\TranslationsUI\Models\Invite;
 
@@ -24,13 +24,9 @@ class InvitationAcceptController extends BaseController
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(InvitationAcceptRequest $request): RedirectResponse
     {
-        $request->validate([
-            'name' => 'required|string',
-            'token' => 'required|string',
-            'password' => 'required|string|confirmed|min:8',
-        ]);
+        $request->validated();
 
         if (! $invite = Invite::where('token', $request->input('token'))->first()) {
             abort(404);
@@ -40,7 +36,7 @@ class InvitationAcceptController extends BaseController
             return redirect()->route('ltu.login')
                 ->with('notification', [
                     'type' => 'error',
-                    'body' => 'You already have an account, please login',
+                    'body' => ltu_trans('You already have an account, please login'),
                 ]);
         }
 
@@ -64,7 +60,7 @@ class InvitationAcceptController extends BaseController
 
         return redirect()->route('ltu.contributors.index')->withFragment('#invited')->with('notification', [
             'type' => 'success',
-            'body' => 'Invitation deleted successfully',
+            'body' => ltu_trans('Invitation deleted successfully'),
         ]);
     }
 }

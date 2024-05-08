@@ -1,14 +1,16 @@
-<script setup lang="ts">
-import { Modal } from "momentum-modal"
-import Navbar from "./partials/navbar.vue"
-import { ChevronRightIcon } from "@heroicons/vue/20/solid"
+<script setup
+    lang="ts">
+    import { Modal } from "momentum-modal"
+    import Navbar from "./partials/navbar.vue"
+    import { ChevronRightIcon } from "@heroicons/vue/20/solid"
+    import { trans } from 'laravel-vue-i18n'
 
-defineProps<{
-    breadcrumbs?: {
-        label: string
-        link: string
-    }[]
-}>()
+    defineProps<{
+        breadcrumbs?: {
+            label: string
+            link: string
+        }[]
+    }>()
 </script>
 
 <template>
@@ -22,17 +24,22 @@ defineProps<{
                         <nav v-if="breadcrumbs" class="flex" aria-label="Breadcrumb">
                             <ol role="list" class="flex items-center space-x-4">
                                 <li>
-                                    <Link :href="route('ltu.translation.index')" class="text-sm font-medium text-gray-500 hover:text-gray-700"> Dashboard </Link>
+                                    <Link :href="route('ltu.translation.index')"
+                                        class="text-sm font-medium text-gray-500 hover:text-gray-700">
+                                    {{ trans('Dashboard') }}
+                                    </Link>
                                 </li>
 
                                 <li v-for="(crumb, index) in breadcrumbs" :key="index" class="flex items-center">
                                     <ChevronRightIcon class="size-5 shrink-0 text-gray-400" aria-hidden="true" />
 
-                                    <Link v-if="crumb.link" :href="crumb.link" class="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700">
-                                        {{ crumb.label }}
+                                    <Link v-if="crumb.link" :href="crumb.link"
+                                        class="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700">
+                                    {{ crumb.label }}
                                     </Link>
 
-                                    <span v-else class="ml-4 whitespace-nowrap text-sm font-medium text-gray-500 hover:text-gray-700">
+                                    <span v-else
+                                        class="ml-4 whitespace-nowrap text-sm font-medium text-gray-500 hover:text-gray-700">
                                         {{ crumb.label }}
                                     </span>
                                 </li>

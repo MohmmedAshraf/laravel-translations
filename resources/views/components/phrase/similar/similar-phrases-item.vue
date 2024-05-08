@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Phrase } from "../../../../scripts/types"
+import { trans } from 'laravel-vue-i18n'
 
 defineProps<{
     phrase: Phrase
@@ -19,7 +20,7 @@ defineProps<{
             </div>
 
             <div v-else class="flex text-gray-600">
-                {{ phrase?.value ?? "Not translated yet..." }}
+                {{ phrase?.value ?? trans("Not translated yet...") }}
             </div>
         </div>
 

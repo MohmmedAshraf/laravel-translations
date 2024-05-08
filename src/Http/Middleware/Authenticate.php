@@ -25,7 +25,7 @@ class Authenticate
             $this->auth->shouldUse('translations');
         } else {
             throw new AuthenticationException(
-                'Unauthenticated.', ['translations'], route('ltu.login')
+                ltu_trans('Unauthenticated.'), ['translations'], route('ltu.login')
             );
         }
 

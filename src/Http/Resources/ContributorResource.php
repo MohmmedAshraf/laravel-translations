@@ -19,6 +19,7 @@ class ContributorResource extends JsonResource
             ],
             'email' => $this->email,
             'avatar' => $this->avatar,
+            'lang' => $this->lang,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

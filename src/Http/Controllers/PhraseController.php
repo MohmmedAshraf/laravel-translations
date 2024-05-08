@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 use Inertia\Inertia;
 use Inertia\Response;
+use Outhebox\TranslationsUI\Http\Requests\PhraseUpdateRequest;
 use Outhebox\TranslationsUI\Http\Resources\PhraseResource;
 use Outhebox\TranslationsUI\Http\Resources\TranslationFileResource;
 use Outhebox\TranslationsUI\Http\Resources\TranslationResource;
@@ -99,18 +100,16 @@ class PhraseController extends BaseController
         ]);
     }
 
-    public function update(Translation $translation, Phrase $phrase, Request $request): RedirectResponse
+    public function update(Translation $translation, Phrase $phrase, PhraseUpdateRequest $request): RedirectResponse
     {
-        $request->validate([
-            'phrase' => 'required|string',
-        ]);
+        $request->validated();
 
         if (! $translation->source) {
             if (is_array($phrase->source->parameters)) {
                 foreach ($phrase->source->parameters as $parameter) {
                     if (! str_contains($request->input('phrase'), ":$parameter")) {
                         return redirect()->back()->withErrors([
-                            'phrase' => 'Required parameters are missing.',
+                            'phrase' => ltu_trans('Required parameters are missing.'),
                         ]);
                     }
                 }
@@ -132,13 +131,13 @@ class PhraseController extends BaseController
                 'phrase' => $nextPhrase,
             ])->with('notification', [
                 'type' => 'success',
-                'body' => 'Phrase has been updated successfully',
+                'body' => ltu_trans('Phrase has been updated successfully'),
             ]);
         }
 
         return redirect()->route('ltu.phrases.index', $translation)->with('notification', [
             'type' => 'success',
-            'body' => 'Phrase has been updated successfully',
+            'body' => ltu_trans('Phrase has been updated successfully'),
         ]);
     }
 }

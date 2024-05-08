@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n'
+
 defineProps<{
     mustVerifyEmail?: Boolean
     status?: String
@@ -21,14 +23,16 @@ const updateProfileInformation = () => {
 <template>
     <section>
         <header>
-            <h2 class="text-lg font-medium text-gray-900">Profile Information</h2>
+            <h2 class="text-lg font-medium text-gray-900">{{ trans('Profile Information') }}</h2>
 
-            <p class="mt-1 text-sm text-gray-600">Update your account's profile information and email address.</p>
+            <p class="mt-1 text-sm text-gray-600">
+                {{ trans("Update your account's profile information and email address.") }}
+            </p>
         </header>
 
         <form class="mt-6 space-y-6" @submit.prevent="updateProfileInformation">
             <div class="space-y-1">
-                <InputLabel for="name" value="Name" />
+                <InputLabel for="name" :value="trans('Name')" />
 
                 <InputText id="name" v-model="form.name" :error="form.errors.name" type="text" required autofocus autocomplete="name" />
 
@@ -36,7 +40,7 @@ const updateProfileInformation = () => {
             </div>
 
             <div class="space-y-1">
-                <InputLabel for="email" value="Email" />
+                <InputLabel for="email" :value="trans('Email')" />
 
                 <InputText id="email" v-model="form.email" :error="form.errors.email" type="email" autocomplete="username" />
 
@@ -44,10 +48,10 @@ const updateProfileInformation = () => {
             </div>
 
             <div class="flex items-center gap-4">
-                <BaseButton type="submit" size="md" variant="primary" :is-loading="form.processing"> Save </BaseButton>
+                <BaseButton type="submit" size="md" variant="primary" :is-loading="form.processing"> {{ trans('Save') }} </BaseButton>
 
                 <Transition enter-active-class="transition ease-in-out" enter-from-class="opacity-0" leave-active-class="transition ease-in-out" leave-to-class="opacity-0">
-                    <p v-if="form.recentlySuccessful" class="text-sm text-gray-600">Saved.</p>
+                    <p v-if="form.recentlySuccessful" class="text-sm text-gray-600">{{ trans('Saved.') }}</p>
                 </Transition>
             </div>
         </form>

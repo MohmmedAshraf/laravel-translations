@@ -7,16 +7,57 @@ use Brick\VarExporter\VarExporter;
 use Exception;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\Application;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use Outhebox\TranslationsUI\Models\Translation;
 use Symfony\Component\Finder\SplFileInfo;
 use ZipArchive;
 
 class TranslationsManager
 {
-    public function __construct(
-        protected Filesystem $filesystem
-    ) {
+    const DOMAIN = null;
+
+    const PATH = 'translations';
+
+    const LOCALE = 'en';
+
+    const FALLBACK_LOCALE = 'en';
+
+    const MIDDLEWARE = ['web'];
+
+    const DB_CONNECTION = null;
+
+    const INCLUDE_FILE_IN_KEY = false;
+
+    const SOURCE_LANGUAGE = 'en';
+
+    const EXCLUDE_FILES = [];
+
+    const CONFIG = [
+        'domain' => self::DOMAIN,
+        'path' => self::PATH,
+        'locale' => self::LOCALE,
+        'middleware' => self::MIDDLEWARE,
+        'database_connection' => self::DB_CONNECTION,
+        'include_file_in_key' => self::INCLUDE_FILE_IN_KEY,
+        'source_language' => self::SOURCE_LANGUAGE,
+        'exclude_files' => self::EXCLUDE_FILES,
+    ];
+
+    protected Application $laravel;
+
+    protected Filesystem $filesystem;
+
+    protected array $config = [];
+
+    public function __construct(Application $laravel, Filesystem $filesystem, string $locale)
+    {
+        $this->filesystem = $filesystem;
+        $this->laravel = $laravel;
+        $this->initializeConfig();
+        $this->setLocale($locale);
     }
 
     public function getLocales(): array
@@ -35,7 +76,7 @@ class TranslationsManager
             if ($this->filesystem->extension($file) !== 'json') {
                 return;
             }
-            foreach (config('translations.exclude_files') as $excludeFile) {
+            foreach ($this->getExcludeFiles() as $excludeFile) {
                 if (fnmatch($excludeFile, $file)) {
                     return;
                 }
@@ -52,10 +93,10 @@ class TranslationsManager
         return $locales->toArray();
     }
 
-    public function getTranslations(string $locale): array
+    public function getTranslations(string $locale = ''): array
     {
         if (blank($locale)) {
-            $locale = config('translations.source_language');
+            $locale = $this->getSourceLanguage();
         }
 
         $translations = [];
@@ -79,14 +120,17 @@ class TranslationsManager
                 return $collection->prepend($rootFileName);
             })
             ->filter(function ($file) use ($locale) {
-                foreach (config('translations.exclude_files') as $excludeFile) {
+                foreach ($this->getExcludeFiles() as $excludeFile) {
 
                     /**
                      * <h1>File exclusion by wildcard</h1>
                      * <h3>$file is with language like <code>en/book/create.php</code> while $excludedFile contains only wildcards or path like <code>book/create.php</code></h3>
                      * <h3>So, we need to remove the language part from $file before comparing with $excludeFile</h3>
                      */
-                    if (fnmatch($excludeFile, str_replace($locale.'/', '', $file))) {
+                    if (fnmatch($excludeFile, str_replace($locale.DIRECTORY_SEPARATOR, '', $file))) {
+                        return false;
+                    }
+                    if (Str::contains(str_replace($locale.DIRECTORY_SEPARATOR, '', $file), $excludeFile)) {
                         return false;
                     }
                 }
@@ -143,7 +187,7 @@ class TranslationsManager
         }
     }
 
-    public function export($download = false): void
+    public function export(bool $download = false): void
     {
         $translations = Translation::with('phrases')->get();
 
@@ -179,6 +223,133 @@ class TranslationsManager
                     }
                 }
             }
+        }
+    }
+
+    public function getDomain(): ?string
+    {
+        return $this->get('domain', self::DOMAIN);
+    }
+
+    public function setDomain(string $domain): void
+    {
+        $this->set('domain', $domain);
+    }
+
+    public function getPath(): string
+    {
+        return $this->get('path');
+    }
+
+    public function setPath(string $path): void
+    {
+        $this->set('path', $path);
+    }
+
+    public function getLocale(): string
+    {
+        return $this->get('locale', self::LOCALE);
+    }
+
+    public function setLocale(string $locale): void
+    {
+        if (Str::contains($locale, ['/', '\\'])) {
+            throw new InvalidArgumentException('Invalid characters present in locale.');
+        }
+
+        $this->set('locale', $locale);
+    }
+
+    public function getFallback(): string
+    {
+        return self::FALLBACK_LOCALE;
+    }
+
+    public function getMiddleware(): array
+    {
+        return $this->get('middleware', self::MIDDLEWARE);
+    }
+
+    public function setMiddleware(array $middleware): void
+    {
+        $this->set('middleware', $middleware);
+    }
+
+    public function getConnection(): ?string
+    {
+        return $this->get('database_connection');
+    }
+
+    public function setConnection(string $connection): void
+    {
+        $this->set('database_connection', $connection);
+    }
+
+    public function getIncludeFileInKey(): bool
+    {
+        return $this->get('include_file_in_key');
+    }
+
+    public function setIncludeFileInKey(bool $bool): void
+    {
+        $this->set('include_file_in_key', $bool);
+    }
+
+    public function getSourceLanguage(): string
+    {
+        return $this->get('source_language', self::SOURCE_LANGUAGE);
+    }
+
+    public function setSourceLanguage(string $locale): void
+    {
+        $this->set('source_language', $locale);
+    }
+
+    public function getExcludeFiles(): array
+    {
+        return $this->get('exclude_files');
+    }
+
+    public function setExcludeFiles(array $files): void
+    {
+        $this->set('exclude_files', $files);
+    }
+
+    public function initializeConfig(): array
+    {
+        foreach ($this->laravel['config']['translations'] as $key => $value) {
+            $this->set($key, $value);
+        }
+
+        return $this->config;
+    }
+
+    private function get(array|string $key, mixed $default = null): string|array
+    {
+        if (is_array($key)) {
+            $config = [];
+            foreach ($key as $k => $default) {
+                if (is_numeric($k)) {
+                    [$k, $default] = [$default, null];
+                }
+                $config[$k] = Str::replace('/', '\\', Arr::get($this->config, $k, $default));
+            }
+
+            return $config;
+        }
+
+        return Str::replace('/', '\\', Arr::get($this->config, $key, $default));
+    }
+
+    private function set(array|string $key, mixed $value = null): void
+    {
+        $keys = is_array($key) ? $key : [$key => $value];
+
+        foreach ($keys as $key => $value) {
+            if (keyNotExist($key, self::CONFIG)) {
+                continue;
+            }
+            Arr::set($this->config, $key, $value);
         }
     }
 }

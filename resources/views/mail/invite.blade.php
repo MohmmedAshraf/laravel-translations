@@ -1,16 +1,16 @@
 @component('mail::message')
-    # Hello
+    # {{ ltu_trans('Hello') }}
 
-    Someone has invited you to join their  translation team on {{ config('app.name') }}.
+    {{ ltu_trans('Someone has invited you to join their  translation team on :name', ['name' => config('app.name')]) }}.
 
     @component('mail::button', ['url' => $link])
-        Accept Invitation
+        {{ ltu_trans('Accept Invitation') }}
     @endcomponent
 
-    This invitation link will expire in 24 hours.
+    {{ ltu_trans('This invitation link will expire in :time :unit', ['time' => '24', 'unit' => ltu_trans('hours')]) }}.
 
-    If you did not request a password reset, no further action is required.
+    {{ ltu_trans('If you did not request a password reset, no further action is required') }}.
 
-    Thanks,<br>
+    {{ ('Thanks') }},<br>
     {{ config('app.name') }}
 @endcomponent

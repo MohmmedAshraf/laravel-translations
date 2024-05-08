@@ -10,6 +10,9 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Momentum\Modal\Modal;
 use Outhebox\TranslationsUI\Actions\CreateSourceKeyAction;
+use Outhebox\TranslationsUI\Http\Requests\SourcePhraseDestroyMultipleRequest;
+use Outhebox\TranslationsUI\Http\Requests\SourcePhraseRequest;
+use Outhebox\TranslationsUI\Http\Requests\SourcePhraseUpdateRequest;
 use Outhebox\TranslationsUI\Http\Resources\PhraseResource;
 use Outhebox\TranslationsUI\Http\Resources\TranslationFileResource;
 use Outhebox\TranslationsUI\Http\Resources\TranslationResource;
@@ -74,14 +77,9 @@ class SourcePhraseController extends BaseController
         ])->baseRoute('ltu.source_translation');
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(SourcePhraseRequest $request): RedirectResponse
     {
-        $connection = config('translations.database_connection');
-        $request->validate([
-            'key' => ['required', 'regex:/^[\w. ]+$/u'],
-            'file' => ['required', 'integer', 'exists:'.($connection ? $connection.'.' : '').'ltu_translation_files,id'],
-            'content' => ['required', 'string'],
-        ]);
+        $request->validated();
 
         CreateSourceKeyAction::execute(
             key: $request->input('key'),
@@ -91,7 +89,7 @@ class SourcePhraseController extends BaseController
 
         return redirect()->route('ltu.source_translation')->with('notification', [
             'type' => 'success',
-            'body' => 'Phrase has been added successfully',
+            'body' => ltu_trans('Phrase has been added successfully'),
         ]);
     }
 
@@ -110,14 +108,9 @@ class SourcePhraseController extends BaseController
         ]);
     }
 
-    public function update(Phrase $phrase, Request $request): RedirectResponse
+    public function update(Phrase $phrase, SourcePhraseUpdateRequest $request): RedirectResponse
     {
-        $connection = config('translations.database_connection');
-        $request->validate([
-            'note' => 'nullable|string',
-            'phrase' => 'required|string',
-            'file' => 'required|integer|exists:'.($connection ? $connection.'.' : '').'ltu_translation_files,id',
-        ]);
+        $request->validated();
 
         $phrase->update([
             'value' => $request->input('phrase'),
@@ -134,11 +127,11 @@ class SourcePhraseController extends BaseController
         return $nextPhrase
             ? redirect()->route('ltu.source_translation.edit', ['translation' => $phrase->translation, 'phrase' => $nextPhrase])->with('notification', [
                 'type' => 'success',
-                'body' => 'Phrase has been updated successfully',
+                'body' => ltu_trans('Phrase has been updated successfully'),
             ])
             : redirect()->route('ltu.source_translation')->with('notification', [
                 'type' => 'success',
-                'body' => 'Phrase has been updated successfully',
+                'body' => ltu_trans('Phrase has been updated successfully'),
             ]);
     }
 
@@ -148,21 +141,19 @@ class SourcePhraseController extends BaseController
 
         return redirect()->route('ltu.source_translation')->with('notification', [
             'type' => 'success',
-            'body' => 'Phrase has been deleted successfully',
+            'body' => ltu_trans('Phrase has been deleted successfully'),
         ]);
     }
 
-    public function destroy_multiple(Request $request): RedirectResponse
+    public function destroy_multiple(SourcePhraseDestroyMultipleRequest $request): RedirectResponse
     {
-        $request->validate([
-            'selected_ids' => 'required|array',
-        ]);
+        $request->validated();
 
         Phrase::whereIn('id', $request->input('selected_ids'))->delete();
 
         return redirect()->route('ltu.source_translation')->with('notification', [
             'type' => 'success',
-            'body' => 'Selected phrases have been deleted successfully',
+            'body' => ltu_trans('Selected phrases have been deleted successfully'),
         ]);
     }
 }

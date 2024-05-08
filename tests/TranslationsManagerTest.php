@@ -1,18 +1,16 @@
 <?php
 
 use Brick\VarExporter\VarExporter;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File;
+use Outhebox\TranslationsUI\Facades\TranslationsUI;
 use Outhebox\TranslationsUI\Models\Language;
 use Outhebox\TranslationsUI\Models\Phrase;
 use Outhebox\TranslationsUI\Models\Translation;
 use Outhebox\TranslationsUI\Models\TranslationFile;
-use Outhebox\TranslationsUI\TranslationsManager;
 
 beforeEach(function () {
-    App::useLangPath(__DIR__.'lang_test');
+    App::useLangPath(__DIR__.'/lang_test');
     createDirectoryIfNotExits(lang_path());
 });
 
@@ -27,8 +25,7 @@ it('returns the correct list of locales', function () {
     // Create nested folder structure
     createPhpLanguageFile('en/book/create.php', []);
 
-    $translationsManager = new TranslationsManager(new Filesystem());
-    $locales = $translationsManager->getLocales();
+    $locales = TranslationsUI::getLocales();
 
     expect($locales)->toBe(['de', 'en', 'fr']);
 });
@@ -53,31 +50,29 @@ it('returns the correct translations for a given locale', function () {
         'nested' => 'Nested test',
     ]);
 
-    Config::set('translations.exclude_files', ['validation.php', 'book/excluded.php']);
-    Config::set('translations.source_language', 'en');
-    $filesystem = new Filesystem();
+    TranslationsUI::setExcludeFiles(['validation.php', 'book/excluded.php']);
+    TranslationsUI::setSourceLanguage('en');
 
-    $translationsManager = new TranslationsManager($filesystem);
-    $translations = $translationsManager->getTranslations('en');
+    $translations = TranslationsUI::getTranslations('en');
     expect($translations)->toBe([
         'en.json' => ['title' => 'My title'],
-        'en/auth.php' => ['test' => 'Test'],
-        'en/book/create.php' => ['nested' => 'Nested test'],
+        'en\auth.php' => ['test' => 'Test'],
+        'en\book\create.php' => ['nested' => 'Nested test'],
     ]);
 
-    $translations = $translationsManager->getTranslations('');
+    $translations = TranslationsUI::getTranslations('');
     expect($translations)->toBe([
         'en.json' => ['title' => 'My title'],
-        'en/auth.php' => ['test' => 'Test'],
-        'en/book/create.php' => ['nested' => 'Nested test'],
+        'en\auth.php' => ['test' => 'Test'],
+        'en\book\create.php' => ['nested' => 'Nested test'],
     ]);
 });
 
 it('it excludes the correct files', function () {
-    createPhpLanguageFile('en/auth.php', [
+    createPhpLanguageFile('en\auth.php', [
         'test' => 'Test',
     ]);
-    createPhpLanguageFile('en/validation.php', [
+    createPhpLanguageFile('en\validation.php', [
         'test' => 'Test1',
     ]);
     createJsonLanguageFile('en.json', [
@@ -85,31 +80,28 @@ it('it excludes the correct files', function () {
     ]);
 
     // Update to include nested folder
-    createPhpLanguageFile('en/book/create.php', [
+    createPhpLanguageFile('en\book\create.php', [
         'nested' => 'Nested test',
     ]);
 
-    Config::set('translations.exclude_files', ['*.php']);
-    Config::set('translations.source_language', 'en');
-    $filesystem = new Filesystem();
+    TranslationsUI::setExcludeFiles(['*.php']);
+    TranslationsUI::setSourceLanguage('en');
 
-    $translationsManager = new TranslationsManager($filesystem);
-    $translations = $translationsManager->getTranslations('en');
+    $translations = TranslationsUI::getTranslations('en');
     expect($translations)->toBe([
         'en.json' => ['title' => 'My title'],
     ]);
 
-    $translations = $translationsManager->getTranslations('');
+    $translations = TranslationsUI::getTranslations('');
     expect($translations)->toBe([
         'en.json' => ['title' => 'My title'],
     ]);
 });
 
 test('export creates a new translation file with the correct content', function () {
-    $filesystem = new Filesystem();
-    createDirectoryIfNotExits(lang_path('en/auth.php'));
+    createDirectoryIfNotExits(lang_path('en\auth.php'));
     // Update to include nested folder
-    createDirectoryIfNotExits(lang_path('en/book/create.php'));
+    createDirectoryIfNotExits(lang_path('en\book\create.php'));
 
     $translation = Translation::factory([
         'source' => true,
@@ -134,16 +126,15 @@ test('export creates a new translation file with the correct content', function 
     ])->has(Phrase::factory()->state([
         'phrase_id' => null,
         'translation_file_id' => TranslationFile::factory([
-            'name' => 'book/create',
+            'name' => 'book\create',
             'extension' => 'php',
         ]),
     ]))->create();
 
-    $translationsManager = new TranslationsManager($filesystem);
-    $translationsManager->export();
+    TranslationsUI::export();
 
-    $fileName = lang_path('en/'.$translation->phrases[0]->file->name.'.'.$translation->phrases[0]->file->extension);
-    $nestedFileName = lang_path('en/'.$nestedTranslation->phrases[0]->file->name.'.'.$nestedTranslation->phrases[0]->file->extension);
+    $fileName = lang_path('en\\'.$translation->phrases[0]->file->name.'.'.$translation->phrases[0]->file->extension);
+    $nestedFileName = lang_path('en\\'.$nestedTranslation->phrases[0]->file->name.'.'.$nestedTranslation->phrases[0]->file->extension);
 
     $fileNameInDisk = File::allFiles(lang_path($translation->language->code))[0]->getPathname();
     $nestedFileNameInDisk = File::allFiles(lang_path($nestedTranslation->language->code))[1]->getPathname();
@@ -163,8 +154,6 @@ test('export can handle PHP translation files', function () {
 
     // Update to include nested folder
     createPhpLanguageFile('en/book/create.php', ['nested' => 'Nested :attribute must be accepted.']);
-
-    $filesystem = new Filesystem();
 
     $translation = Translation::factory()
         ->has(Phrase::factory()
@@ -188,8 +177,7 @@ test('export can handle PHP translation files', function () {
         ->for(Language::factory()->state(['code' => 'en']))
         ->create();
 
-    $translationsManager = new TranslationsManager($filesystem);
-    $translationsManager->export();
+    TranslationsUI::export();
 
     $path = lang_path('en'.DIRECTORY_SEPARATOR.'test.php');
     $nestedPath = lang_path('en'.DIRECTORY_SEPARATOR.'book'.DIRECTORY_SEPARATOR.'create.php');
@@ -207,7 +195,6 @@ test('export can handle JSON translation files', function () {
 
     // Update to include nested folder
     createJsonLanguageFile('en/book/create.json', ['nested' => 'Nested test']);
-    $filesystem = new Filesystem();
 
     $translation = Translation::factory()
         ->has(Phrase::factory()
@@ -231,8 +218,7 @@ test('export can handle JSON translation files', function () {
         ->for(Language::factory()->state(['code' => 'en']))
         ->create();
 
-    $translationsManager = new TranslationsManager($filesystem);
-    $translationsManager->export();
+    TranslationsUI::export();
 
     $path = lang_path('en'.DIRECTORY_SEPARATOR.'test.json');
     $nestedPath = lang_path('en'.DIRECTORY_SEPARATOR.'book'.DIRECTORY_SEPARATOR.'create.json');
@@ -248,7 +234,6 @@ test('export can handle JSON translation files', function () {
 it('returns the correct list of parameters for a given phrase', function () {
     $parameters = getPhraseParameters('The :attribute must be accepted when :other is :value.');
     expect($parameters)->toBe(['attribute', 'other', 'value']);
-
     $parametersEmpty = getPhraseParameters('');
     expect($parametersEmpty)->toBe(null);
 });

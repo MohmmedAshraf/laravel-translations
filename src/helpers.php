@@ -2,6 +2,7 @@
 
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 use Outhebox\TranslationsUI\Models\Contributor;
 
 if (! function_exists('translationsUIAssets')) {
@@ -14,7 +15,8 @@ if (! function_exists('translationsUIAssets')) {
         if ($devServerIsRunning) {
             $viteServer = file_get_contents($hot);
 
-            return new HtmlString(<<<HTML
+            return new HtmlString(
+                <<<HTML
                 <script type="module" src="$viteServer/@vite/client"></script>
                 <script type="module" src="$viteServer/resources/scripts/app.ts"></script>
             HTML
@@ -24,7 +26,8 @@ if (! function_exists('translationsUIAssets')) {
         $manifestPath = public_path('vendor/translations-ui/manifest.json');
 
         if (! file_exists($manifestPath)) {
-            return new HtmlString(<<<'HTML'
+            return new HtmlString(
+                <<<'HTML'
                 <div>The manifest.json file could not be found.</div>
             HTML
             );
@@ -32,7 +35,8 @@ if (! function_exists('translationsUIAssets')) {
 
         $manifest = json_decode(file_get_contents($manifestPath), true);
 
-        return new HtmlString(<<<HTML
+        return new HtmlString(
+            <<<HTML
                 <script type="module" src="/vendor/translations-ui/{$manifest['resources/scripts/app.ts']['file']}"></script>
                 <link rel="stylesheet" href="/vendor/translations-ui/{$manifest['resources/scripts/app.ts']['css'][0]}">
             HTML
@@ -117,5 +121,65 @@ if (! function_exists('currentUser')) {
     function currentUser(): null|Authenticatable|Contributor
     {
         return auth('translations')->user();
+    }
+}
+
+if (! function_exists('ltu_trans')) {
+    function ltu_trans($key = null, $replace = [], $locale = null)
+    {
+        if (is_null($key)) {
+            return app('translations');
+        }
+        if (is_null($locale)) {
+            $locale = app('translations')->getLocale();
+        }
+
+        $trans = trans('translations::'.$key, $replace, $locale);
+
+        if (Str::contains($trans, 'translations::')) {
+            $trans = trans(Str::replace('translations::', '', $trans), $replace, $locale);
+        }
+
+        return $trans;
+    }
+}
+
+if (! function_exists('ltu_trans_choice')) {
+    function ltu_trans_choice($key, $number, array $replace = [], $locale = null)
+    {
+        if (is_null($key)) {
+            return app('translations');
+        }
+        if (is_null($locale)) {
+            $locale = app('translations')->getLocale();
+        }
+
+        $trans_choice = trans_choice('translations::'.$key, $number, $replace, $locale);
+        if (Str::contains($trans_choice, 'translations::')) {
+            $trans_choice = trans_choice(Str::replace('translations::', '', $trans_choice), $number, $replace, $locale);
+        }
+
+        return $trans_choice;
+    }
+}
+
+if (! function_exists('keyNotExist')) {
+    function keyNotExist(string $key, array $array): bool
+    {
+        return ! array_key_exists($key, $array) && empty($array[$key]);
+    }
+}
+
+if (! function_exists('keysNotExist')) {
+    function keysNotExist(array $keys, array $array)
+    {
+        $output = [];
+        foreach ($keys as $key) {
+            if (keyNotExist($key, $array)) {
+                $output[] = $key;
+            }
+        }
+
+        return ! empty($output) ? implode(',', $output) : true;
     }
 }

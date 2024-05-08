@@ -10,6 +10,7 @@ use Illuminate\Foundation\Testing\RefreshDatabaseState;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
 use Orchestra\Testbench\TestCase as Orchestra;
+use Outhebox\TranslationsUI\Enums\LocaleEnum;
 use Outhebox\TranslationsUI\Enums\RoleEnum;
 use Outhebox\TranslationsUI\Models\Contributor;
 use Outhebox\TranslationsUI\TranslationsUIServiceProvider;
@@ -36,10 +37,12 @@ class TestCase extends Orchestra
 
         $this->owner = Contributor::factory([
             'role' => RoleEnum::owner,
+            'lang' => LocaleEnum::english,
         ])->create();
 
         $this->translator = Contributor::factory([
             'role' => RoleEnum::translator,
+            'lang' => LocaleEnum::indonesian,
         ])->create();
     }
 
@@ -80,6 +83,9 @@ class TestCase extends Orchestra
         $migration->up();
 
         $migration = include __DIR__.'/../database/migrations/add_is_root_to_translation_files_table.php';
+        $migration->up();
+
+        $migration = include __DIR__.'/../database/migrations/add_lang_to_constributors_table.php';
         $migration->up();
     }
 

@@ -2,11 +2,13 @@
 
 namespace Outhebox\TranslationsUI\Traits;
 
+use Outhebox\TranslationsUI\Facades\TranslationsUI;
+
 trait HasDatabaseConnection
 {
-    public function getConnectionName()
+    public function getConnectionName(): ?string
     {
-        if ($connection = config('translations.database_connection')) {
+        if ($connection = TranslationsUI::getConnection()) {
             return $connection;
         }
 

@@ -2,13 +2,13 @@
 
 namespace Outhebox\TranslationsUI\Http\Controllers\Auth;
 
-use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
+use Outhebox\TranslationsUI\Http\Requests\Auth\ResetPasswordRequest;
 use Outhebox\TranslationsUI\Models\Contributor;
 use Throwable;
 
@@ -30,13 +30,9 @@ class NewPasswordController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(ResetPasswordRequest $request)
     {
-        $request->validate([
-            'token' => 'required',
-            'email' => 'required|email',
-            'password' => 'required|confirmed|min:8',
-        ]);
+        $request->validated();
 
         try {
             [$id, $token] = explode('|', decrypt($request->input('token')));
@@ -54,7 +50,7 @@ class NewPasswordController extends Controller
 
             Auth::guard('translations')->login($user);
         } catch (Throwable $e) {
-            return redirect()->route('ltu.password.request')->with('invalidResetToken', 'Invalid token');
+            return redirect()->route('ltu.password.request')->with('invalidResetToken', ltu_trans('Invalid token'));
         }
 
         cache()->forget("password.reset.$id");

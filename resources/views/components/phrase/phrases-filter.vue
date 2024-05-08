@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n'
+
 const props = defineProps<{ modelValue: string | null }>()
 
 const emit = defineEmits<{
@@ -22,7 +24,7 @@ const keyword = computed({
                 autocomplete="off"
                 type="text"
                 name="search"
-                placeholder="Search"
+                :placeholder="trans('Search')"
             />
         </div>
 
@@ -31,7 +33,7 @@ const keyword = computed({
             type="button"
             @click="$emit('reset')"
         >
-            Reset
+            {{ trans('Reset') }}
         </button>
     </div>
 </template>

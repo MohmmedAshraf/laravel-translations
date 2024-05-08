@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ChevronUpDownIcon } from "@heroicons/vue/24/outline/index.js"
 import { Combobox, ComboboxInput, ComboboxOptions, ComboboxOption, ComboboxButton, TransitionRoot } from "@headlessui/vue"
+import { trans } from 'laravel-vue-i18n'
 
 const props = withDefaults(
     defineProps<{
@@ -51,7 +52,7 @@ const focus = () => {
 
             <TransitionRoot leave="transition ease-in duration-100" leave-from="opacity-100" leave-to="opacity-0" @before-leave="query = ''">
                 <ComboboxOptions class="absolute z-10 mt-1 w-full overflow-auto border border-gray-300 bg-white py-1 text-base shadow-lg focus:outline-none">
-                    <li v-if="!results.length" class="px-3 py-2 text-sm text-gray-600">Start typing to add an option</li>
+                    <li v-if="!results.length" class="px-3 py-2 text-sm text-gray-600">{{ trans('Start typing to add an option') }}</li>
 
                     <ComboboxOption v-for="(item, index) in results" :key="index" v-slot="{ selected, active }" as="template" :value="item">
                         <li class="relative cursor-default select-none py-2 pl-3 pr-10 text-sm font-medium transition-colors" :class="[active ? 'bg-gray-50 text-black' : 'text-gray-900']">

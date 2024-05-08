@@ -11,6 +11,7 @@ import { ZiggyVue } from "ziggy-js"
 import { notifications } from "./plugins/notifications"
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers"
 import "vue-toastification/dist/index.css"
+import { i18nVue } from "laravel-vue-i18n"
 
 const appName = import.meta.env.VITE_APP_NAME || "Laravel"
 
@@ -35,6 +36,13 @@ createInertiaApp({
             .use(notifications)
             .use(plugin)
             .use(ZiggyVue)
+            .use(i18nVue, {
+                fallbackLang: "en",
+                resolve: async (lang: string) => {
+                    const langs: any = import.meta.glob("../lang/*.json");
+                    return await langs[`../lang/${lang}.json`]();
+                },
+            })
             .component("tabs", Tabs)
             .component("tab", Tab)
             .mount(el)

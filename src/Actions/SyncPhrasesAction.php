@@ -2,6 +2,7 @@
 
 namespace Outhebox\TranslationsUI\Actions;
 
+use Outhebox\TranslationsUI\Facades\TranslationsUI;
 use Outhebox\TranslationsUI\Models\Language;
 use Outhebox\TranslationsUI\Models\Translation;
 use Outhebox\TranslationsUI\Models\TranslationFile;
@@ -22,7 +23,7 @@ class SyncPhrasesAction
 
         $translation = Translation::firstOrCreate([
             'language_id' => $language->id,
-            'source' => config('translations.source_language') === $locale,
+            'source' => TranslationsUI::getSourceLanguage() === $locale,
         ]);
 
         $isRoot = $file === $locale.'.json' || $file === $locale.'.php';
@@ -35,7 +36,7 @@ class SyncPhrasesAction
             'is_root' => $isRoot,
         ]);
 
-        $key = config('translations.include_file_in_key') && ! $isRoot ? "{$translationFile->name}.{$key}" : $key;
+        $key = TranslationsUI::getIncludeFileInKey() && ! $isRoot ? "{$translationFile->name}.{$key}" : $key;
 
         $translation->phrases()->updateOrCreate([
             'key' => $key,

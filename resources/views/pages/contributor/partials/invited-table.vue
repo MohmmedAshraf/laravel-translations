@@ -1,14 +1,16 @@
-<script setup lang="ts">
-import InvitedItem from "./invited-item.vue"
-import { Invite } from "../../../../scripts/types"
+<script setup
+    lang="ts">
+    import InvitedItem from "./invited-item.vue"
+    import { Invite } from "../../../../scripts/types"
+    import { trans } from 'laravel-vue-i18n'
 
-defineProps<{
-    invitations: {
-        data: Record<string, Invite>
-        links: Record<string, string>
-        meta: Record<string, string>
-    }
-}>()
+    defineProps<{
+        invitations: {
+            data: Record<string, Invite>
+            links: Record<string, string>
+            meta: Record<string, string>
+        }
+    }>()
 </script>
 
 <template>
@@ -17,30 +19,32 @@ defineProps<{
             <div class="flex h-14 w-full divide-x">
                 <div class="grid w-full grid-cols-3 divide-x">
                     <div class="col-span-3 flex w-full items-center justify-start px-4 sm:col-span-1">
-                        <span class="text-sm font-medium text-gray-400">Email</span>
+                        <span class="text-sm font-medium text-gray-400">{{ trans('Email') }}</span>
                     </div>
 
                     <div class="hidden w-full items-center justify-start px-4 md:flex">
-                        <span class="text-sm font-medium text-gray-400">Role</span>
+                        <span class="text-sm font-medium text-gray-400">{{ trans('Role') }}</span>
                     </div>
 
                     <div class="hidden w-full items-center justify-start px-4 md:flex">
-                        <span class="text-sm font-medium text-gray-400">Invitation Date</span>
+                        <span class="text-sm font-medium text-gray-400">{{ trans('Invitation Date') }}</span>
                     </div>
                 </div>
 
                 <div class="grid w-16">
-                    <Link v-tooltip="'Invite Contributor'" :href="route('ltu.contributors.invite')" class="group flex items-center justify-center px-3 hover:bg-blue-50">
-                        <IconPlus class="size-5 text-gray-400 group-hover:text-blue-600" />
+                    <Link v-tooltip="trans('Invite Contributor')" :href="route('ltu.contributors.invite')"
+                        class="group flex items-center justify-center px-3 hover:bg-blue-50">
+                    <IconPlus class="size-5 text-gray-400 group-hover:text-blue-600" />
                     </Link>
                 </div>
             </div>
         </div>
 
-        <InvitedItem v-for="invitation in invitations.data" v-if="invitations.data.length" :key="invitation.id" :invitation="invitation" />
+        <InvitedItem v-for="invitation in invitations.data" v-if="invitations.data.length" :key="invitation.id"
+            :invitation="invitation" />
 
         <div v-else class="flex w-full items-center justify-center bg-gray-50 px-4 py-12">
-            <span class="text-sm text-gray-400">There are no invitations yet..</span>
+            <span class="text-sm text-gray-400">{{ trans('There are no invitations yet..') }}</span>
         </div>
 
         <Pagination :links="invitations.links" :meta="invitations.meta" />

@@ -3,6 +3,7 @@
 namespace Outhebox\TranslationsUI;
 
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Support\Facades\Cookie;
 use Outhebox\TranslationsUI\Console\Commands\CleanOldVersionCommand;
 use Outhebox\TranslationsUI\Console\Commands\ContributorCommand;
 use Outhebox\TranslationsUI\Console\Commands\ExportTranslationsCommand;
@@ -28,6 +29,7 @@ class TranslationsUIServiceProvider extends PackageServiceProvider
             ->hasConfigFile()
             ->hasViews()
             ->hasRoute('web')
+            ->hasTranslations()
             ->hasMigrations([
                 'create_languages_table',
                 'create_translations_table',
@@ -37,6 +39,7 @@ class TranslationsUIServiceProvider extends PackageServiceProvider
                 'create_contributor_languages_table',
                 'create_invites_table',
                 'add_is_root_to_translation_files_table',
+                'add_lang_to_constributors_table',
             ])
             ->hasCommands([
                 PublishCommand::class,
@@ -105,5 +108,14 @@ class TranslationsUIServiceProvider extends PackageServiceProvider
     protected function writeSeparationLine(InstallCommand $command): void
     {
         $command->info('*---------------------------------------------------------------------------*');
+    }
+
+    public function registeringPackage(): void
+    {
+        $this->app->singleton('translations', function ($app) {
+            $locale = Cookie::get('translations_locale') ?? $app['config']->get('translations.locale', 'en');
+
+            return new TranslationsManager($app, $app['files'], $locale);
+        });
     }
 }

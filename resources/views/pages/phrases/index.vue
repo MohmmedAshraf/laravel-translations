@@ -3,6 +3,7 @@ import _, { debounce } from "lodash"
 import { ref, watch, watchEffect } from "vue"
 import PhraseItem from "./phrase-item.vue"
 import { Phrase, Translation, TranslationFile } from "../../../scripts/types"
+import { trans } from 'laravel-vue-i18n'
 
 const props = defineProps<{
     phrases: {
@@ -62,7 +63,7 @@ watch(
 )
 </script>
 <template>
-    <Head title="Phrases" />
+    <Head :title="trans('Phrases')" />
 
     <LayoutDashboard>
         <div class="w-full bg-white shadow">
@@ -93,40 +94,40 @@ watch(
             <div class="w-full divide-y overflow-hidden rounded-md bg-white shadow">
                 <div class="flex w-full flex-wrap items-center justify-between gap-4 px-4 py-3 sm:flex-nowrap">
                     <div class="w-full max-w-full md:max-w-sm">
-                        <InputText v-model="searchField" placeholder="Search by key or value" size="md" />
+                        <InputText v-model="searchField" :placeholder="trans('Search by key or value')" size="md" />
                     </div>
 
                     <div class="w-full max-w-full md:max-w-sm">
-                        <InputNativeSelect id="translationFile" v-model="phraseTranslationFile" size="md" placeholder="Filter by file" :items="translationFiles" />
+                        <InputNativeSelect id="translationFile" v-model="phraseTranslationFile" size="md" :placeholder="trans('Filter by file')" :items="translationFiles" />
                     </div>
 
                     <div class="w-full max-w-full md:max-w-sm">
-                        <InputNativeSelect id="status" v-model="phraseStatus" size="md" placeholder="Filter by status" :items="statusEnum" />
+                        <InputNativeSelect id="status" v-model="phraseStatus" size="md" :placeholder="trans('Filter by status')" :items="statusEnum" />
                     </div>
                 </div>
 
                 <div class="w-full shadow-md">
                     <div class="flex h-14 w-full divide-x">
                         <div class="hidden w-20 items-center justify-center px-4 md:flex">
-                            <span class="text-sm font-medium text-gray-400">State</span>
+                            <span class="text-sm font-medium text-gray-400">{{ trans('State') }}</span>
                         </div>
 
                         <div class="grid w-full grid-cols-2 divide-x md:grid-cols-3">
                             <div class="flex w-full items-center justify-start px-4">
-                                <span class="text-sm font-medium text-gray-400">Key</span>
+                                <span class="text-sm font-medium text-gray-400">{{ trans('Key') }}</span>
                             </div>
 
                             <div class="hidden w-full items-center justify-start px-4 md:flex">
-                                <span class="text-sm font-medium text-gray-400">Source</span>
+                                <span class="text-sm font-medium text-gray-400">{{ trans('Source') }}</span>
                             </div>
 
                             <div class="flex w-full items-center justify-start px-4">
-                                <span class="text-sm font-medium text-gray-400"> Translation </span>
+                                <span class="text-sm font-medium text-gray-400"> {{ trans('Translation') }} </span>
                             </div>
                         </div>
 
                         <div class="grid w-[67px] grid-cols-1 divide-x">
-                            <Link v-tooltip="'Add New Key'" :href="route('ltu.source_translation.add_source_key')" class="group flex items-center justify-center hover:bg-blue-50">
+                            <Link v-tooltip="trans('Add New Key')" :href="route('ltu.source_translation.add_source_key')" class="group flex items-center justify-center hover:bg-blue-50">
                                 <IconPlus class="size-5 text-gray-400 group-hover:text-blue-600" />
                             </Link>
                         </div>

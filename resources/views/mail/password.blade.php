@@ -1,16 +1,16 @@
 @component('mail::message')
-    # Hello
+    # {{ ltu_trans('Hello') }}
 
-    You are receiving this email because we received a password reset request for your account.
+    {{ ltu_trans('You are receiving this email because we received a password reset request for your account') }}.
 
     @component('mail::button', ['url' => $link])
-        Reset Password
+        {{ ltu_trans('Reset Password') }}
     @endcomponent
 
-    This password reset link will expire in 60 minutes.
+    {{ ltu_trans('This password reset link will expire in :time :unit', ['time' => '60', 'unit' => ltu_trans('minutes')]) }}.
 
-    If you did not request a password reset, no further action is required.
+    {{ ltu_trans('If you did not request a password reset, no further action is required') }}.
 
-    Thanks,<br>
+    {{ ('Thanks') }},<br>
     {{ config('app.name') }}
 @endcomponent

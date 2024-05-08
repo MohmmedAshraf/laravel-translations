@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ChevronUpDownIcon } from "@heroicons/vue/24/outline/index.js"
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from "@headlessui/vue"
+import { trans } from 'laravel-vue-i18n'
 
 const props = defineProps<{
     modelValue: any[]
@@ -24,7 +25,7 @@ const results = computed(() => {
             <ListboxButton class="relative w-full cursor-default border border-gray-300 bg-white py-2.5 pl-3 pr-10 text-left text-sm transition focus:border-gray-700 focus:outline-none focus:ring-0">
                 <span v-if="value.length" class="block truncate">{{ value.map((item) => labelBy(item)).join(", ") }}</span>
 
-                <span v-else class="italic text-gray-500">Select some from the list</span>
+                <span v-else class="italic text-gray-500">{{ trans('Select some from the list') }}</span>
 
                 <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                     <ChevronUpDownIcon class="size-5 text-gray-400" aria-hidden="true" />

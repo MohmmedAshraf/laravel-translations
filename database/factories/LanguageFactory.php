@@ -13,8 +13,8 @@ class LanguageFactory extends Factory
     {
         return [
             'rtl' => $this->faker->boolean(),
-            'code' => $this->faker->randomElement(['en', 'nl', 'fr', 'de', 'es', 'it', 'pt', 'ru', 'ja', 'zh']),
-            'name' => $this->faker->randomElement(['English', 'Dutch', 'French', 'German', 'Spanish', 'Italian', 'Portuguese', 'Russian', 'Japanese', 'Chinese']),
+            'code' => $this->faker->randomElement(['en', 'nl', 'fr', 'de', 'es', 'id', 'it', 'pt', 'ru', 'ja', 'zh']),
+            'name' => $this->faker->randomElement(['English', 'Dutch', 'French', 'German', 'Spanish', 'Indonesian', 'Italian', 'Portuguese', 'Russian', 'Japanese', 'Chinese']),
         ];
     }
 }
