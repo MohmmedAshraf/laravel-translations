@@ -56,23 +56,23 @@ it('returns the correct translations for a given locale', function () {
     $translations = TranslationsUI::getTranslations('en');
     expect($translations)->toBe([
         'en.json' => ['title' => 'My title'],
-        'en\auth.php' => ['test' => 'Test'],
-        'en\book\create.php' => ['nested' => 'Nested test'],
+        'en/auth.php' => ['test' => 'Test'],
+        'en/book/create.php' => ['nested' => 'Nested test'],
     ]);
 
     $translations = TranslationsUI::getTranslations('');
     expect($translations)->toBe([
         'en.json' => ['title' => 'My title'],
-        'en\auth.php' => ['test' => 'Test'],
-        'en\book\create.php' => ['nested' => 'Nested test'],
+        'en/auth.php' => ['test' => 'Test'],
+        'en/book/create.php' => ['nested' => 'Nested test'],
     ]);
 });
 
 it('it excludes the correct files', function () {
-    createPhpLanguageFile('en\auth.php', [
+    createPhpLanguageFile('en/auth.php', [
         'test' => 'Test',
     ]);
-    createPhpLanguageFile('en\validation.php', [
+    createPhpLanguageFile('en/validation.php', [
         'test' => 'Test1',
     ]);
     createJsonLanguageFile('en.json', [
@@ -80,7 +80,7 @@ it('it excludes the correct files', function () {
     ]);
 
     // Update to include nested folder
-    createPhpLanguageFile('en\book\create.php', [
+    createPhpLanguageFile('en/book/create.php', [
         'nested' => 'Nested test',
     ]);
 
@@ -99,9 +99,9 @@ it('it excludes the correct files', function () {
 });
 
 test('export creates a new translation file with the correct content', function () {
-    createDirectoryIfNotExits(lang_path('en\auth.php'));
+    createDirectoryIfNotExits(lang_path('en/auth.php'));
     // Update to include nested folder
-    createDirectoryIfNotExits(lang_path('en\book\create.php'));
+    createDirectoryIfNotExits(lang_path('en/book/create.php'));
 
     $translation = Translation::factory([
         'source' => true,
@@ -126,15 +126,15 @@ test('export creates a new translation file with the correct content', function 
     ])->has(Phrase::factory()->state([
         'phrase_id' => null,
         'translation_file_id' => TranslationFile::factory([
-            'name' => 'book\create',
+            'name' => 'book/create',
             'extension' => 'php',
         ]),
     ]))->create();
 
     TranslationsUI::export();
 
-    $fileName = lang_path('en\\'.$translation->phrases[0]->file->name.'.'.$translation->phrases[0]->file->extension);
-    $nestedFileName = lang_path('en\\'.$nestedTranslation->phrases[0]->file->name.'.'.$nestedTranslation->phrases[0]->file->extension);
+    $fileName = lang_path('en/'.$translation->phrases[0]->file->name.'.'.$translation->phrases[0]->file->extension);
+    $nestedFileName = lang_path('en/'.$nestedTranslation->phrases[0]->file->name.'.'.$nestedTranslation->phrases[0]->file->extension);
 
     $fileNameInDisk = File::allFiles(lang_path($translation->language->code))[0]->getPathname();
     $nestedFileNameInDisk = File::allFiles(lang_path($nestedTranslation->language->code))[1]->getPathname();

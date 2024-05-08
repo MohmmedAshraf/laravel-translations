@@ -324,21 +324,21 @@ class TranslationsManager
         return $this->config;
     }
 
-    private function get(array|string $key, mixed $default = null): string|array
+    private function get(array|string $key, mixed $default = null): mixed
     {
         if (is_array($key)) {
             $config = [];
-            foreach ($key as $k => $default) {
+            foreach ($key as $k => $v) {
                 if (is_numeric($k)) {
-                    [$k, $default] = [$default, null];
+                    [$k, $v] = [$v, null];
                 }
-                $config[$k] = Str::replace('/', '\\', Arr::get($this->config, $k, $default));
+                $config[$k] = Arr::get($this->config, $k, $v);
             }
 
             return $config;
         }
 
-        return Str::replace('/', '\\', Arr::get($this->config, $key, $default));
+        return Arr::get($this->config, $key, $default);
     }
 
     private function set(array|string $key, mixed $value = null): void
