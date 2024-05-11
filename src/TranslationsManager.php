@@ -86,7 +86,7 @@ class TranslationsManager
                      * <h3>$file is with language like <code>en/book/create.php</code> while $excludedFile contains only wildcards or path like <code>book/create.php</code></h3>
                      * <h3>So, we need to remove the language part from $file before comparing with $excludeFile</h3>
                      */
-                    if (fnmatch($excludeFile, str_replace($locale.'/', '', $file))) {
+                    if (fnmatch($excludeFile, str_replace($locale.DIRECTORY_SEPARATOR, '', $file))) {
                         return false;
                     }
                 }
