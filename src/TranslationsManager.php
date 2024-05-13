@@ -79,14 +79,14 @@ class TranslationsManager
                 return $collection->prepend($rootFileName);
             })
             ->filter(function ($file) use ($locale) {
-                foreach (config('translations.exclude_files') as $excludeFile) {
+                foreach (Str::replace('/', DIRECTORY_SEPARATOR, config('translations.exclude_files')) as $excludeFile) {
 
                     /**
                      * <h1>File exclusion by wildcard</h1>
                      * <h3>$file is with language like <code>en/book/create.php</code> while $excludedFile contains only wildcards or path like <code>book/create.php</code></h3>
                      * <h3>So, we need to remove the language part from $file before comparing with $excludeFile</h3>
                      */
-                    if (fnmatch($excludeFile, str_replace($locale.DIRECTORY_SEPARATOR, '', $file))) {
+                    if (fnmatch($excludeFile, str_replace($locale.DIRECTORY_SEPARATOR, '', $file)) || Str::contains(str_replace($locale.DIRECTORY_SEPARATOR, '', $file), $excludeFile)) {
                         return false;
                     }
                 }
