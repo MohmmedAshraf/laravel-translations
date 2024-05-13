@@ -77,8 +77,14 @@ class SourcePhraseController extends BaseController
     public function store(Request $request): RedirectResponse
     {
         $connection = config('translations.database_connection');
+
+        $key = ['required', 'regex:/^[\w.]+$/u'];
+        if (TranslationFile::find($request->input('file'))?->extension === 'json') {
+            $key = ['required', 'string'];
+        }
+
         $request->validate([
-            'key' => ['required', 'regex:/^[\w. ]+$/u'],
+            'key' => $key,
             'file' => ['required', 'integer', 'exists:'.($connection ? $connection.'.' : '').'ltu_translation_files,id'],
             'content' => ['required', 'string'],
         ]);

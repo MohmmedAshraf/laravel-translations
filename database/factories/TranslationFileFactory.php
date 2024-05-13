@@ -12,9 +12,9 @@ class TranslationFileFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->randomElement(['app', 'auth', 'pagination', 'passwords', 'validation']),
-            'extension' => 'php',
-            'is_root' => false,
+            'name' => $this->faker->randomElement(['app', 'auth', 'pagination', 'passwords', 'validation', 'en']),
+            'extension' => $this->faker->randomElement(['php', 'php', 'php', 'php', 'php', 'json']),
+            'is_root' => $this->faker->randomElement([false, false, false, false, false, true]),
         ];
     }
 
