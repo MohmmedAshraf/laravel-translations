@@ -77,8 +77,14 @@ class SourcePhraseController extends BaseController
     public function store(Request $request): RedirectResponse
     {
         $connection = config('translations.database_connection');
+
+        $key = ['required', 'regex:/^[\w.]+$/u'];
+        if (TranslationFile::find($request->input('file'))?->extension === 'json') {
+            $key = ['required', 'string'];
+        }
+
         $request->validate([
-            'key' => ['required', 'regex:/^[\w. ]+$/u'],
+            'key' => $key,
             'file' => ['required', 'integer', 'exists:'.($connection ? $connection.'.' : '').'ltu_translation_files,id'],
             'content' => ['required', 'string'],
         ]);
@@ -101,11 +107,16 @@ class SourcePhraseController extends BaseController
             return redirect()->route('ltu.phrases.edit', $phrase->uuid);
         }
 
+        $files = [];
+        foreach (collect($phrase->where('translation_id', $phrase->translation->id)->get())->unique('translation_file_id') as $value) {
+            $files[] = TranslationFile::where('id', $value->translation_file_id)->first();
+        }
+
         return Inertia::render('source/edit', [
             'phrase' => PhraseResource::make($phrase),
             'translation' => TranslationResource::make($phrase->translation),
             'source' => TranslationResource::make($phrase->translation),
-            'files' => TranslationFileResource::collection(TranslationFile::get()),
+            'files' => TranslationFileResource::collection($files),
             'similarPhrases' => PhraseResource::collection($phrase->similarPhrases()),
         ]);
     }

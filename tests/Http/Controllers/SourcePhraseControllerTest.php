@@ -61,10 +61,27 @@ it('can delete multiple source phrases', function () {
         ]))->assertRedirect(route('ltu.source_translation'));
 });
 
-it('can add new source key', function () {
+it('can add new source key to php file', function () {
     $file = TranslationFile::factory()->create();
 
     $phrase = Phrase::factory()->make([
+        'translation_id' => $this->translation->id,
+        'translation_file_id' => $file->id,
+    ]);
+
+    $this->actingAs($this->owner, 'translations')
+        ->post(route('ltu.source_translation.store_source_key'), [
+            'file' => $file->id,
+            'key' => $phrase->key,
+            'content' => $phrase->value,
+        ])->assertRedirect(route('ltu.source_translation'));
+});
+
+it('can add new source key to json file', function () {
+    $file = TranslationFile::factory()->json()->create(['name' => 'en']);
+
+    $phrase = Phrase::factory()->make([
+        'key' => 'Hello :name',
         'translation_id' => $this->translation->id,
         'translation_file_id' => $file->id,
     ]);

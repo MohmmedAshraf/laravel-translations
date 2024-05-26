@@ -87,7 +87,8 @@ Example: `composer.json`
             "type": "path",
             "url": "/home/myuser/projects/laravel-translations"
         }
-    ]
+    ],
+    "minimum-stability": "dev"
 }
 ```
 

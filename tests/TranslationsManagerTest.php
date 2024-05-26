@@ -61,15 +61,15 @@ it('returns the correct translations for a given locale', function () {
     $translations = $translationsManager->getTranslations('en');
     expect($translations)->toBe([
         'en.json' => ['title' => 'My title'],
-        'en/auth.php' => ['test' => 'Test'],
-        'en/book/create.php' => ['nested' => 'Nested test'],
+        'en'.DIRECTORY_SEPARATOR.'auth.php' => ['test' => 'Test'],
+        'en'.DIRECTORY_SEPARATOR.'book'.DIRECTORY_SEPARATOR.'create.php' => ['nested' => 'Nested test'],
     ]);
 
     $translations = $translationsManager->getTranslations('');
     expect($translations)->toBe([
         'en.json' => ['title' => 'My title'],
-        'en/auth.php' => ['test' => 'Test'],
-        'en/book/create.php' => ['nested' => 'Nested test'],
+        'en'.DIRECTORY_SEPARATOR.'auth.php' => ['test' => 'Test'],
+        'en'.DIRECTORY_SEPARATOR.'book'.DIRECTORY_SEPARATOR.'create.php' => ['nested' => 'Nested test'],
     ]);
 });
 
@@ -134,7 +134,7 @@ test('export creates a new translation file with the correct content', function 
     ])->has(Phrase::factory()->state([
         'phrase_id' => null,
         'translation_file_id' => TranslationFile::factory([
-            'name' => 'book/create',
+            'name' => 'book'.DIRECTORY_SEPARATOR.'create',
             'extension' => 'php',
         ]),
     ]))->create();
@@ -142,8 +142,8 @@ test('export creates a new translation file with the correct content', function 
     $translationsManager = new TranslationsManager($filesystem);
     $translationsManager->export();
 
-    $fileName = lang_path('en/'.$translation->phrases[0]->file->name.'.'.$translation->phrases[0]->file->extension);
-    $nestedFileName = lang_path('en/'.$nestedTranslation->phrases[0]->file->name.'.'.$nestedTranslation->phrases[0]->file->extension);
+    $fileName = lang_path('en'.DIRECTORY_SEPARATOR.$translation->phrases[0]->file->name.'.'.$translation->phrases[0]->file->extension);
+    $nestedFileName = lang_path('en'.DIRECTORY_SEPARATOR.$nestedTranslation->phrases[0]->file->name.'.'.$nestedTranslation->phrases[0]->file->extension);
 
     $fileNameInDisk = File::allFiles(lang_path($translation->language->code))[0]->getPathname();
     $nestedFileNameInDisk = File::allFiles(lang_path($nestedTranslation->language->code))[1]->getPathname();
