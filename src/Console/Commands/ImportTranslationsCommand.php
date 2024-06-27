@@ -3,6 +3,7 @@
 namespace Outhebox\TranslationsUI\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Database\Schema\Builder as SchemaBuilder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -50,7 +51,7 @@ class ImportTranslationsCommand extends Command
 
     protected function importLanguages(): void
     {
-        if (! Schema::hasTable('ltu_languages') || Language::count() === 0) {
+        if (! $this->getSchema()->hasTable('ltu_languages') || Language::count() === 0) {
             if ($this->confirm('The ltu_languages table does not exist or is empty, would you like to install the default languages?', true)) {
                 $this->call('db:seed', ['--class' => LanguagesTableSeeder::class]);
             } else {
@@ -63,11 +64,16 @@ class ImportTranslationsCommand extends Command
 
     protected function truncateTables(): void
     {
-        Schema::withoutForeignKeyConstraints(function () {
+        $this->getSchema()->withoutForeignKeyConstraints(function () {
             Phrase::truncate();
             Translation::truncate();
             TranslationFile::truncate();
         });
+    }
+
+    protected function getSchema(): SchemaBuilder
+    {
+        return Schema::connection(config('translations.database_connection'));
     }
 
     public function createOrGetSourceLanguage(): Translation
