@@ -42,3 +42,13 @@ it('can update phrase', function () {
         ])
         ->assertStatus(302);
 });
+
+it('can auto translate phrase', function () {
+    $this->actingAs($this->owner, 'translations')
+        ->post(route('ltu.phrases.translate', [
+            'translation' => $this->translation->id,
+        ]), [
+            'phrase' => fake()->sentence(),
+        ])
+        ->assertStatus(302);
+});
