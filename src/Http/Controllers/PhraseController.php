@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 use Inertia\Inertia;
 use Inertia\Response;
+use Momentum\Modal\Modal;
 use Outhebox\TranslationsUI\Http\Resources\PhraseResource;
 use Outhebox\TranslationsUI\Http\Resources\TranslationFileResource;
 use Outhebox\TranslationsUI\Http\Resources\TranslationResource;
@@ -90,7 +91,7 @@ class PhraseController extends BaseController
                 'google' => [
                     'id' => 'google',
                     'engine' => 'Google Translate',
-                    'value' => (new GoogleTranslate())->preserveParameters()
+                    'value' => (new GoogleTranslate)->preserveParameters()
                         ->setSource($phrase->source->translation->language->code)
                         ->setTarget($translation->language->code)
                         ->translate($phrase->source->value),
@@ -139,6 +140,45 @@ class PhraseController extends BaseController
         return redirect()->route('ltu.phrases.index', $translation)->with('notification', [
             'type' => 'success',
             'body' => 'Phrase has been updated successfully',
+        ]);
+    }
+
+    public function auto_translate(Translation $translation): Modal
+    {
+        $source = $translation->where('source', true)->first()?->language;
+        $language = $translation->language;
+        $isUntranslated = false;
+        if (count($translation->phrases()->newQuery()->where(fn (Builder $query) => $query->whereNull('value'))->get()) !== 0) {
+            $isUntranslated = true;
+        }
+
+        return Inertia::modal('phrases/modals/auto-translate', [
+            'isUntranslated' => $isUntranslated,
+            'translation' => $translation,
+            'source' => $source,
+            'language' => $language,
+        ])->baseRoute('ltu.phrases.index', $translation);
+    }
+
+    public function translate(Translation $translation): RedirectResponse
+    {
+        set_time_limit(0);
+        $translation->phrases()->newQuery()
+            ->where(fn (Builder $query) => $query->whereNull('value'))->chunkById(50, function ($phrases) use ($translation) {
+                foreach ($phrases as $phrase) {
+                    $translate = (new GoogleTranslate)->preserveParameters()
+                        ->setSource($phrase->source->translation->language->code)
+                        ->setTarget($translation->language->code)
+                        ->translate($phrase->source->value);
+                    $phrase->update([
+                        'value' => $translate,
+                    ]);
+                }
+            });
+
+        return redirect()->route('ltu.phrases.index', $translation)->with('notification', [
+            'type' => 'success',
+            'body' => 'Phrases auto translate successfully',
         ]);
     }
 }

@@ -35,7 +35,7 @@ defineProps<{
                 </div>
             </Link>
 
-            <div class="grid w-[67px] grid-cols-1 divide-x">
+            <div class="grid w-[134px] grid-cols-1 divide-x">
                 <Link v-tooltip="'Edit'" :href="route('ltu.phrases.edit', { translation: translation.id, phrase: phrase.uuid })" class="group flex items-center justify-center px-3 hover:bg-blue-50">
                     <IconPencil class="size-5 text-gray-400 group-hover:text-blue-600" />
                 </Link>

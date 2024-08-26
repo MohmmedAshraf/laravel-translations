@@ -3,14 +3,15 @@
 namespace Outhebox\TranslationsUI\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Outhebox\TranslationsUI\Traits\HasDatabaseConnection;
 
 // clean old version
 class CleanOldVersionCommand extends Command
 {
+    use HasDatabaseConnection;
+
     public $signature = 'translations:clean';
 
     public $description = 'Clean all of the Translations UI resources and database tables from any version before v1.0';
@@ -21,16 +22,16 @@ class CleanOldVersionCommand extends Command
         File::deleteDirectory(public_path('vendor/translations-ui'));
 
         // clean database tables
-        Schema::withoutForeignKeyConstraints(function () {
-            Schema::dropIfExists('ltu_languages');
-            Schema::dropIfExists('ltu_phrases');
-            Schema::dropIfExists('ltu_translations');
-            Schema::dropIfExists('ltu_translation_files');
+        $this->schema()->withoutForeignKeyConstraints(function () {
+            $this->schema()->dropIfExists('ltu_languages');
+            $this->schema()->dropIfExists('ltu_phrases');
+            $this->schema()->dropIfExists('ltu_translations');
+            $this->schema()->dropIfExists('ltu_translation_files');
         });
 
         // clean migrations
-        if (Schema::hasTable('migrations')) {
-            DB::table('migrations')->where('migration', 'like', '%create_translations_tables%')->delete();
+        if ($this->schema()->hasTable('migrations')) {
+            $this->db()->table('migrations')->where('migration', 'like', '%create_translations_tables%')->delete();
         }
 
         // remove old config file

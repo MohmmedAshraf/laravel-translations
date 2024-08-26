@@ -72,6 +72,8 @@ Route::domain(config('translations.domain'))->group(function () {
             Route::prefix('phrases')->group(function () {
                 Route::prefix('{translation}')->group(function () {
                     Route::get('/', [PhraseController::class, 'index'])->name('phrases.index');
+                    Route::get('/auto-translate', [PhraseController::class, 'auto_translate'])->name('phrases.auto_translate');
+                    Route::post('/auto-translate', [PhraseController::class, 'translate'])->name('phrases.translate');
                     Route::get('/edit/{phrase:uuid}', [PhraseController::class, 'edit'])->name('phrases.edit');
                     Route::post('/edit/{phrase:uuid}', [PhraseController::class, 'update'])->name('phrases.update');
 

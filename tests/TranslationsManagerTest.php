@@ -27,7 +27,7 @@ it('returns the correct list of locales', function () {
     // Create nested folder structure
     createPhpLanguageFile('en/book/create.php', []);
 
-    $translationsManager = new TranslationsManager(new Filesystem());
+    $translationsManager = new TranslationsManager(new Filesystem);
     $locales = $translationsManager->getLocales();
 
     expect($locales)->toBe(['de', 'en', 'fr']);
@@ -55,7 +55,7 @@ it('returns the correct translations for a given locale', function () {
 
     Config::set('translations.exclude_files', ['validation.php', 'book/excluded.php']);
     Config::set('translations.source_language', 'en');
-    $filesystem = new Filesystem();
+    $filesystem = new Filesystem;
 
     $translationsManager = new TranslationsManager($filesystem);
     $translations = $translationsManager->getTranslations('en');
@@ -91,7 +91,7 @@ it('it excludes the correct files', function () {
 
     Config::set('translations.exclude_files', ['*.php']);
     Config::set('translations.source_language', 'en');
-    $filesystem = new Filesystem();
+    $filesystem = new Filesystem;
 
     $translationsManager = new TranslationsManager($filesystem);
     $translations = $translationsManager->getTranslations('en');
@@ -106,7 +106,7 @@ it('it excludes the correct files', function () {
 });
 
 test('export creates a new translation file with the correct content', function () {
-    $filesystem = new Filesystem();
+    $filesystem = new Filesystem;
     createDirectoryIfNotExits(lang_path('en/auth.php'));
     // Update to include nested folder
     createDirectoryIfNotExits(lang_path('en/book/create.php'));
@@ -164,7 +164,7 @@ test('export can handle PHP translation files', function () {
     // Update to include nested folder
     createPhpLanguageFile('en/book/create.php', ['nested' => 'Nested :attribute must be accepted.']);
 
-    $filesystem = new Filesystem();
+    $filesystem = new Filesystem;
 
     $translation = Translation::factory()
         ->has(Phrase::factory()
@@ -207,7 +207,7 @@ test('export can handle JSON translation files', function () {
 
     // Update to include nested folder
     createJsonLanguageFile('en/book/create.json', ['nested' => 'Nested test']);
-    $filesystem = new Filesystem();
+    $filesystem = new Filesystem;
 
     $translation = Translation::factory()
         ->has(Phrase::factory()
