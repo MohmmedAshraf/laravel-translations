@@ -4,7 +4,6 @@ namespace Outhebox\TranslationsUI\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Outhebox\TranslationsUI\Actions\SyncPhrasesAction;
 use Outhebox\TranslationsUI\Database\Seeders\LanguagesTableSeeder;
@@ -12,10 +11,13 @@ use Outhebox\TranslationsUI\Models\Language;
 use Outhebox\TranslationsUI\Models\Phrase;
 use Outhebox\TranslationsUI\Models\Translation;
 use Outhebox\TranslationsUI\Models\TranslationFile;
+use Outhebox\TranslationsUI\Traits\HasDatabaseConnection;
 use Outhebox\TranslationsUI\TranslationsManager;
 
 class ImportTranslationsCommand extends Command
 {
+    use HasDatabaseConnection;
+
     public TranslationsManager $manager;
 
     protected $signature = 'translations:import {--F|fresh : Truncate all translations and phrases before importing}';
@@ -50,7 +52,7 @@ class ImportTranslationsCommand extends Command
 
     protected function importLanguages(): void
     {
-        if (! Schema::hasTable('ltu_languages') || Language::count() === 0) {
+        if (! $this->schema()->hasTable('ltu_languages') || Language::count() === 0) {
             if ($this->confirm('The ltu_languages table does not exist or is empty, would you like to install the default languages?', true)) {
                 $this->call('db:seed', ['--class' => LanguagesTableSeeder::class]);
             } else {
@@ -63,7 +65,7 @@ class ImportTranslationsCommand extends Command
 
     protected function truncateTables(): void
     {
-        Schema::withoutForeignKeyConstraints(function () {
+        $this->schema()->withoutForeignKeyConstraints(function () {
             Phrase::truncate();
             Translation::truncate();
             TranslationFile::truncate();
