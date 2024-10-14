@@ -24,7 +24,10 @@ Laravel Translations UI package provides a user-friendly interface for managing 
 > 📺 **[Watch a 4-minute video by Povilas Korop](https://www.youtube.com/watch?v=lYkgXnwnVbw)** showcasing the package.
 
 ---
-### Support
+
+## Support the Project
+
+[<img src="https://outhebox-github-ads.s3.us-east-1.amazonaws.com/laravel-translations.jpg?t=1" width="419px" />](https://outhebox.dev/github-ad-click/laravel-translations).
 
 Thank you for considering supporting the development of this package! If you'd like to contribute, you can buy me a coffee or sponsor me to help keep me motivated to continue improving this package. You can also support the project by starring ⭐ the repository.
 
