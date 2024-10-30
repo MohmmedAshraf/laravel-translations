@@ -90,7 +90,7 @@ class PhraseController extends BaseController
                 'google' => [
                     'id' => 'google',
                     'engine' => 'Google Translate',
-                    'value' => (new GoogleTranslate())->preserveParameters()
+                    'value' => (new GoogleTranslate)->preserveParameters()
                         ->setSource($phrase->source->translation->language->code)
                         ->setTarget($translation->language->code)
                         ->translate($phrase->source->value),
