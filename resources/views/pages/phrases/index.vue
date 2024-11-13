@@ -125,10 +125,18 @@ watch(
                             </div>
                         </div>
 
-                        <div class="grid w-[67px] grid-cols-1 divide-x">
-                            <Link v-tooltip="'Add New Key'" :href="route('ltu.source_translation.add_source_key')" class="group flex items-center justify-center hover:bg-blue-50">
-                                <IconPlus class="size-5 text-gray-400 group-hover:text-blue-600" />
-                            </Link>
+                        <div class="grid w-[134px] grid-cols-2 divide-x">
+                            <div class="grid w-[58px] grid-cols-1">
+                                <Link v-tooltip="'Auto Translate'" :href="route('ltu.phrases.auto_translate', translation.id)" class="group flex items-center justify-center hover:bg-blue-50">
+                                    <IconLanguage class="size-5 text-gray-400 group-hover:text-blue-600" />
+                                </Link>
+                            </div>
+
+                            <div class="grid w-[58px] grid-cols-1">
+                                <Link v-tooltip="'Add New Key'" :href="route('ltu.source_translation.add_source_key')" class="group flex items-center justify-center hover:bg-blue-50">
+                                    <IconPlus class="size-5 text-gray-400 group-hover:text-blue-600" />
+                                </Link>
+                            </div>
                         </div>
                     </div>
                 </div>

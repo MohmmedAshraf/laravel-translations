@@ -5,6 +5,9 @@ on:
     paths:
       - '**.php'
 
+permissions:
+  contents: write
+
 jobs:
   php-code-styling:
     runs-on: ubuntu-latest
@@ -16,7 +19,7 @@ jobs:
           ref: ${{ github.head_ref }}
 
       - name: Fix PHP code style issues
-        uses: aglipanci/laravel-pint-action@2.0.0
+        uses: aglipanci/laravel-pint-action@2.4
 
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v5
