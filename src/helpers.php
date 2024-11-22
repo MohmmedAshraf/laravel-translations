@@ -32,9 +32,12 @@ if (! function_exists('translationsUIAssets')) {
 
         $manifest = json_decode(file_get_contents($manifestPath), true);
 
+        $file = asset("/vendor/translations-ui/{$manifest['resources/scripts/app.ts']['file']}");
+        $css = asset("/vendor/translations-ui/{$manifest['resources/scripts/app.ts']['css'][0]}");
+
         return new HtmlString(<<<HTML
-                <script type="module" src="/vendor/translations-ui/{$manifest['resources/scripts/app.ts']['file']}"></script>
-                <link rel="stylesheet" href="/vendor/translations-ui/{$manifest['resources/scripts/app.ts']['css'][0]}">
+                <script type="module" src="{$file}"></script>
+                <link rel="stylesheet" href="{$css}">
             HTML
         );
     }
