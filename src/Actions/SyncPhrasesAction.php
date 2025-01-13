@@ -1,12 +1,12 @@
 <?php
 
-namespace Outhebox\TranslationsUI\Actions;
+namespace App\Actions;
 
 use Outhebox\TranslationsUI\Models\Language;
 use Outhebox\TranslationsUI\Models\Translation;
 use Outhebox\TranslationsUI\Models\TranslationFile;
 
-class SyncPhrasesAction
+class SyncPhrasesActionForked
 {
     public static function execute(Translation $source, $key, $value, $locale, $file): void
     {
@@ -44,7 +44,9 @@ class SyncPhrasesAction
         ], [
             'value' => (empty($value) ? null : $value),
             'parameters' => getPhraseParameters($value),
-            'phrase_id' => $translation->source ? null : $source->phrases()->where('key', $key)->first()?->id,
+            'phrase_id' => $translation->source ? null : $source->phrases()->where('translation_file_id', $translationFile->id)
+                ->where('group', $translationFile->name)
+                ->where('key', $key)->first()?->id,
         ]);
     }
 }
