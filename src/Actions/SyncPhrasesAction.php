@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Actions;
+namespace Outhebox\TranslationsUI\Actions;
 
 use Outhebox\TranslationsUI\Models\Language;
 use Outhebox\TranslationsUI\Models\Translation;
