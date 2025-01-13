@@ -6,7 +6,7 @@ use Outhebox\TranslationsUI\Models\Language;
 use Outhebox\TranslationsUI\Models\Translation;
 use Outhebox\TranslationsUI\Models\TranslationFile;
 
-class SyncPhrasesActionForked
+class SyncPhrasesAction
 {
     public static function execute(Translation $source, $key, $value, $locale, $file): void
     {
