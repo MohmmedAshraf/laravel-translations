@@ -19,7 +19,9 @@ class ImportTranslationsCommand extends Command
 {
     public TranslationsManager $manager;
 
-    protected $signature = 'translations:import {--F|fresh : Truncate all translations and phrases before importing}';
+    private bool $overwrite = true;
+
+    protected $signature = 'translations:import {--F|fresh : Truncate all translations and phrases before importing} {--no-overwrite : Do not overwrite existing translations}';
 
     protected $description = 'Sync translation all keys from the translation files to the database';
 
@@ -38,6 +40,10 @@ class ImportTranslationsCommand extends Command
             $this->info('Truncating translations and phrases...'.PHP_EOL);
 
             $this->truncateTables();
+        }
+
+        if ($this->option('no-overwrite')) {
+            $this->overwrite = false;
         }
 
         $translation = $this->createOrGetSourceLanguage();
@@ -110,7 +116,7 @@ class ImportTranslationsCommand extends Command
     {
         foreach ($this->manager->getTranslations($locale) as $file => $translations) {
             foreach (Arr::dot($translations) as $key => $value) {
-                SyncPhrasesAction::execute($translation, $key, $value, $locale, $file);
+                SyncPhrasesAction::execute($translation, $key, $value, $locale, $file, $this->overwrite);
             }
         }
 
