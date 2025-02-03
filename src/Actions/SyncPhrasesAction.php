@@ -8,7 +8,7 @@ use Outhebox\TranslationsUI\Models\TranslationFile;
 
 class SyncPhrasesAction
 {
-    public static function execute(Translation $source, $key, $value, $locale, $file): void
+    public static function execute(Translation $source, $key, $value, $locale, $file, bool $overwrite = true): void
     {
         if (is_array($value) && empty($value)) {
             return;
@@ -36,8 +36,8 @@ class SyncPhrasesAction
         ]);
 
         $key = config('translations.include_file_in_key') && ! $isRoot ? "{$translationFile->name}.{$key}" : $key;
-
-        $translation->phrases()->updateOrCreate([
+        $method = $overwrite ? 'updateOrCreate' : 'firstOrCreate';
+        $translation->phrases()->$method([
             'key' => $key,
             'group' => $translationFile->name,
             'translation_file_id' => $translationFile->id,
