@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Middleware;
 use Outhebox\TranslationsUI\Http\Resources\ContributorResource;
 use Outhebox\TranslationsUI\Models\Contributor;
-use Tighten\Ziggy\Ziggy;
+use Outhebox\TranslationsUI\Models\Translation;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -24,16 +24,15 @@ class HandleInertiaRequests extends Middleware
 
     public function share(Request $request): array
     {
-        return array_merge(parent::share($request), [
+        return [
+            ...parent::share($request),
             'auth' => $this->auth(),
-            'ziggy' => function () use ($request) {
-                return array_merge((new Ziggy)->toArray(), [
-                    'location' => $request->url(),
-                ]);
-            },
-            'notification' => fn () => $request->session()->get('notification'),
-            'status' => fn () => $request->session()->get('status'),
-        ]);
+            'canPublish' => (bool) Translation::count() > 0,
+            'isProductionEnvironment' => app()->isProduction(),
+            'flash' => [
+                'message' => fn () => $request->session()->get('message'),
+            ],
+        ];
     }
 
     protected function auth(): array

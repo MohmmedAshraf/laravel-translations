@@ -16,7 +16,14 @@ if (! function_exists('translationsUIAssets')) {
 
             return new HtmlString(<<<HTML
                 <script type="module" src="$viteServer/@vite/client"></script>
-                <script type="module" src="$viteServer/resources/scripts/app.ts"></script>
+                <script type="module">
+                    import RefreshRuntime from '$viteServer/@react-refresh';
+                    RefreshRuntime.injectIntoGlobalHook(window);
+                    window.\$RefreshReg$ = () => {};
+                    window.\$RefreshSig$ = () => (type) => type;
+                    window.__vite_plugin_react_preamble_installed__ = true;
+                </script>
+                <script type="module" src="$viteServer/resources/js/app.tsx"></script>
             HTML
             );
         }
@@ -33,8 +40,8 @@ if (! function_exists('translationsUIAssets')) {
         $manifest = json_decode(file_get_contents($manifestPath), true);
 
         return new HtmlString(<<<HTML
-                <script type="module" src="/vendor/translations-ui/{$manifest['resources/scripts/app.ts']['file']}"></script>
-                <link rel="stylesheet" href="/vendor/translations-ui/{$manifest['resources/scripts/app.ts']['css'][0]}">
+                <script type="module" src="/vendor/translations-ui/{$manifest['resources/js/app.tsx']['file']}"></script>
+                <link rel="stylesheet" href="/vendor/translations-ui/{$manifest['resources/js/app.tsx']['css'][0]}">
             HTML
         );
     }

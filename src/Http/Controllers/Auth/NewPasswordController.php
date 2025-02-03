@@ -24,7 +24,7 @@ class NewPasswordController extends Controller
             abort(404);
         }
 
-        return Inertia::render('auth/reset-password', [
+        return Inertia::render('Auth/ResetPassword', [
             'token' => $token,
             'email' => $user->email,
         ]);

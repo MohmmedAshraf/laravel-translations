@@ -8,6 +8,7 @@ use Outhebox\TranslationsUI\Http\Controllers\Auth\PasswordResetLinkController;
 use Outhebox\TranslationsUI\Http\Controllers\ContributorController;
 use Outhebox\TranslationsUI\Http\Controllers\PhraseController;
 use Outhebox\TranslationsUI\Http\Controllers\ProfileController;
+use Outhebox\TranslationsUI\Http\Controllers\PublishTranslationController;
 use Outhebox\TranslationsUI\Http\Controllers\SourcePhraseController;
 use Outhebox\TranslationsUI\Http\Controllers\TranslationController;
 use Outhebox\TranslationsUI\Http\Middleware\Authenticate;
@@ -40,12 +41,10 @@ Route::domain(config('translations.domain'))->group(function () {
             Route::get('/', [TranslationController::class, 'index'])->name('translation.index');
 
             Route::middleware(RedirectIfNotOwner::class)->group(function () {
-                Route::get('publish', [TranslationController::class, 'publish'])->name('translation.publish');
-                Route::post('publish', [TranslationController::class, 'export'])->name('translation.export');
-                Route::get('download', [TranslationController::class, 'download'])->name('translation.download');
+                Route::post('publish', [PublishTranslationController::class, 'publish'])->name('translation.publish');
+                Route::get('download', [PublishTranslationController::class, 'download'])->name('translation.download');
             });
 
-            Route::get('add-translation', [TranslationController::class, 'create'])->name('translation.create');
             Route::post('add-translation', [TranslationController::class, 'store'])->name('translation.store');
 
             // Source Phrase Routes
@@ -73,7 +72,7 @@ Route::domain(config('translations.domain'))->group(function () {
                 Route::prefix('{translation}')->group(function () {
                     Route::get('/', [PhraseController::class, 'index'])->name('phrases.index');
                     Route::get('/edit/{phrase:uuid}', [PhraseController::class, 'edit'])->name('phrases.edit');
-                    Route::post('/edit/{phrase:uuid}', [PhraseController::class, 'update'])->name('phrases.update');
+                    Route::put('/edit/{phrase:uuid}', [PhraseController::class, 'update'])->name('phrases.update');
 
                     Route::delete('delete', [TranslationController::class, 'destroy'])
                         ->middleware(RedirectIfNotOwner::class)

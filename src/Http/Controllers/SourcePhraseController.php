@@ -2,7 +2,6 @@
 
 namespace Outhebox\TranslationsUI\Http\Controllers;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
@@ -16,6 +15,8 @@ use Outhebox\TranslationsUI\Http\Resources\TranslationResource;
 use Outhebox\TranslationsUI\Models\Phrase;
 use Outhebox\TranslationsUI\Models\Translation;
 use Outhebox\TranslationsUI\Models\TranslationFile;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class SourcePhraseController extends BaseController
 {
@@ -23,38 +24,25 @@ class SourcePhraseController extends BaseController
     {
         $source = Translation::where('source', true)->first();
 
-        $phrases = $source->phrases()->newQuery();
+        $filters = $request->input('filter', []);
+        $filtersApplied = ! empty($filters);
+        $page = $filtersApplied ? 1 : ($request->input('page', 1));
 
-        $files = [];
-        foreach (collect($phrases->where('translation_id', $source->id)->get())->unique('translation_file_id') as $value) {
-            $files[] = TranslationFile::where('id', $value->translation_file_id)->first();
-        }
-
-        if ($request->has('filter.keyword')) {
-            $phrases->where(function (Builder $query) use ($request) {
-                $query->where('key', 'LIKE', "%{$request->input('filter.keyword')}%")
-                    ->orWhere('value', 'LIKE', "%{$request->input('filter.keyword')}%");
-            });
-        }
-
-        if ($request->has('filter.translationFile')) {
-            $phrases->where(
-                ! is_null($request->input('filter.translationFile')) || ! empty($request->input('filter.translationFile'))
-                    ? fn (Builder $query) => $query->where('translation_file_id', $request->input('filter.translationFile'))
-                    : fn (Builder $query) => $query->whereNull('translation_file_id')
-            );
-        }
-
-        $phrases = $phrases
+        $phrases = QueryBuilder::for($source->phrases())
+            ->allowedFilters([
+                AllowedFilter::partial('key'),
+                AllowedFilter::partial('value'),
+                AllowedFilter::exact('translation_file_id'),
+            ])
             ->orderBy('key')
-            ->paginate($request->input('perPage') ?? 12)
+            ->paginate($request->input('per_page', 11), ['*'], 'page', $page)
             ->withQueryString();
 
-        return Inertia::render('source/index', [
+        return Inertia::render('Translations/Source/Index', [
             'phrases' => PhraseResource::collection($phrases),
             'translation' => TranslationResource::make($source),
-            'files' => TranslationFileResource::collection(collect($files)),
             'filter' => $request->input('filter', collect()),
+            'files' => TranslationFileResource::collection(TranslationFile::distinct()->get()),
         ]);
     }
 

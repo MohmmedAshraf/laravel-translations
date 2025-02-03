@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+#app {
+    @apply h-full;
+}
+
+.link {
+    @apply text-sm text-blue-600 no-underline hover:text-blue-400 transition-colors;
+}
+
+img.emoji {
+    display: inline-block;
+    height: 1em;
+    width: 1em;
+    margin: 0 .05em 0 .1em;
+    vertical-align: -.1em;
+}
+
+.ant-modal-header {
+    @apply !mb-6;
+}
+
+.text-gray-400-prefix {
+    @apply text-gray-400;
+}
+
+.ant-table-footer {
+    @apply !p-0;
+}
+
+.ant-table-tbody > tr > td {
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
+.ant-tabs-nav {
+    @apply !mb-0;
+}
+
+.table-btn {
+    @apply border-none shadow-none text-gray-400 py-4 h-14 bg-transparent rounded-none;
+}
+
+.table-cell-title {
+    @apply text-sm px-4 text-gray-400 font-normal;
+}

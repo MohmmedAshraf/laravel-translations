@@ -2,7 +2,6 @@
 
 namespace Outhebox\TranslationsUI\Http\Controllers;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
@@ -14,6 +13,8 @@ use Outhebox\TranslationsUI\Http\Resources\TranslationResource;
 use Outhebox\TranslationsUI\Models\Phrase;
 use Outhebox\TranslationsUI\Models\Translation;
 use Outhebox\TranslationsUI\Models\TranslationFile;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 use Stichoza\GoogleTranslate\Exceptions\LargeTextException;
 use Stichoza\GoogleTranslate\Exceptions\RateLimitException;
 use Stichoza\GoogleTranslate\Exceptions\TranslationRequestException;
@@ -27,45 +28,27 @@ class PhraseController extends BaseController
             return redirect()->route('ltu.source_translation');
         }
 
-        $phrases = $translation->phrases()->newQuery();
-
-        $files = [];
-        foreach (collect($phrases->where('translation_id', $translation->id)->get())->unique('translation_file_id') as $value) {
-            $files[] = TranslationFile::where('id', $value->translation_file_id)->first();
-        }
-
-        if ($request->has('filter.keyword')) {
-            $phrases->where(function (Builder $query) use ($request) {
-                $query->where('key', 'LIKE', "%{$request->input('filter.keyword')}%")
-                    ->orWhere('value', 'LIKE', "%{$request->input('filter.keyword')}%");
-            });
-        }
-
-        if ($request->has('filter.translationFile')) {
-            $phrases->where(
-                ! is_null($request->input('filter.translationFile')) || ! empty($request->input('filter.translationFile'))
-                    ? fn (Builder $query) => $query->where('translation_file_id', $request->input('filter.translationFile'))
-                    : fn (Builder $query) => $query->whereNull('translation_file_id')
-            );
-        }
-
-        if ($request->has('filter.status')) {
-            $phrases->where(
-                $request->input('filter.status') === 'translated'
-                    ? fn (Builder $query) => $query->whereNotNull('value')
-                    : fn (Builder $query) => $query->whereNull('value')
-            );
-        }
-
-        $phrases = $phrases
+        $phrases = QueryBuilder::for($translation->phrases())
+            ->allowedFilters([
+                AllowedFilter::partial('key'),
+                AllowedFilter::partial('value'),
+                AllowedFilter::exact('translation_file_id'),
+                AllowedFilter::callback('status', function ($query, $value) {
+                    if ($value === 'translated') {
+                        $query->where('value', '!=', null);
+                    } else {
+                        $query->where('value', '=', null);
+                    }
+                }),
+            ])
             ->orderBy('key')
-            ->paginate($request->input('perPage') ?? 12)
+            ->paginate($request->input('per_page', 11))
             ->withQueryString();
 
-        return Inertia::render('phrases/index', [
+        return Inertia::render('Translations/Language/Index', [
             'phrases' => PhraseResource::collection($phrases),
             'translation' => TranslationResource::make($translation),
-            'files' => TranslationFileResource::collection(collect($files)),
+            'files' => TranslationFileResource::collection(TranslationFile::distinct()->get()),
             'filter' => $request->input('filter', collect()),
         ]);
     }
@@ -81,16 +64,16 @@ class PhraseController extends BaseController
             return redirect()->route('ltu.source_translation.edit', $phrase->uuid);
         }
 
-        return Inertia::render('phrases/edit', [
+        return Inertia::render('Translations/Phrase/Form', [
             'phrase' => PhraseResource::make($phrase),
             'translation' => TranslationResource::make($translation),
             'source' => TranslationResource::make(Translation::where('source', true)?->first()),
             'similarPhrases' => PhraseResource::collection($phrase->similarPhrases()),
             'suggestedTranslations' => [
-                'google' => [
+                [
                     'id' => 'google',
                     'engine' => 'Google Translate',
-                    'value' => (new GoogleTranslate())->preserveParameters()
+                    'value' => (new GoogleTranslate)->preserveParameters()
                         ->setSource($phrase->source->translation->language->code)
                         ->setTarget($translation->language->code)
                         ->translate($phrase->source->value),
@@ -103,6 +86,8 @@ class PhraseController extends BaseController
     {
         $request->validate([
             'phrase' => 'required|string',
+        ], [
+            'phrase.required' => 'Invalid empty translation',
         ]);
 
         if (! $translation->source) {
@@ -110,7 +95,7 @@ class PhraseController extends BaseController
                 foreach ($phrase->source->parameters as $parameter) {
                     if (! str_contains($request->input('phrase'), ":$parameter")) {
                         return redirect()->back()->withErrors([
-                            'phrase' => 'Required parameters are missing.',
+                            'phrase' => "Missing placeholder :$parameter in translation",
                         ]);
                     }
                 }
@@ -130,15 +115,9 @@ class PhraseController extends BaseController
             return redirect()->route('ltu.phrases.edit', [
                 'translation' => $translation,
                 'phrase' => $nextPhrase,
-            ])->with('notification', [
-                'type' => 'success',
-                'body' => 'Phrase has been updated successfully',
             ]);
         }
 
-        return redirect()->route('ltu.phrases.index', $translation)->with('notification', [
-            'type' => 'success',
-            'body' => 'Phrase has been updated successfully',
-        ]);
+        return redirect()->route('ltu.phrases.index', $translation);
     }
 }

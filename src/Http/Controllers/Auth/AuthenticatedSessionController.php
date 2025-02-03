@@ -17,7 +17,9 @@ class AuthenticatedSessionController extends Controller
             return redirect()->route('ltu.translation.index');
         }
 
-        return Inertia::render('auth/login');
+        return Inertia::render('Auth/Login', [
+            'status' => session('status'),
+        ]);
     }
 
     public function store(LoginRequest $request): RedirectResponse

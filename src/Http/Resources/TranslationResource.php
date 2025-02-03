@@ -16,21 +16,10 @@ class TranslationResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'language' => LanguageResource::make($this->whenLoaded('language')),
             'source' => $this->source,
-            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
-            'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
-            'progress' => $this->formatProgress(),
             'phrases_count' => $this->phrases_count,
+            'language' => LanguageResource::make($this->whenLoaded('language')),
+            'progress' => $this->progress > 0 ? number_format($this->progress, 2) : 0,
         ];
-    }
-
-    private function formatProgress(): string
-    {
-        if ($this->progress > 0) {
-            return "{$this->progress}%";
-        }
-
-        return '0%';
     }
 }

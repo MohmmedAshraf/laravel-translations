@@ -27,7 +27,8 @@
         "spatie/laravel-package-tools": "^1.0",
         "stichoza/google-translate-php": "^5.1",
         "tightenco/ziggy": "^2.0",
-        "ext-zip": "*"
+        "ext-zip": "*",
+        "spatie/laravel-query-builder": "^6.0"
     },
     "require-dev": {
         "laravel/pint": "^1.0",

@@ -16,8 +16,7 @@ class TranslationsManager
 {
     public function __construct(
         protected Filesystem $filesystem
-    ) {
-    }
+    ) {}
 
     public function getLocales(): array
     {
@@ -118,7 +117,7 @@ class TranslationsManager
         try {
             $this->export(download: true);
 
-            $zip = new ZipArchive();
+            $zip = new ZipArchive;
 
             $zipPath = storage_path('app/lang.zip');
             $zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
