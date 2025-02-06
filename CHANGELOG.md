@@ -2,6 +2,25 @@
 
 All notable changes to `laravel-translations` will be documented in this file.
 
+## v1.1.9 - 2024-12-22
+
+### What's Changed
+
+* various fixes by @adereksisusanto in https://github.com/MohmmedAshraf/laravel-translations/pull/117
+* Fixed scopeWithProgress to work with pg_sql by @lyalls-marc in https://github.com/MohmmedAshraf/laravel-translations/pull/134
+* sync uuid creation column with the new upgrade by @benounnas in https://github.com/MohmmedAshraf/laravel-translations/pull/130
+* Fix asset paths for non-root project setups by @vzambon in https://github.com/MohmmedAshraf/laravel-translations/pull/138
+* Use the schema of the selected database when running the 'ImportTramslationsCommand'. by @caswd in https://github.com/MohmmedAshraf/laravel-translations/pull/123
+
+### New Contributors
+
+* @lyalls-marc made their first contribution in https://github.com/MohmmedAshraf/laravel-translations/pull/134
+* @benounnas made their first contribution in https://github.com/MohmmedAshraf/laravel-translations/pull/130
+* @vzambon made their first contribution in https://github.com/MohmmedAshraf/laravel-translations/pull/138
+* @caswd made their first contribution in https://github.com/MohmmedAshraf/laravel-translations/pull/123
+
+**Full Changelog**: https://github.com/MohmmedAshraf/laravel-translations/compare/1.1.8...1.1.9
+
 ## v1.1.8 - 2024-05-12
 
 ### What's Changed
@@ -234,11 +253,13 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
      
      
      
+     
      ```
    - Alternatively, manually uninstall using:
      
      ```bash
      composer remove outhebox/laravel-translations
+     
      
      
      
@@ -265,6 +286,7 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
    
      ```bash
      composer require outhebox/laravel-translations
+   
    
    
    

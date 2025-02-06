@@ -3,6 +3,7 @@
 namespace Outhebox\TranslationsUI\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Collection;
 use Outhebox\TranslationsUI\Models\Translation;
 
 /**
@@ -12,6 +13,8 @@ use Outhebox\TranslationsUI\Models\Translation;
  */
 class TranslationResource extends JsonResource
 {
+    public static $wrap = null;
+
     public function toArray($request): array
     {
         return [
@@ -32,5 +35,18 @@ class TranslationResource extends JsonResource
         }
 
         return '0%';
+    }
+
+    /**
+     * Create an AnonymousResourceCollection without wrapping
+     *
+     * @see JsonResource::newCollection()
+     *
+     * @param  mixed|Collection  $resource
+     * @return UnwrappedAnonymousResourceCollection
+     */
+    protected static function newCollection($resource)
+    {
+        return new UnwrappedAnonymousResourceCollection($resource, TranslationResource::class);
     }
 }
