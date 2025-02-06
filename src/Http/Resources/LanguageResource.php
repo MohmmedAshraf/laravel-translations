@@ -31,6 +31,6 @@ class LanguageResource extends JsonResource
      */
     protected static function newCollection($resource)
     {
-        return new UnwrappedAnonymousResourceCollection($resource, TranslationResource::class);
+        return new UnwrappedAnonymousResourceCollection($resource, LanguageResource::class);
     }
 }
