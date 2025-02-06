@@ -27,7 +27,7 @@ class SyncPhrasesAction
 
         $isRoot = $file === $locale.'.json' || $file === $locale.'.php';
         $extension = pathinfo($file, PATHINFO_EXTENSION);
-        $filePath = str_replace('.'.$extension, '', str_replace($locale.DIRECTORY_SEPARATOR, '', $file));
+        $filePath = str_replace('.'.$extension, '', preg_replace('/^'.preg_quote($locale.DIRECTORY_SEPARATOR, '/').'/', '', $file));
 
         $translationFile = TranslationFile::firstOrCreate([
             'name' => $filePath,
