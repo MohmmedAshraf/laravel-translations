@@ -22,17 +22,4 @@ class TranslationFileResource extends JsonResource
             'phrases' => PhraseResource::collection($this->whenLoaded('phrases')),
         ];
     }
-
-    /**
-     * Create an AnonymousResourceCollection without wrapping
-     *
-     * @see JsonResource::newCollection()
-     *
-     * @param  mixed|Collection  $resource
-     * @return UnwrappedAnonymousResourceCollection
-     */
-    protected static function newCollection($resource)
-    {
-        return new UnwrappedAnonymousResourceCollection($resource, TranslationResource::class);
-    }
 }
