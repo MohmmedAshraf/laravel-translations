@@ -2,6 +2,23 @@
 
 All notable changes to `laravel-translations` will be documented in this file.
 
+## v1.2.0 - 2025-02-06
+
+### What's Changed
+
+* Fix `JsonResource::withoutWrapping()` by @BrianHenryIE in https://github.com/MohmmedAshraf/laravel-translations/pull/144
+* Add `--no-overwrite` flag while importing by @lvdigitalaaank in https://github.com/MohmmedAshraf/laravel-translations/pull/148
+* Add `UnwrappedAnonymousResourceCollection` by @BrianHenryIE in https://github.com/MohmmedAshraf/laravel-translations/pull/149
+* Fix file names when publish by @SalemCode8 in https://github.com/MohmmedAshraf/laravel-translations/pull/132
+
+### New Contributors
+
+* @lvdigitalaaank made their first contribution in https://github.com/MohmmedAshraf/laravel-translations/pull/147
+* @BrianHenryIE made their first contribution in https://github.com/MohmmedAshraf/laravel-translations/pull/144
+* @SalemCode8 made their first contribution in https://github.com/MohmmedAshraf/laravel-translations/pull/132
+
+**Full Changelog**: https://github.com/MohmmedAshraf/laravel-translations/compare/1.1.9...1.2.0
+
 ## v1.1.9 - 2024-12-22
 
 ### What's Changed
@@ -254,11 +271,13 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
      
      
      
+     
      ```
    - Alternatively, manually uninstall using:
      
      ```bash
      composer remove outhebox/laravel-translations
+     
      
      
      
@@ -286,6 +305,7 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
    
      ```bash
      composer require outhebox/laravel-translations
+   
    
    
    
