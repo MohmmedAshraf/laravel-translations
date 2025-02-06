@@ -3,6 +3,7 @@
 namespace Outhebox\TranslationsUI\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Collection;
 use Outhebox\TranslationsUI\Models\Translation;
 
 /**
@@ -23,5 +24,10 @@ class TranslationResource extends JsonResource
             'language' => LanguageResource::make($this->whenLoaded('language')),
             'progress' => $this->progress > 0 ? number_format($this->progress, 2) : 0,
         ];
+    }
+
+    protected static function newCollection($resource)
+    {
+        return new UnwrappedAnonymousResourceCollection($resource, TranslationResource::class);
     }
 }

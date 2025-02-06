@@ -14,6 +14,7 @@ use Outhebox\TranslationsUI\Http\Resources\InviteResource;
 use Outhebox\TranslationsUI\Http\Resources\LanguageResource;
 use Outhebox\TranslationsUI\Http\Resources\PhraseResource;
 use Outhebox\TranslationsUI\Http\Resources\TranslationFileResource;
+use Outhebox\TranslationsUI\Http\Resources\TranslationResource;
 use Outhebox\TranslationsUI\Models\Contributor;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
@@ -81,7 +82,7 @@ class TranslationsUIServiceProvider extends PackageServiceProvider
         LanguageResource::withoutWrapping();
         ContributorResource::withoutWrapping();
         TranslationFileResource::withoutWrapping();
-        TranslationFileResource::withoutWrapping();
+        TranslationResource::withoutWrapping();
     }
 
     private function registerAuthDriver(): void
