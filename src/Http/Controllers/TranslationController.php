@@ -22,7 +22,7 @@ class TranslationController extends BaseController
     {
         return Inertia::modal('translations/modals/publish-translations', [
             'canPublish' => (bool) Translation::count() > 0,
-            'isProductionEnv' => (bool) app()->environment('production'),
+            'isProductionEnv' => app()->isProduction(),
         ])->baseRoute('ltu.translation.index');
     }
 

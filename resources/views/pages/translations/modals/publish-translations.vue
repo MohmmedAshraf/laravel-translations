@@ -77,12 +77,12 @@ const download = () => {
                 </div>
             </div>
 
-            <div class="w-full text-center">
-                <Alert v-if="!isProductionEnv" variant="warning" class="text-left">
+            <div v-if="isProductionEnv" class="w-full text-center">
+                <Alert variant="warning" class="text-left">
                     <strong>Warning:</strong> This is a Production Environment. Publishing translations will causing issues with version control and other developers, Please use the download button below instead.
                 </Alert>
 
-                <BaseButton v-if="!isProductionEnv" :disabled="loading || downloadLoading" :is-loading="downloadLoading" variant="dark" size="lg" class="mt-4" full-width target="_blank" @click="download">
+                <BaseButton :disabled="loading || downloadLoading" :is-loading="downloadLoading" variant="dark" size="lg" class="mt-4" full-width target="_blank" @click="download">
                     <ArrowDownTrayIcon class="size-4" />
 
                     <span>Download</span>
