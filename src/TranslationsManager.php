@@ -22,7 +22,7 @@ class TranslationsManager
     {
         $locales = collect();
 
-        foreach ($this->filesystem->directories(lang_path()) as $dir) {
+        foreach ($this->filesystem->directories(translation_lang_path()) as $dir) {
             if (Str::contains($dir, 'vendor')) {
                 continue;
             }
@@ -30,7 +30,7 @@ class TranslationsManager
             $locales->push(basename($dir));
         }
 
-        collect($this->filesystem->files(lang_path()))->each(function ($file) use ($locales) {
+        collect($this->filesystem->files(translation_lang_path()))->each(function ($file) use ($locales) {
             if ($this->filesystem->extension($file) !== 'json') {
                 return;
             }
@@ -62,8 +62,8 @@ class TranslationsManager
 
         $files = [];
 
-        if ($this->filesystem->exists(lang_path($locale))) {
-            $files = $this->filesystem->allFiles(lang_path($locale));
+        if ($this->filesystem->exists(translation_lang_path($locale))) {
+            $files = $this->filesystem->allFiles(translation_lang_path($locale));
         }
 
         collect($files)
@@ -74,7 +74,7 @@ class TranslationsManager
 
                 return $locale.DIRECTORY_SEPARATOR.$file->getRelativePath().DIRECTORY_SEPARATOR.$file->getFilename();
             })
-            ->when($this->filesystem->exists(lang_path($rootFileName)), function ($collection) use ($rootFileName) {
+            ->when($this->filesystem->exists(translation_lang_path($rootFileName)), function ($collection) use ($rootFileName) {
                 return $collection->prepend($rootFileName);
             })
             ->filter(function ($file) use ($locale) {
@@ -98,11 +98,11 @@ class TranslationsManager
             ->each(function ($file) use (&$translations) {
                 try {
                     if ($this->filesystem->extension($file) == 'php') {
-                        $translations[$file] = $this->filesystem->getRequire(lang_path($file));
+                        $translations[$file] = $this->filesystem->getRequire(translation_lang_path($file));
                     }
 
                     if ($this->filesystem->extension($file) == 'json') {
-                        $translations[$file] = json_decode($this->filesystem->get(lang_path($file)), true);
+                        $translations[$file] = json_decode($this->filesystem->get(translation_lang_path($file)), true);
                     }
                 } catch (FileNotFoundException $e) {
                     $translations[$file] = [];
@@ -152,9 +152,9 @@ class TranslationsManager
             foreach ($phrasesTree as $locale => $groups) {
                 foreach ($groups as $file => $phrases) {
                     if ($file === "$locale.json") {
-                        $langPath = $download ? storage_path("app/translations/$file") : lang_path("$file");
+                        $langPath = $download ? storage_path("app/translations/$file") : translation_lang_path("$file");
                     } else {
-                        $langPath = $download ? storage_path("app/translations/$locale/$file") : lang_path("$locale/$file");
+                        $langPath = $download ? storage_path("app/translations/$locale/$file") : translation_lang_path("$locale/$file");
                     }
 
                     if (! $this->filesystem->isDirectory(dirname($langPath))) {

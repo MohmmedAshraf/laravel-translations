@@ -18,7 +18,7 @@ function createDirectoryIfNotExits($path): void
 
 function createPhpLanguageFile($path, array $content): void
 {
-    $path = lang_path($path);
+    $path = translation_lang_path($path);
 
     createDirectoryIfNotExits($path);
 
@@ -27,7 +27,7 @@ function createPhpLanguageFile($path, array $content): void
 
 function createJsonLanguageFile($path, array $content): void
 {
-    $path = lang_path($path);
+    $path = translation_lang_path($path);
 
     createDirectoryIfNotExits($path);
 

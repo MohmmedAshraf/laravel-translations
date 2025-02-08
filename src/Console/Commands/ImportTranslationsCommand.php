@@ -92,7 +92,7 @@ class ImportTranslationsCommand extends Command
             exit;
         }
 
-        if (! is_dir(lang_path()) || count(scandir(lang_path())) <= 2) {
+        if (! is_dir(translation_lang_path()) || count(scandir(translation_lang_path())) <= 2) {
             if ($this->confirm('It seems that you don\'t have any languages yet, would you like to publish the default language files?', true)) {
                 $this->call('lang:publish');
             } else {

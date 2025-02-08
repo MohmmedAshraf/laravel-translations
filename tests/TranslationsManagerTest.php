@@ -13,7 +13,7 @@ use Outhebox\TranslationsUI\TranslationsManager;
 
 beforeEach(function () {
     App::useLangPath(__DIR__.'lang_test');
-    createDirectoryIfNotExits(lang_path());
+    createDirectoryIfNotExits(translation_lang_path());
 });
 
 it('returns the correct list of locales', function () {
@@ -107,9 +107,9 @@ it('it excludes the correct files', function () {
 
 test('export creates a new translation file with the correct content', function () {
     $filesystem = new Filesystem;
-    createDirectoryIfNotExits(lang_path('en/auth.php'));
+    createDirectoryIfNotExits(translation_lang_path('en/auth.php'));
     // Update to include nested folder
-    createDirectoryIfNotExits(lang_path('en/book/create.php'));
+    createDirectoryIfNotExits(translation_lang_path('en/book/create.php'));
 
     $translation = Translation::factory([
         'source' => true,
@@ -142,11 +142,11 @@ test('export creates a new translation file with the correct content', function 
     $translationsManager = new TranslationsManager($filesystem);
     $translationsManager->export();
 
-    $fileName = lang_path('en'.DIRECTORY_SEPARATOR.$translation->phrases[0]->file->name.'.'.$translation->phrases[0]->file->extension);
-    $nestedFileName = lang_path('en'.DIRECTORY_SEPARATOR.$nestedTranslation->phrases[0]->file->name.'.'.$nestedTranslation->phrases[0]->file->extension);
+    $fileName = translation_lang_path('en'.DIRECTORY_SEPARATOR.$translation->phrases[0]->file->name.'.'.$translation->phrases[0]->file->extension);
+    $nestedFileName = translation_lang_path('en'.DIRECTORY_SEPARATOR.$nestedTranslation->phrases[0]->file->name.'.'.$nestedTranslation->phrases[0]->file->extension);
 
-    $fileNameInDisk = File::allFiles(lang_path($translation->language->code))[0]->getPathname();
-    $nestedFileNameInDisk = File::allFiles(lang_path($nestedTranslation->language->code))[1]->getPathname();
+    $fileNameInDisk = File::allFiles(translation_lang_path($translation->language->code))[0]->getPathname();
+    $nestedFileNameInDisk = File::allFiles(translation_lang_path($nestedTranslation->language->code))[1]->getPathname();
 
     expect($fileName)->toBe($fileNameInDisk)
         ->and(File::get($fileName))
@@ -155,7 +155,7 @@ test('export creates a new translation file with the correct content', function 
         ->and(File::get($nestedFileName))
         ->toBe("<?php\n\nreturn ".VarExporter::export($nestedTranslation->phrases->pluck('value', 'key')->toArray(), VarExporter::TRAILING_COMMA_IN_ARRAY).';'.PHP_EOL);
 
-    File::deleteDirectory(lang_path());
+    File::deleteDirectory(translation_lang_path());
 });
 
 test('export can handle PHP translation files', function () {
@@ -191,15 +191,15 @@ test('export can handle PHP translation files', function () {
     $translationsManager = new TranslationsManager($filesystem);
     $translationsManager->export();
 
-    $path = lang_path('en'.DIRECTORY_SEPARATOR.'test.php');
-    $nestedPath = lang_path('en'.DIRECTORY_SEPARATOR.'book'.DIRECTORY_SEPARATOR.'create.php');
-    $pathInDisk = lang_path($translation->language->code.DIRECTORY_SEPARATOR.'test.php');
-    $nestedPathInDisk = lang_path($nestedTranslation->language->code.DIRECTORY_SEPARATOR.'book'.DIRECTORY_SEPARATOR.'create.php');
+    $path = translation_lang_path('en'.DIRECTORY_SEPARATOR.'test.php');
+    $nestedPath = translation_lang_path('en'.DIRECTORY_SEPARATOR.'book'.DIRECTORY_SEPARATOR.'create.php');
+    $pathInDisk = translation_lang_path($translation->language->code.DIRECTORY_SEPARATOR.'test.php');
+    $nestedPathInDisk = translation_lang_path($nestedTranslation->language->code.DIRECTORY_SEPARATOR.'book'.DIRECTORY_SEPARATOR.'create.php');
 
     expect(File::get($path))->toBe(File::get($pathInDisk))
         ->and(File::get($nestedPath))->toBe(File::get($nestedPathInDisk));
 
-    File::deleteDirectory(lang_path());
+    File::deleteDirectory(translation_lang_path());
 });
 
 test('export can handle JSON translation files', function () {
@@ -234,15 +234,15 @@ test('export can handle JSON translation files', function () {
     $translationsManager = new TranslationsManager($filesystem);
     $translationsManager->export();
 
-    $path = lang_path('en'.DIRECTORY_SEPARATOR.'test.json');
-    $nestedPath = lang_path('en'.DIRECTORY_SEPARATOR.'book'.DIRECTORY_SEPARATOR.'create.json');
-    $pathInDisk = lang_path($translation->language->code.DIRECTORY_SEPARATOR.'test.json');
-    $nestedPathInDisk = lang_path($nestedTranslation->language->code.DIRECTORY_SEPARATOR.'book'.DIRECTORY_SEPARATOR.'create.json');
+    $path = translation_lang_path('en'.DIRECTORY_SEPARATOR.'test.json');
+    $nestedPath = translation_lang_path('en'.DIRECTORY_SEPARATOR.'book'.DIRECTORY_SEPARATOR.'create.json');
+    $pathInDisk = translation_lang_path($translation->language->code.DIRECTORY_SEPARATOR.'test.json');
+    $nestedPathInDisk = translation_lang_path($nestedTranslation->language->code.DIRECTORY_SEPARATOR.'book'.DIRECTORY_SEPARATOR.'create.json');
 
     expect(File::get($path))->toBe(File::get($pathInDisk))
         ->and(File::get($nestedPath))->toBe(File::get($nestedPathInDisk));
 
-    File::deleteDirectory(lang_path());
+    File::deleteDirectory(translation_lang_path());
 });
 
 it('returns the correct list of parameters for a given phrase', function () {
@@ -254,5 +254,5 @@ it('returns the correct list of parameters for a given phrase', function () {
 });
 
 afterEach(function () {
-    File::deleteDirectory(lang_path());
+    File::deleteDirectory(translation_lang_path());
 });

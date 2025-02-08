@@ -122,3 +122,12 @@ if (! function_exists('currentUser')) {
         return auth('translations')->user();
     }
 }
+
+if (! function_exists('translation_lang_path')) {
+    function translation_lang_path($path = '') :string
+    {
+        $langPath = rtrim(config('translations.lang_path'), '/');
+        $path = trim($path);
+        return $path ? $langPath . '/' . $path : $langPath;
+    }
+}
