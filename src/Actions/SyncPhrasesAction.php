@@ -8,7 +8,7 @@ use Outhebox\TranslationsUI\Models\TranslationFile;
 
 class SyncPhrasesAction
 {
-    public static function execute(Translation $source, $key, $value, $locale, $file, bool $overwrite = true): void
+    public static function execute(Translation $source, string $key, $value, string $locale, string $file, bool $overwrite = true): void
     {
         if (is_array($value) && empty($value)) {
             return;
