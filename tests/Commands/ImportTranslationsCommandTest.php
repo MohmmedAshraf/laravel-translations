@@ -26,7 +26,7 @@ it('can import translations with same keys in diffent groups', function () {
         ]);
 
     createPhpLanguageFile('en/authors.php', [
-        'title' => 'Authors'
+        'title' => 'Authors',
     ]);
 
     createPhpLanguageFile('en/books.php', [
