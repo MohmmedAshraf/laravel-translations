@@ -44,7 +44,7 @@ class SyncPhrasesAction
         ], [
             'value' => (empty($value) ? null : $value),
             'parameters' => getPhraseParameters($value),
-            'phrase_id' => $translation->source ? null : $source->phrases()->where('key', $key)->first()?->id,
+            'phrase_id' => $translation->source ? null : $source->phrases()->where('key', $key)->where('group', $translationFile->name)->first()?->id,
         ]);
     }
 }
