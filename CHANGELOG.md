@@ -2,6 +2,14 @@
 
 All notable changes to `laravel-translations` will be documented in this file.
 
+## v1.2.1 - 2025-02-26
+
+### What's Changed
+
+* Allow import translations with same keys in different groups. by @caswd in https://github.com/MohmmedAshraf/laravel-translations/pull/155
+
+**Full Changelog**: https://github.com/MohmmedAshraf/laravel-translations/compare/1.2.0...1.2.1
+
 ## v1.2.0 - 2025-02-06
 
 ### What's Changed
@@ -272,11 +280,13 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
      
      
      
+     
      ```
    - Alternatively, manually uninstall using:
      
      ```bash
      composer remove outhebox/laravel-translations
+     
      
      
      
@@ -305,6 +315,7 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
    
      ```bash
      composer require outhebox/laravel-translations
+   
    
    
    
