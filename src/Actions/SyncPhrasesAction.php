@@ -8,7 +8,7 @@ use Outhebox\TranslationsUI\Models\TranslationFile;
 
 class SyncPhrasesAction
 {
-    public static function execute(Translation $source, $key, $value, $locale, $file, bool $overwrite = true): void
+    public static function execute(Translation $source, string $key, $value, string $locale, string $file, bool $overwrite = true): void
     {
         if (is_array($value) && empty($value)) {
             return;
@@ -43,8 +43,8 @@ class SyncPhrasesAction
             'translation_file_id' => $translationFile->id,
         ], [
             'value' => (empty($value) ? null : $value),
-            'parameters' => getPhraseParameters($value),
-            'phrase_id' => $translation->source ? null : $source->phrases()->where('key', $key)->first()?->id,
+            'parameters' => is_string($value) ? getPhraseParameters($value) : null,
+            'phrase_id' => $translation->source ? null : $source->phrases()->where('key', $key)->where('group', $translationFile->name)->first()?->id,
         ]);
     }
 }
