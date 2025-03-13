@@ -77,4 +77,9 @@ export default defineConfig({
             ],
         }),
     ],
+	build: {
+		manifest: true,
+            // ... other build options
+    }
 })
+
