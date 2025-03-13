@@ -19,15 +19,8 @@
             "role": "Developer"
         }
     ],
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/laravel-shift/momentum-modal"
-        }
-    ],
     "require": {
         "php": "^8.2|^8.3",
-        "based/momentum-modal": "dev-l12-compatibility as 0.4.0",
         "brick/varexporter": "^0.6.0",
         "inertiajs/inertia-laravel": "^2.0",
         "spatie/laravel-package-tools": "^1.0",
@@ -80,6 +73,6 @@
             }
         }
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true
 }
