@@ -31,12 +31,12 @@ class TranslationController extends BaseController
         try {
             app(TranslationsManager::class)->export();
 
-            return redirect()->route('ltu.translation.index')->with('notification', [
+            return back()->with('notification', [
                 'type' => 'success',
                 'body' => 'Translations have been exported successfully',
             ]);
         } catch (Exception $e) {
-            return redirect()->route('ltu.translation.index')->with('notification', [
+            return back()->with('notification', [
                 'type' => 'error',
                 'body' => $e->getMessage(),
             ]);
