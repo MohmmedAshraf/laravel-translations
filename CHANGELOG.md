@@ -2,6 +2,18 @@
 
 All notable changes to `laravel-translations` will be documented in this file.
 
+## v1.3.1 - 2025-07-11
+
+### What's Changed
+
+* fix: freezing after save on translation page by @djgiant in https://github.com/MohmmedAshraf/laravel-translations/pull/166
+
+### New Contributors
+
+* @djgiant made their first contribution in https://github.com/MohmmedAshraf/laravel-translations/pull/166
+
+**Full Changelog**: https://github.com/MohmmedAshraf/laravel-translations/compare/1.3.0...1.3.1
+
 ## v1.3.0 - 2025-03-13
 
 ### What's Changed
@@ -297,11 +309,13 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
      
      
      
+     
      ```
    - Alternatively, manually uninstall using:
      
      ```bash
      composer remove outhebox/laravel-translations
+     
      
      
      
@@ -332,6 +346,7 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
    
      ```bash
      composer require outhebox/laravel-translations
+   
    
    
    
