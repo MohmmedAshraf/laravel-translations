@@ -62,6 +62,11 @@ class PhraseController extends BaseController
             ->paginate($request->input('perPage') ?? 12)
             ->withQueryString();
 
+        $translation = $translation
+            ->withCount('phrases')
+            ->withProgress()
+            ->first();
+
         return Inertia::render('phrases/index', [
             'phrases' => PhraseResource::collection($phrases),
             'translation' => TranslationResource::make($translation),
