@@ -59,7 +59,7 @@ const isAllSelected = computed(() => selectedIds.value.length === Object.keys(pr
     <Head title="Translations" />
 
     <LayoutDashboard>
-        <div class="mx-auto max-w-7xl px-6 py-10 lg:px-8">
+        <div class="mx-auto max-w-7xl px-6 py-4 lg:px-8">
             <div v-if="sourceTranslation" class="w-full">
                 <div class="w-auto">
                     <InputText v-model="searchQuery" placeholder="Search languages by name or code" />

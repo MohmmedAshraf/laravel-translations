@@ -2,12 +2,11 @@
 
 namespace Outhebox\TranslationsUI\Http\Middleware;
 
+use Inertia\Middleware;
+use Tighten\Ziggy\Ziggy;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Inertia\Middleware;
 use Outhebox\TranslationsUI\Http\Resources\ContributorResource;
-use Outhebox\TranslationsUI\Models\Contributor;
-use Tighten\Ziggy\Ziggy;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -38,17 +37,13 @@ class HandleInertiaRequests extends Middleware
 
     protected function auth(): array
     {
-        if (! Auth::guard('translations')->check()) {
+        if (! Auth::check()) {
             return [
                 'user' => null,
             ];
         }
 
-        $user = Auth::guard('translations')->user();
-
-        if (! $user instanceof Contributor) {
-            return [];
-        }
+        $user = Auth::user();
 
         return [
             'user' => new ContributorResource($user),

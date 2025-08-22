@@ -54,7 +54,6 @@ declare module 'vue' {
     InputText: typeof import('./../../views/components/form/input-text.vue')['default']
     InputTextarea: typeof import('./../../views/components/form/input-textarea.vue')['default']
     LayoutDashboard: typeof import('@/views/layouts/dashboard/layout-dashboard.vue')['default']
-    LayoutGuest: typeof import('@/views/layouts/guest/layout-guest.vue')['default']
     Link: typeof import('@inertiajs/vue3')['Link']
     Logo: typeof import('./../../views/components/logo.vue')['default']
     MachineTranslate: typeof import('./../../views/components/phrase/suggestions/machine-translate.vue')['default']

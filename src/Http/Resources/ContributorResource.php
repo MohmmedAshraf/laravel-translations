@@ -16,10 +16,6 @@ class ContributorResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'role' => [
-                'value' => $this->role->value,
-                'label' => $this->role->label(),
-            ],
             'email' => $this->email,
             'avatar' => $this->avatar,
             'created_at' => $this->created_at,

@@ -119,6 +119,6 @@ if (! function_exists('setArrayValue')) {
 if (! function_exists('currentUser')) {
     function currentUser(): null|Authenticatable|Contributor
     {
-        return auth('translations')->user();
+        return auth()->user();
     }
 }
