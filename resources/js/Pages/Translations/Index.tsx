@@ -6,6 +6,7 @@ import { Language, PageProps, Translation } from '@/types';
 import LanguageTag from "@/Components/Language/LanguageTag";
 import IconTranslate from "@/Components/Icons/IconTranslate";
 import AddTranslations from "@/Pages/Modals/AddTranslations";
+import PublishTranslations from "@/Pages/Modals/PublishTranslations";
 import IconEmptyTranslations from "@/Components/Icons/IconEmptyTranslations";
 import {
     Button,
@@ -32,8 +33,12 @@ interface DataType {
 
 const TranslationsIndex: React.FC<PageProps<{ translations: Translation[], languages: Language[] }>> = ({ auth, translations, languages }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
     const [confirmLoading, setConfirmLoading] = useState(false);
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+
+    const canPublish = translations.some(t => !t.source);
+    const isProductionEnv = process.env.NODE_ENV === 'production';
 
     const rowSelection: TableProps<DataType>['rowSelection'] = {
         onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
@@ -277,6 +282,23 @@ const TranslationsIndex: React.FC<PageProps<{ translations: Translation[], langu
         >
             <Head title="Translations" />
 
+            <div className="mb-4 flex justify-end gap-2">
+                <Button
+                    type="primary"
+                    onClick={() => setIsPublishModalOpen(true)}
+                    disabled={!canPublish}
+                >
+                    Publish Translations
+                </Button>
+                <Button
+                    type="default"
+                    onClick={() => setIsModalOpen(true)}
+                    icon={<PlusIcon className="size-5" />}
+                >
+                    Add Language
+                </Button>
+            </div>
+
             <div className="rounded-lg shadow overflow-hidden mx-auto">
                 <Table
                     bordered
@@ -332,6 +354,13 @@ const TranslationsIndex: React.FC<PageProps<{ translations: Translation[], langu
                 languages={languages}
                 isModalOpen={isModalOpen}
                 setIsModalOpen={setIsModalOpen}
+            />
+
+            <PublishTranslations
+                isOpen={isPublishModalOpen}
+                onClose={() => setIsPublishModalOpen(false)}
+                canPublish={canPublish}
+                isProductionEnv={isProductionEnv}
             />
         </DashboardLayout>
     );
