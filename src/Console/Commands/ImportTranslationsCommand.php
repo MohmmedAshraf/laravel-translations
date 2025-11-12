@@ -139,7 +139,12 @@ class ImportTranslationsCommand extends Command
         $source->load('phrases.translation', 'phrases.file');
 
         $source->phrases->each(function ($phrase) use ($translation, $locale) {
-            if (! $translation->phrases()->where('key', $phrase->key)->where('group', $phrase->group)->first()) {
+            $shouldFilterByGroup = $phrase->group !== config('translations.source_language');
+            if (
+                ! $translation->phrases()->where('key', $phrase->key)
+                    ->when($shouldFilterByGroup, fn ($query) => $query->where('group', $phrase->group))
+                    ->first()
+            ) {
                 $fileName = $phrase->file->name.'.'.$phrase->file->extension;
 
                 if ($phrase->file->name === config('translations.source_language')) {
