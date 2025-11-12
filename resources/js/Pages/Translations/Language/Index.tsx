@@ -1,13 +1,17 @@
-import React from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Head, Link, router } from "@inertiajs/react";
 import IconKey from "@/Components/Icons/IconKey";
-import { PageProps, Phrase, PhrasePagination, Translation } from "@/types";
+import { PageProps, Phrase, PhrasePagination, Translation, TranslationFile } from "@/types";
 import DashboardLayout from '@/Layouts/DashboardLayout';
 import IconEmptyTranslations from "@/Components/Icons/IconEmptyTranslations";
 import {
     Button,
     Empty,
+    Input,
     Popover,
+    Select,
+    Space,
+    Spin,
     Table,
     TableColumnsType,
     TableProps,
@@ -18,6 +22,7 @@ import { PencilIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import CountryFlag from "@/Components/Language/Flag";
 import { ArrowRightIcon } from "@heroicons/react/16/solid";
 import RenderPhraseWithParameters from "@/Components/Phrase/RenderPhraseWithParameters"
+import { CheckIcon, GlobeIcon } from "@heroicons/react/16/solid";
 
 export interface DataType {
     key: React.Key;
@@ -43,23 +48,89 @@ const rowSelection: TableProps<DataType>['rowSelection'] = {
     },
 };
 
+export interface PhraseFilter {
+    keyword?: string;
+    status?: "translated" | "untranslated";
+    translationFile?: number;
+}
+
 export interface Props {
     auth: PageProps['auth'];
     phrases: PhrasePagination;
     translation: Translation;
-    files: any;
-    filter: any;
+    files: TranslationFile[];
+    filter: PhraseFilter;
 }
 
 const LanguageIndex: React.FC<Props> = ({ auth, phrases, translation, files, filter }) => {
-    const handleTableChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter, extra) => {
-        router.get(route('ltu.phrases.index', { translation: translation.id }), {
-            page: pagination.current,
-            per_page: pagination.pageSize,
-        }, {
-            preserveState: true,
-            replace: true,
-        });
+    const [searchField, setSearchField] = useState<string>(filter.keyword || "");
+    const [phraseStatus, setPhraseStatus] = useState<string | undefined>(filter.status);
+    const [phraseTranslationFile, setPhraseTranslationFile] = useState<number | undefined>(filter.translationFile);
+    const [loading, setLoading] = useState(false);
+
+    const debounceTimer = React.useRef<NodeJS.Timeout | null>(null);
+
+    const translationFiles = files.map((file) => ({
+        value: file.id,
+        label: `${file.name}.${file.extension}`,
+    }));
+
+    const handleFilterChange = useCallback(() => {
+        setLoading(true);
+        
+        const newFilter: any = {};
+        if (searchField) newFilter.keyword = searchField;
+        if (phraseStatus) newFilter.status = phraseStatus;
+        if (phraseTranslationFile) newFilter.translationFile = phraseTranslationFile;
+
+        router.get(
+            route("ltu.phrases.index", [translation.id]),
+            {
+                filter: Object.keys(newFilter).length > 0 ? newFilter : undefined,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                only: ["phrases"],
+                onFinish: () => setLoading(false),
+            }
+        );
+    }, [searchField, phraseStatus, phraseTranslationFile, translation.id]);
+
+    useEffect(() => {
+        if (debounceTimer.current) {
+            clearTimeout(debounceTimer.current);
+        }
+
+        debounceTimer.current = setTimeout(() => {
+            handleFilterChange();
+        }, 300);
+
+        return () => {
+            if (debounceTimer.current) {
+                clearTimeout(debounceTimer.current);
+            }
+        };
+    }, [searchField, phraseStatus, phraseTranslationFile, handleFilterChange]);
+    const handleTableChange: TableProps<DataType>['onChange'] = (pagination) => {
+        const newFilter: any = {};
+        if (searchField) newFilter.keyword = searchField;
+        if (phraseStatus) newFilter.status = phraseStatus;
+        if (phraseTranslationFile) newFilter.translationFile = phraseTranslationFile;
+
+        router.get(
+            route("ltu.phrases.index", [translation.id]),
+            {
+                page: pagination.current,
+                per_page: pagination.pageSize,
+                filter: Object.keys(newFilter).length > 0 ? newFilter : undefined,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                only: ["phrases"],
+            }
+        );
     };
 
     const columns: TableColumnsType<DataType> = [
@@ -134,19 +205,17 @@ const LanguageIndex: React.FC<Props> = ({ auth, phrases, translation, files, fil
         key: phrase.uuid,
         uuid: phrase.uuid,
         state: (
-            <Link href={route('ltu.phrases.edit', { translation: translation.id, phrase: phrase.uuid })} className="w-full h-full flex p-4">
-                <div className="w-full flex items-center justify-center">
-                    {phrase.value ? (
-                        <div className="flex items-center justify-center size-5 bg-green-50 rounded-full">
-                            <div className="size-2 bg-green-400 rounded-full"></div>
-                        </div>
-                    ) : (
-                        <div className="flex items-center justify-center size-5 bg-red-50 rounded-full">
-                            <div className="size-2 bg-red-400 rounded-full"></div>
-                        </div>
-                    )}
-                </div>
-            </Link>
+            <div className="flex items-center justify-center w-full">
+                {phrase.value ? (
+                    <Tooltip title="Translated">
+                        <CheckIcon className="size-5 text-green-600" />
+                    </Tooltip>
+                ) : (
+                    <Tooltip title="Untranslated">
+                        <GlobeIcon className="size-5 text-gray-500" />
+                    </Tooltip>
+                )}
+            </div>
         ),
         value: (
             <Link href={route('ltu.phrases.edit', { translation: translation.id, phrase: phrase.uuid })} className="w-full h-full flex p-4">
@@ -218,8 +287,44 @@ const LanguageIndex: React.FC<Props> = ({ auth, phrases, translation, files, fil
                 </>
             }
         >
-            <Head title={translation.language.name} />
+            <Head title={`${translation.language.name} - Phrases`} />
 
+            {/* Filters */}
+            <div className="mb-4 rounded-lg bg-white p-4 shadow">
+                <Space wrap style={{ width: "100%" }}>
+                    <Input
+                        placeholder="Search by key or value"
+                        value={searchField}
+                        onChange={(e) => setSearchField(e.target.value)}
+                        style={{ width: 250 }}
+                        allowClear
+                    />
+                    
+                    <Select
+                        placeholder="Filter by status"
+                        style={{ width: 150 }}
+                        value={phraseStatus || undefined}
+                        onChange={setPhraseStatus}
+                        allowClear
+                        options={[
+                            { label: "Translated", value: "translated" },
+                            { label: "Untranslated", value: "untranslated" },
+                        ]}
+                    />
+
+                    <Select
+                        placeholder="Filter by file"
+                        style={{ width: 200 }}
+                        value={phraseTranslationFile || undefined}
+                        onChange={setPhraseTranslationFile}
+                        allowClear
+                        options={translationFiles}
+                    />
+                </Space>
+            </div>
+
+            {/* Table */}
+            <Spin spinning={loading}>
             <div className="rounded-lg shadow overflow-hidden mx-auto">
                 <Table
                     bordered
@@ -265,6 +370,7 @@ const LanguageIndex: React.FC<Props> = ({ auth, phrases, translation, files, fil
                     }}>
                 </Table>
             </div>
+            </Spin>
         </DashboardLayout>
     );
 }
