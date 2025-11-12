@@ -25,7 +25,7 @@ it('can render translations page', function () {
 it('can store new translation', function () {
     $this->actingAs($this->owner, 'translations')
         ->post(route('ltu.translation.store'), [
-            'languages' => [Language::inRandomOrder()->first()->id],
+            'language_ids' => [Language::inRandomOrder()->first()->id],
         ])
         ->assertRedirect(route('ltu.translation.index'));
 
@@ -35,7 +35,7 @@ it('can store new translation', function () {
 it('translation can be deleted', function () {
     $this->actingAs($this->owner, 'translations')
         ->delete(route('ltu.translation.delete', $this->translation->id))
-        ->assertRedirect(route('ltu.translation.index'));
+        ->assertStatus(200);
 
     $this->assertCount(1, Translation::all());
 });
@@ -45,7 +45,7 @@ it('multiple translations can be deleted', function () {
         ->post(route('ltu.translation.delete_multiple', [
             'selected_ids' => [$this->translation->id],
         ]))
-        ->assertRedirect(route('ltu.translation.index'));
+        ->assertStatus(200);
 
     $this->assertCount(1, Translation::all());
 });

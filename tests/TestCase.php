@@ -59,6 +59,7 @@ class TestCase extends Orchestra
 
     public function getEnvironmentSetUp($app): void
     {
+        config()->set('app.key', 'base64:'.base64_encode('Dred1234567890123456789012345678'));
         config()->set('cache.default', 'array');
         config()->set('inertia.testing.ensure_pages_exist', false);
 

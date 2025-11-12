@@ -34,7 +34,7 @@ it('can render phrases page', function () {
 
 it('can update phrase', function () {
     $this->actingAs($this->owner, 'translations')
-        ->post(route('ltu.phrases.update', [
+        ->put(route('ltu.phrases.update', [
             'phrase' => $this->phrase->uuid,
             'translation' => $this->translation->id,
         ]), [
