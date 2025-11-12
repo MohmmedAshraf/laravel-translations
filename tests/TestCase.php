@@ -46,8 +46,8 @@ class TestCase extends Orchestra
     protected function refreshTestDatabase(): void
     {
         if (! RefreshDatabaseState::$migrated) {
-            //$this->artisan('vendor:publish', ['--tag' => 'mixpost-migrations', '--force' => true])->run();
-            //$this->artisan('migrate:fresh', $this->migrateFreshUsing());
+            // $this->artisan('vendor:publish', ['--tag' => 'mixpost-migrations', '--force' => true])->run();
+            // $this->artisan('migrate:fresh', $this->migrateFreshUsing());
 
             $this->app[Kernel::class]->setArtisan(null);
 

@@ -73,6 +73,6 @@ return [
     |
     */
     'exclude_files' => [
-        //'validation.php', // Exclude default validation for example.
+        // 'validation.php', // Exclude default validation for example.
     ],
 ];
