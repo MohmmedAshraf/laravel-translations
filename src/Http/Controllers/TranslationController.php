@@ -12,6 +12,7 @@ use Inertia\Response;
 use Outhebox\TranslationsUI\Actions\CreateTranslationForLanguageAction;
 use Outhebox\TranslationsUI\Http\Resources\LanguageResource;
 use Outhebox\TranslationsUI\Http\Resources\TranslationResource;
+use Outhebox\TranslationsUI\Modal;
 use Outhebox\TranslationsUI\Models\Language;
 use Outhebox\TranslationsUI\Models\Translation;
 

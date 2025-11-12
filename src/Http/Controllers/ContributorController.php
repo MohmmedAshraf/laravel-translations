@@ -9,11 +9,11 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
-use Momentum\Modal\Modal;
 use Outhebox\TranslationsUI\Enums\RoleEnum;
 use Outhebox\TranslationsUI\Http\Resources\ContributorResource;
 use Outhebox\TranslationsUI\Http\Resources\InviteResource;
 use Outhebox\TranslationsUI\Mail\InviteCreated;
+use Outhebox\TranslationsUI\Modal;
 use Outhebox\TranslationsUI\Models\Contributor;
 use Outhebox\TranslationsUI\Models\Invite;
 
