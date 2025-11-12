@@ -22,7 +22,7 @@ import { PencilIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import CountryFlag from "@/Components/Language/Flag";
 import { ArrowRightIcon } from "@heroicons/react/16/solid";
 import RenderPhraseWithParameters from "@/Components/Phrase/RenderPhraseWithParameters"
-import { CheckIcon, GlobeIcon } from "@heroicons/react/16/solid";
+import { CheckIcon, GlobeAltIcon } from "@heroicons/react/16/solid";
 
 export interface DataType {
     key: React.Key;
@@ -212,7 +212,7 @@ const LanguageIndex: React.FC<Props> = ({ auth, phrases, translation, files, fil
                     </Tooltip>
                 ) : (
                     <Tooltip title="Untranslated">
-                        <GlobeIcon className="size-5 text-gray-500" />
+                        <GlobeAltIcon className="size-5 text-gray-500" />
                     </Tooltip>
                 )}
             </div>

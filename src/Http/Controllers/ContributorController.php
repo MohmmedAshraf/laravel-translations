@@ -21,7 +21,7 @@ class ContributorController extends BaseController
 {
     public function index(): Response
     {
-        return Inertia::render('contributor/index', [
+        return Inertia::render('Contributor/Index', [
             'invited' => InviteResource::collection(Invite::paginate(10)),
             'contributors' => ContributorResource::collection(Contributor::paginate(10)),
         ]);
@@ -29,7 +29,7 @@ class ContributorController extends BaseController
 
     public function create(): Modal
     {
-        return Inertia::modal('contributor/modals/invite', [
+        return Inertia::modal('Contributor/InviteModal', [
             'roles' => RoleEnum::toSelectArray(),
         ])->baseRoute('ltu.contributors.index');
     }

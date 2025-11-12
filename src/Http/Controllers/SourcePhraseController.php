@@ -57,7 +57,7 @@ class SourcePhraseController extends BaseController
             $files[] = TranslationFile::where('id', $value->translation_file_id)->first();
         }
 
-        return Inertia::modal('source/modals/add-source-key', [
+        return Inertia::modal('Modals/AddSourceKeyModal', [
             'files' => TranslationFileResource::collection(collect($files)),
         ])->baseRoute('ltu.source_translation');
     }
@@ -100,7 +100,7 @@ class SourcePhraseController extends BaseController
             $files[] = TranslationFile::where('id', $value->translation_file_id)->first();
         }
 
-        return Inertia::render('source/edit', [
+        return Inertia::render('Translations/Source/Edit', [
             'phrase' => PhraseResource::make($phrase),
             'translation' => TranslationResource::make($phrase->translation),
             'source' => TranslationResource::make($phrase->translation),
