@@ -17,12 +17,17 @@ class TranslationResource extends JsonResource
 
     public function toArray($request): array
     {
+        $progress = null;
+        if (isset($this->progress)) {
+            $progress = $this->progress > 0 ? number_format($this->progress, 2) : 0;
+        }
+
         return [
             'id' => $this->id,
             'source' => $this->source,
             'phrases_count' => $this->phrases_count ?? 0,
             'language' => LanguageResource::make($this->whenLoaded('language')),
-            'progress' => $this->when($this->progress !== null, fn () => $this->progress > 0 ? number_format($this->progress, 2) : 0),
+            'progress' => $progress,
         ];
     }
 
