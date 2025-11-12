@@ -1,6 +1,8 @@
 import React, {useState} from "react";
-import {Head, useForm} from '@inertiajs/react';
+import {Head, useForm, Link as InertiaLink} from '@inertiajs/react';
 import CountryFlag from "@/Components/Language/Flag";
+// @ts-ignore
+import { useSpeechSynthesis } from 'react-speech-kit';
 import {
     Alert,
     Button,
@@ -44,10 +46,24 @@ export interface Props {
 
 const PhraseForm = ({ auth, translation, phrase, similarPhrases, suggestedTranslations }: Props) => {
     const [componentKey, setComponentKey] = useState(0);
+    const { speak, cancel, speaking } = useSpeechSynthesis();
 
     const { data, setData, put, processing, errors } = useForm({
         phrase: phrase.value || '',
     });
+
+    const handleCopySuggestion = (value: string) => {
+        setData('phrase', value);
+        message.success('Suggestion copied to translation');
+    };
+
+    const handleSpeakSuggestion = (value: string) => {
+        if (speaking) {
+            cancel();
+        } else {
+            speak({ text: value });
+        }
+    };
 
     const tabItems: TabItem[] = [
         {
@@ -74,10 +90,20 @@ const PhraseForm = ({ auth, translation, phrase, similarPhrases, suggestedTransl
                                 <span className="text-gray-700">{suggestion.value}</span>
                             </div>
                             <div className="flex divide-x">
-                                <button className="flex w-14 items-center justify-center px-4 py-3 text-gray-400 transition-colors duration-100 hover:bg-blue-100 hover:text-blue-600 v-popper--has-tooltip">
+                                <button
+                                    onClick={() => handleCopySuggestion(suggestion.value)}
+                                    type="button"
+                                    className="flex w-14 items-center justify-center px-4 py-3 text-gray-400 transition-colors duration-100 hover:bg-blue-100 hover:text-blue-600"
+                                    title="Copy to translation"
+                                >
                                     <IconTranslate className="size-6" />
                                 </button>
-                                <button className="flex w-14 items-center justify-center px-4 py-3 text-gray-400 transition-colors duration-100 hover:bg-blue-100 hover:text-blue-600 v-popper--has-tooltip">
+                                <button
+                                    onClick={() => handleSpeakSuggestion(suggestion.value)}
+                                    type="button"
+                                    className="flex w-14 items-center justify-center px-4 py-3 text-gray-400 transition-colors duration-100 hover:bg-blue-100 hover:text-blue-600"
+                                    title="Listen to suggestion"
+                                >
                                     <IconSpeak className="size-6" />
                                 </button>
                             </div>
@@ -138,9 +164,16 @@ const PhraseForm = ({ auth, translation, phrase, similarPhrases, suggestedTransl
                                 )}
                             </div>
                             <div className="flex divide-x">
-                                <button className="flex size-14 items-center justify-center px-4 py-3 text-gray-400 transition-colors duration-100 hover:bg-blue-100 hover:text-blue-600 v-popper--has-tooltip">
+                                <InertiaLink
+                                    href={route('ltu.phrases.edit', {
+                                        translation: translation.id,
+                                        phrase: similarPhrase.uuid
+                                    })}
+                                    className="flex size-14 items-center justify-center px-4 py-3 text-gray-400 transition-colors duration-100 hover:bg-blue-100 hover:text-blue-600"
+                                    title="Edit this phrase"
+                                >
                                     <PencilIcon className="size-5" />
-                                </button>
+                                </InertiaLink>
                             </div>
                         </div>
                     ))}
@@ -294,14 +327,12 @@ const PhraseForm = ({ auth, translation, phrase, similarPhrases, suggestedTransl
                     </div>
 
                     <div className="grid border-t border-blue-100 grid-cols-2">
-                        <Button
-                            href="#"
-                            size="large"
-                            disabled={processing}
-                            className="rounded-none h-12 border-none text-gray-400 border-gray-200 py-6"
+                        <InertiaLink
+                            href={route('ltu.phrases.index', [translation.id])}
+                            className="flex items-center justify-center rounded-none h-12 border-none text-gray-400 border-gray-200 py-6 hover:bg-gray-50 disabled:opacity-50"
                         >
                             Cancel
-                        </Button>
+                        </InertiaLink>
 
                         <Button
                             size="large"

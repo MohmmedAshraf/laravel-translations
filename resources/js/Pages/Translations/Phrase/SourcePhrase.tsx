@@ -37,15 +37,22 @@ const SourcePhrase: React.FC<Props> = ({ phrase, translation }) => {
                 </div>
 
                 <div className="flex items-center divide-x border-l">
-                    <button type="button" className="group h-full p-3 hover:bg-blue-50">
+                    <button
+                        type="button"
+                        onClick={() => {
+                            navigator.clipboard.writeText(phrase?.value || '');
+                        }}
+                        className="group h-full p-3 hover:bg-blue-50"
+                        title="Copy to clipboard"
+                    >
                         <ClipboardIcon className="size-5 text-gray-400 group-hover:text-blue-600" />
                     </button>
 
-                    <Link href="#" type="button" className="group h-full p-3 hover:bg-blue-50">
+                    <Link href={route('ltu.source_translation.edit', phrase.uuid)} className="group h-full p-3 hover:bg-blue-50">
                         <PencilIcon className="size-5 text-gray-400 group-hover:text-blue-600" />
                     </Link>
 
-                    <button type="button" className="group h-full p-3 hover:bg-red-50">
+                    <button type="button" className="group h-full p-3 hover:bg-red-50" title="Delete">
                         <TrashIcon className="size-5 text-gray-400 group-hover:text-red-600" />
                     </button>
                 </div>

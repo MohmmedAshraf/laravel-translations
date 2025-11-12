@@ -15,7 +15,7 @@ const PhraseHeader: React.FC<Props> = ({ phrase, translation }) => {
         <>
             <div className="flex w-full items-center">
                 <div className="flex w-full items-center gap-3 py-4">
-                    <Link href="#" className="flex items-center gap-2 rounded-md border border-transparent bg-gray-50 px-2 py-1 hover:border-blue-400 hover:bg-blue-100">
+                    <Link href={route('ltu.phrases.index', [translation.id])} className="flex items-center gap-2 rounded-md border border-transparent bg-gray-50 px-2 py-1 hover:border-blue-400 hover:bg-blue-100">
                         <div className="h-5 shrink-0">
                             <CountryFlag countryCode={translation.language.code} />
                         </div>
@@ -31,7 +31,7 @@ const PhraseHeader: React.FC<Props> = ({ phrase, translation }) => {
                 </div>
             </div>
 
-            <Link href="#" className="flex size-10 items-center justify-center rounded-full bg-gray-100 p-1 hover:bg-gray-200">
+            <Link href={route('ltu.phrases.index', [translation.id])} className="flex size-10 items-center justify-center rounded-full bg-gray-100 p-1 hover:bg-gray-200">
                 <ChevronRightIcon className="size-6 text-gray-400" />
             </Link>
         </>
