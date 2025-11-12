@@ -59,6 +59,7 @@ class TestCase extends Orchestra
 
     public function getEnvironmentSetUp($app): void
     {
+        config()->set('cache.default', 'array');
         config()->set('inertia.testing.ensure_pages_exist', false);
 
         $migration = include __DIR__.'/../database/migrations/create_languages_table.php';

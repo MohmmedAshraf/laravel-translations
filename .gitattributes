@@ -7,9 +7,9 @@
 /.gitignore         export-ignore
 /phpunit.xml.dist   export-ignore
 /art                export-ignore
-/screenshots        export-ignore
 /docs               export-ignore
 /tests              export-ignore
+/workbench          export-ignore
 /.editorconfig      export-ignore
 /.php_cs.dist.php   export-ignore
 /psalm.xml          export-ignore
@@ -18,4 +18,3 @@
 /UPGRADING.md       export-ignore
 /phpstan.neon.dist  export-ignore
 /phpstan-baseline.neon  export-ignore
-*.vue linguist-detectable=false
