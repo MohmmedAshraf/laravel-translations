@@ -46,11 +46,27 @@ class ImportTranslationsCommand extends Command
             $this->overwrite = false;
         }
 
-        $translation = $this->createOrGetSourceLanguage();
+        $sourceTranslation = $this->createOrGetSourceLanguage();
 
         $this->info('Importing translations...'.PHP_EOL);
 
-        $this->withProgressBar($this->manager->getLocales(), function ($locale) use ($translation) {
+        $this->withProgressBar($this->manager->getLocales(), function ($locale) use ($sourceTranslation) {
+            if ($locale === config('translations.source_language')) {
+                $this->syncTranslations($sourceTranslation, $locale);
+                return;
+            }
+
+            $language = Language::where('code', $locale)->first();
+
+            if (! $language) {
+                return;
+            }
+
+            $translation = Translation::firstOrCreate([
+                'language_id' => $language->id,
+                'source' => false,
+            ]);
+
             $this->syncTranslations($translation, $locale);
         });
     }
@@ -158,3 +174,4 @@ class ImportTranslationsCommand extends Command
         });
     }
 }
+
