@@ -53,6 +53,7 @@ class ImportTranslationsCommand extends Command
         $this->withProgressBar($this->manager->getLocales(), function ($locale) use ($sourceTranslation) {
             if ($locale === config('translations.source_language')) {
                 $this->syncTranslations($sourceTranslation, $locale);
+
                 return;
             }
 
@@ -174,4 +175,3 @@ class ImportTranslationsCommand extends Command
         });
     }
 }
-
