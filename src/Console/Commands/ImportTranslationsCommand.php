@@ -21,6 +21,8 @@ class ImportTranslationsCommand extends Command
 
     private bool $overwrite = true;
 
+    private ?Translation $sourceTranslation = null;
+
     protected $signature = 'translations:import {--F|fresh : Truncate all translations and phrases before importing} {--no-overwrite : Do not overwrite existing translations}';
 
     protected $description = 'Sync translation all keys from the translation files to the database';
@@ -46,14 +48,12 @@ class ImportTranslationsCommand extends Command
             $this->overwrite = false;
         }
 
-        $sourceTranslation = $this->createOrGetSourceLanguage();
+        $this->sourceTranslation = $this->createOrGetSourceLanguage();
 
         $this->info('Importing translations...'.PHP_EOL);
 
-        $this->withProgressBar($this->manager->getLocales(), function ($locale) use ($sourceTranslation) {
+        $this->withProgressBar($this->manager->getLocales(), function ($locale) {
             if ($locale === config('translations.source_language')) {
-                $this->syncTranslations($sourceTranslation, $locale);
-
                 return;
             }
 
@@ -131,9 +131,11 @@ class ImportTranslationsCommand extends Command
 
     public function syncTranslations(Translation $translation, string $locale): void
     {
+        $source = $this->sourceTranslation ?? $translation;
+
         foreach ($this->manager->getTranslations($locale) as $file => $translations) {
             foreach (Arr::dot($translations) as $key => $value) {
-                SyncPhrasesAction::execute($translation, $key, $value, $locale, $file, $this->overwrite);
+                SyncPhrasesAction::execute($source, $key, $value, $locale, $file, $this->overwrite);
             }
         }
 
@@ -141,7 +143,7 @@ class ImportTranslationsCommand extends Command
             return;
         }
 
-        $this->syncMissingTranslations($translation, $locale);
+        $this->syncMissingTranslations($source, $locale);
     }
 
     public function syncMissingTranslations(Translation $source, string $locale): void
