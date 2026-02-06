@@ -81,6 +81,9 @@ class TestCase extends Orchestra
 
         $migration = include __DIR__.'/../database/migrations/add_is_root_to_translation_files_table.php';
         $migration->up();
+
+        $migration = include __DIR__.'/../database/migrations/update_phrases_table.php';
+        $migration->up();
     }
 
     protected function getPackageProviders($app): array
