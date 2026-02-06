@@ -3,9 +3,9 @@
 namespace Outhebox\TranslationsUI\Tests\Http\Controllers;
 
 use Illuminate\Support\Facades\Hash;
-use Outhebox\TranslationsUI\Tests\TestCase;
-use Outhebox\TranslationsUI\Models\Contributor;
 use Outhebox\TranslationsUI\Enums\RoleEnum;
+use Outhebox\TranslationsUI\Models\Contributor;
+use Outhebox\TranslationsUI\Tests\TestCase;
 
 class PasswordUpdateTest extends TestCase
 {
