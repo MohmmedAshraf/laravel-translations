@@ -36,6 +36,7 @@ class SyncPhrasesAction
         ]);
 
         $key = config('translations.include_file_in_key') && ! $isRoot ? "{$translationFile->name}.{$key}" : $key;
+        $group = $isRoot && config('translations.source_language') !== $locale ? $source->language->code : $translationFile->name;
         $method = $overwrite ? 'updateOrCreate' : 'firstOrCreate';
         $translation->phrases()->$method([
             'key' => $key,
@@ -43,8 +44,8 @@ class SyncPhrasesAction
             'translation_file_id' => $translationFile->id,
         ], [
             'value' => (empty($value) ? null : $value),
-            'parameters' => getPhraseParameters($value),
-            'phrase_id' => $translation->source ? null : $source->phrases()->where('key', $key)->where('group', $translationFile->name)->first()?->id,
+            'parameters' => is_string($value) ? getPhraseParameters($value) : null,
+            'phrase_id' => $translation->source ? null : $source->phrases()->where('key', $key)->where('group', $group)->first()?->id,
         ]);
     }
 }
