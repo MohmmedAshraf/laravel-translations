@@ -8,10 +8,10 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 use Inertia\Inertia;
 use Inertia\Response;
-use Momentum\Modal\Modal;
 use Outhebox\TranslationsUI\Actions\CreateTranslationForLanguageAction;
 use Outhebox\TranslationsUI\Http\Resources\LanguageResource;
 use Outhebox\TranslationsUI\Http\Resources\TranslationResource;
+use Outhebox\TranslationsUI\Modal;
 use Outhebox\TranslationsUI\Models\Language;
 use Outhebox\TranslationsUI\Models\Translation;
 use Outhebox\TranslationsUI\TranslationsManager;
@@ -31,12 +31,12 @@ class TranslationController extends BaseController
         try {
             app(TranslationsManager::class)->export();
 
-            return redirect()->route('ltu.translation.index')->with('notification', [
+            return back()->with('notification', [
                 'type' => 'success',
                 'body' => 'Translations have been exported successfully',
             ]);
         } catch (Exception $e) {
-            return redirect()->route('ltu.translation.index')->with('notification', [
+            return back()->with('notification', [
                 'type' => 'error',
                 'body' => $e->getMessage(),
             ]);

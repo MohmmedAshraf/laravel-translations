@@ -3,6 +3,9 @@
 namespace Outhebox\TranslationsUI;
 
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Contracts\Support\Arrayable;
+use Inertia\Response;
+use Inertia\ResponseFactory;
 use Outhebox\TranslationsUI\Console\Commands\CleanOldVersionCommand;
 use Outhebox\TranslationsUI\Console\Commands\ContributorCommand;
 use Outhebox\TranslationsUI\Console\Commands\ExportTranslationsCommand;
@@ -70,6 +73,35 @@ class TranslationsUIServiceProvider extends PackageServiceProvider
         $this->registerAuthDriver();
 
         $this->registerExceptionHandler();
+
+        $this->registerModalMacro();
+    }
+
+    public function registerModalMacro(): void
+    {
+        ResponseFactory::macro('modal', function (
+            string $component,
+            array|Arrayable $props = []
+        ) {
+            return new Modal($component, $props);
+        });
+
+        $this->registerCompatibilityMacros();
+    }
+
+    public function registerCompatibilityMacros(): void
+    {
+        ResponseFactory::macro('dialog', function (
+            string $component,
+            array|Arrayable $props = []
+        ) {
+            return new Modal($component, $props);
+        });
+
+        Response::macro('stackable', function () {
+            /** @phpstan-ignore-next-line */
+            return new Modal($this->component, $this->props);
+        });
     }
 
     private function registerAuthDriver(): void

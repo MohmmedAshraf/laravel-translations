@@ -2,6 +2,45 @@
 
 All notable changes to `laravel-translations` will be documented in this file.
 
+## v1.4.1 - 2025-08-08
+
+### What's Changed
+
+* bigfix: translation detail throws an error  by @antonL95 in https://github.com/MohmmedAshraf/laravel-translations/pull/167
+
+### New Contributors
+
+* @antonL95 made their first contribution in https://github.com/MohmmedAshraf/laravel-translations/pull/167
+
+**Full Changelog**: https://github.com/MohmmedAshraf/laravel-translations/compare/1.3.1...1.4.1
+
+## v1.3.1 - 2025-07-11
+
+### What's Changed
+
+* fix: freezing after save on translation page by @djgiant in https://github.com/MohmmedAshraf/laravel-translations/pull/166
+
+### New Contributors
+
+* @djgiant made their first contribution in https://github.com/MohmmedAshraf/laravel-translations/pull/166
+
+**Full Changelog**: https://github.com/MohmmedAshraf/laravel-translations/compare/1.3.0...1.3.1
+
+## v1.3.0 - 2025-03-13
+
+### What's Changed
+
+* Inertia upgraded to v2.0
+* Add Laravel 12.x Compatibility
+* Fix/fix phrase function can't accept null by @lvdigitalaaank in https://github.com/MohmmedAshraf/laravel-translations/pull/161
+* fix for bug 136 - publish not displaying on smaller screens by @ajconradie in https://github.com/MohmmedAshraf/laravel-translations/pull/157
+
+### New Contributors
+
+* @ajconradie made their first contribution in https://github.com/MohmmedAshraf/laravel-translations/pull/157
+
+**Full Changelog**: https://github.com/MohmmedAshraf/laravel-translations/compare/1.2.1...1.3.0
+
 ## v1.2.1 - 2025-02-26
 
 ### What's Changed
@@ -281,11 +320,17 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
      
      
      
+     
+     
+     
      ```
    - Alternatively, manually uninstall using:
      
      ```bash
      composer remove outhebox/laravel-translations
+     
+     
+     
      
      
      
@@ -315,6 +360,9 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
    
      ```bash
      composer require outhebox/laravel-translations
+   
+   
+   
    
    
    
