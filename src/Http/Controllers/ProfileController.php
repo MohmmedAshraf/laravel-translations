@@ -35,7 +35,7 @@ class ProfileController extends BaseController
     public function updatePassword(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'current_password' => ['required', 'current_password'],
+            'current_password' => ['required', 'current_password:translations'],
             'password' => ['required', Password::defaults(), 'confirmed'],
         ]);
 
