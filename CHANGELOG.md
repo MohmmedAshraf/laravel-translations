@@ -2,6 +2,18 @@
 
 All notable changes to `laravel-translations` will be documented in this file.
 
+## v1.4.2 - 2026-02-06
+
+### What's Changed
+
+* fix: import translations into correct language instead of source by @kha333n in https://github.com/MohmmedAshraf/laravel-translations/pull/173
+* fix: translators unable to change their passwords by @lvdigitalaaank in https://github.com/MohmmedAshraf/laravel-translations/pull/174
+
+### New Contributors
+
+* @kha333n made their first contribution in https://github.com/MohmmedAshraf/laravel-translations/pull/173
+* @lvdigitalaaank made their first contribution in https://github.com/MohmmedAshraf/laravel-translations/pull/174
+
 ## v1.4.1 - 2025-08-08
 
 ### What's Changed
@@ -323,11 +335,13 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
      
      
      
+     
      ```
    - Alternatively, manually uninstall using:
      
      ```bash
      composer remove outhebox/laravel-translations
+     
      
      
      
@@ -360,6 +374,7 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
    
      ```bash
      composer require outhebox/laravel-translations
+   
    
    
    
