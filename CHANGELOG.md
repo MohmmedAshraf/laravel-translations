@@ -2,6 +2,15 @@
 
 All notable changes to `laravel-translations` will be documented in this file.
 
+## v1.4.3 - 2026-02-06
+
+### What's Changed
+
+* fix: change `ltu_phrases.key` column from `varchar(255)` to `text` to support long keys commonly used in JSON translation files (closes #122)
+* fix: change `phrase_id` foreign key from `cascadeOnDelete` to `nullOnDelete` to fix migration failure on MSSQL/Azure SQL (closes #139)
+
+**Upgrade:** Run `php artisan migrate` after updating the package.
+
 ## v1.4.2 - 2026-02-06
 
 ### What's Changed
@@ -336,11 +345,13 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
      
      
      
+     
      ```
    - Alternatively, manually uninstall using:
      
      ```bash
      composer remove outhebox/laravel-translations
+     
      
      
      
@@ -374,6 +385,7 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
    
      ```bash
      composer require outhebox/laravel-translations
+   
    
    
    
