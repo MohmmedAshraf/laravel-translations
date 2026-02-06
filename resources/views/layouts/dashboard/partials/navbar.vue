@@ -5,6 +5,12 @@ import { Popover, PopoverButton, PopoverOverlay, PopoverPanel, TransitionChild, 
 const user = useAuth()
 
 const navigation = [
+    { name: "Publish", href: route("ltu.translation.publish"), current: false },
+    { name: "Translations", href: route("ltu.translation.index"), current: route().current("ltu.translation*") || route().current("ltu.source_translation*") || route().current("ltu.phrases*") },
+    { name: "Contributors", href: route("ltu.contributors.index"), current: route().current("ltu.contributors*") },
+    { name: "Account Settings", href: route("ltu.profile.edit"), current: route().current("ltu.profile*") },
+]
+const navigation2 = [
     { name: "Translations", href: route("ltu.translation.index"), current: route().current("ltu.translation*") || route().current("ltu.source_translation*") || route().current("ltu.phrases*") },
     { name: "Contributors", href: route("ltu.contributors.index"), current: route().current("ltu.contributors*") },
     { name: "Account Settings", href: route("ltu.profile.edit"), current: route().current("ltu.profile*") },
@@ -22,7 +28,7 @@ const navigation = [
                 </div>
 
                 <nav aria-label="Global" class="hidden lg:ml-6 lg:flex lg:items-center lg:space-x-4">
-                    <Link v-for="item in navigation" :key="item.name" :href="item.href" class="rounded-md px-3 py-2 text-sm font-medium" :class="[item.current ? 'bg-blue-500 text-white' : 'text-white hover:bg-blue-700 hover:text-white']" :aria-current="item.current ? 'page' : undefined">
+                    <Link v-for="item in navigation2" :key="item.name" :href="item.href" class="rounded-md px-3 py-2 text-sm font-medium" :class="[item.current ? 'bg-blue-500 text-white' : 'text-white hover:bg-blue-700 hover:text-white']" :aria-current="item.current ? 'page' : undefined">
                         {{ item.name }}
                     </Link>
                 </nav>

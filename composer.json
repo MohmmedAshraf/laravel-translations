@@ -21,21 +21,20 @@
     ],
     "require": {
         "php": "^8.2|^8.3",
-        "based/momentum-modal": "^0.3.0",
-        "brick/varexporter": "^0.5.0",
-        "inertiajs/inertia-laravel": "^1.0",
+        "brick/varexporter": "^0.6.0",
+        "inertiajs/inertia-laravel": "^2.0",
         "spatie/laravel-package-tools": "^1.0",
-        "stichoza/google-translate-php": "^5.1",
-        "tightenco/ziggy": "^2.0",
+        "stichoza/google-translate-php": "^5.0",
+        "tightenco/ziggy": "^2.5",
         "ext-zip": "*"
     },
     "require-dev": {
         "laravel/pint": "^1.0",
         "nunomaduro/collision": "^8.0",
-        "orchestra/testbench": "^9.0",
-        "pestphp/pest": "^2.18",
-        "pestphp/pest-plugin-faker": "^2.0",
-        "pestphp/pest-plugin-laravel": "^2.2"
+        "orchestra/testbench": "^9.0|^10.0",
+        "pestphp/pest": "^3.0",
+        "pestphp/pest-plugin-faker": "^3.0",
+        "pestphp/pest-plugin-laravel": "^3.0"
     },
     "autoload": {
         "psr-4": {

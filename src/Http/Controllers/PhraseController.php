@@ -62,6 +62,12 @@ class PhraseController extends BaseController
             ->paginate($request->input('perPage') ?? 12)
             ->withQueryString();
 
+        $translation = $translation
+            ->withCount('phrases')
+            ->withProgress()
+            ->where('id', $translation->id)
+            ->first();
+
         return Inertia::render('phrases/index', [
             'phrases' => PhraseResource::collection($phrases),
             'translation' => TranslationResource::make($translation),
@@ -81,10 +87,18 @@ class PhraseController extends BaseController
             return redirect()->route('ltu.source_translation.edit', $phrase->uuid);
         }
 
+        $translation = $translation
+            ->withCount('phrases')
+            ->withProgress()
+            ->where('id', $translation->id)
+            ->first();
+
         return Inertia::render('phrases/edit', [
             'phrase' => PhraseResource::make($phrase),
             'translation' => TranslationResource::make($translation),
-            'source' => TranslationResource::make(Translation::where('source', true)?->first()),
+            'source' => TranslationResource::make(Translation::isSource()
+                ->withCount('phrases')
+                ->withProgress()?->first()),
             'similarPhrases' => PhraseResource::collection($phrase->similarPhrases()),
             'suggestedTranslations' => [
                 'google' => [
