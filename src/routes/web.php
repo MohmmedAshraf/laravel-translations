@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Outhebox\Translations\Http\Controllers\AccountController;
 use Outhebox\Translations\Http\Controllers\ContributorController;
 use Outhebox\Translations\Http\Controllers\GroupController;
 use Outhebox\Translations\Http\Controllers\ImportExportController;
@@ -8,7 +9,7 @@ use Outhebox\Translations\Http\Controllers\LanguageController;
 use Outhebox\Translations\Http\Controllers\PhraseController;
 use Outhebox\Translations\Http\Controllers\SourcePhraseController;
 
-Route::middleware(['translations.auth'])->group(function () {
+Route::middleware('translations.auth')->group(function () {
     Route::get('/', [LanguageController::class, 'index'])->name('ltu.languages.index');
     Route::get('/phrases/{language}', [PhraseController::class, 'index'])->name('ltu.phrases.index');
     Route::get('/phrases/{language}/edit/{translationKey}', [PhraseController::class, 'edit'])->name('ltu.phrases.edit');
@@ -16,11 +17,12 @@ Route::middleware(['translations.auth'])->group(function () {
     Route::get('/source-language/{translationKey}', [SourcePhraseController::class, 'show'])->name('ltu.source.show');
     Route::get('/groups', [GroupController::class, 'index'])->name('ltu.groups.index');
 
-    Route::middleware(['translations.role:translator'])->group(function () {
-        Route::put('/phrases/{language}/{translationKey}', [PhraseController::class, 'update'])->name('ltu.phrases.update');
-    });
+    Route::put('/account', [AccountController::class, 'update'])->name('ltu.account.update');
+    Route::put('/account/password', [AccountController::class, 'updatePassword'])->name('ltu.account.password');
 
-    Route::middleware(['translations.role:admin'])->group(function () {
+    Route::put('/phrases/{language}/{translationKey}', [PhraseController::class, 'update'])->middleware('translations.role:translator')->name('ltu.phrases.update');
+
+    Route::middleware('translations.role:admin')->group(function () {
         Route::post('/languages', [LanguageController::class, 'store'])->name('ltu.languages.store');
         Route::post('/languages/custom', [LanguageController::class, 'storeCustom'])->name('ltu.languages.store-custom');
         Route::delete('/languages/{language}', [LanguageController::class, 'destroy'])->name('ltu.languages.destroy');
