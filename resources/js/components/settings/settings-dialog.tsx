@@ -71,7 +71,7 @@ export function SettingsDialog({
                         'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
                         'duration-200',
                         'inset-0',
-                        'md:inset-auto md:top-[50%] md:left-[50%] md:h-[600px] md:w-[800px] md:translate-x-[-50%] md:translate-y-[-50%] md:rounded-lg md:border',
+                        'md:inset-auto md:top-[50%] md:left-[50%] md:h-150 md:w-200 md:translate-x-[-50%] md:translate-y-[-50%] md:rounded-lg md:border',
                         'md:data-[state=closed]:zoom-out-95 md:data-[state=open]:zoom-in-95',
                     )}
                 >

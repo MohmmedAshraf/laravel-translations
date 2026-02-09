@@ -24,7 +24,7 @@ export function ThemeCard({
                     : 'border-border hover:border-primary/50',
             )}
         >
-            <div className="mb-3 aspect-[4/3] w-full overflow-hidden rounded-lg">
+            <div className="mb-3 aspect-4/3 w-full overflow-hidden rounded-lg">
                 {preview}
             </div>
             <div className="flex items-center gap-2">

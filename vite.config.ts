@@ -23,24 +23,22 @@ export default defineConfig({
         {
             name: 'translations-hot-file',
             configureServer(server) {
-                const protocol = server.config.server.https ? 'https' : 'http';
-                const host = server.config.server.host || 'localhost';
-                const port = server.config.server.port || 5173;
+                const clean = () => hotFiles.forEach((f) => fs.existsSync(f) && fs.unlinkSync(f));
 
                 server.httpServer?.once('listening', () => {
-                    const address = `${protocol}://${typeof host === 'string' ? host : 'localhost'}:${port}`;
+                    const addr = server.httpServer?.address();
+                    const port = typeof addr === 'object' && addr ? addr.port : 5173;
+                    const url = `http://localhost:${port}`;
+
                     for (const hotFile of hotFiles) {
                         fs.mkdirSync(resolve(hotFile, '..'), { recursive: true });
-                        fs.writeFileSync(hotFile, address);
+                        fs.writeFileSync(hotFile, url);
                     }
                 });
-            },
-            buildEnd() {
-                for (const hotFile of hotFiles) {
-                    if (fs.existsSync(hotFile)) {
-                        fs.unlinkSync(hotFile);
-                    }
-                }
+
+                process.on('exit', clean);
+                process.on('SIGINT', () => process.exit());
+                process.on('SIGTERM', () => process.exit());
             },
         },
     ],

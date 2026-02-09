@@ -17,7 +17,7 @@ export function SettingsNav({
     onToggleGroup,
 }: SettingsNavProps) {
     return (
-        <div className="flex h-full w-[240px] flex-col border-r border-border bg-muted/30 p-4">
+        <div className="flex h-full w-60 flex-col border-r border-border bg-muted/30 p-4">
             <h2 className="mb-6 text-xl font-semibold">Settings</h2>
 
             <nav className="flex-1 space-y-1">
