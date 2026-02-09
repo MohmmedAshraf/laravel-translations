@@ -7,8 +7,9 @@ use Outhebox\Translations\Concerns\DisplayHelper;
 use Outhebox\Translations\Services\Exporter\TranslationExporter;
 
 use function Laravel\Prompts\info;
+use function Laravel\Prompts\spin;
 
-class ExportTranslationsCommand extends Command
+class ExportCommand extends Command
 {
     use DisplayHelper;
 
@@ -22,13 +23,14 @@ class ExportTranslationsCommand extends Command
     {
         $this->displayHeader('Export');
 
-        info('Exporting translations...');
-
-        $result = $exporter->export([
-            'locale' => $this->option('locale'),
-            'group' => $this->option('group'),
-            'source' => 'cli',
-        ]);
+        $result = spin(
+            callback: fn () => $exporter->export([
+                'locale' => $this->option('locale'),
+                'group' => $this->option('group'),
+                'source' => 'cli',
+            ]),
+            message: 'Exporting translations...',
+        );
 
         $durationSec = round($result->durationMs / 1000, 2);
 

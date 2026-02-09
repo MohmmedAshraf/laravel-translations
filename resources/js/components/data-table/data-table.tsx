@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import {
     DataTableEmptyState,
     type EmptyStateConfig,
@@ -49,12 +49,31 @@ export function DataTable<T>({
     selectedIds = [],
     onSelectionChange,
     isRowSelectable,
+    selectAllPages = false,
+    onSelectAllPages,
 }: DataTableProps<T>) {
     const getRowIdValue = useCallback(
         (row: T, index: number): string | number => {
             return getRowId ? getRowId(row) : index;
         },
         [getRowId],
+    );
+
+    const effectiveSelectedIds = useMemo(() => {
+        if (selectAllPages) {
+            return data.map((row, index) => getRowIdValue(row, index));
+        }
+        return selectedIds;
+    }, [selectAllPages, data, selectedIds, getRowIdValue]);
+
+    const handleSelectionChangeWrapper = useCallback(
+        (ids: (string | number)[]) => {
+            if (selectAllPages) {
+                onSelectAllPages?.(false);
+            }
+            onSelectionChange?.(ids);
+        },
+        [selectAllPages, onSelectAllPages, onSelectionChange],
     );
 
     const {
@@ -65,8 +84,8 @@ export function DataTable<T>({
     } = useDataTableSelection({
         data,
         selectable,
-        selectedIds,
-        onSelectionChange,
+        selectedIds: effectiveSelectedIds,
+        onSelectionChange: handleSelectionChangeWrapper,
         getRowIdValue,
         isRowSelectable,
     });
@@ -80,6 +99,16 @@ export function DataTable<T>({
 
     const totalPages =
         pagination && rowCount ? Math.ceil(rowCount / pagination.pageSize) : 0;
+
+    const totalColSpan =
+        columns.length + (selectable ? 1 : 0) + (rowActions ? 1 : 0);
+
+    const showSelectAllBanner =
+        selectable &&
+        allSelected &&
+        !selectAllPages &&
+        rowCount !== undefined &&
+        rowCount > data.length;
 
     const hasNoData = data.length === 0;
     const showPlaceholder = hasNoData && !isFiltered && !!placeholderData;
@@ -146,6 +175,51 @@ export function DataTable<T>({
                         thClassName={thClassName}
                     />
                     <tbody>
+                        {(showSelectAllBanner || selectAllPages) && (
+                            <tr>
+                                <td
+                                    colSpan={totalColSpan}
+                                    className="border-b border-neutral-200 bg-muted/50 py-2 text-center text-sm text-neutral-600 dark:border-neutral-800 dark:text-neutral-400"
+                                >
+                                    {selectAllPages ? (
+                                        <>
+                                            All{' '}
+                                            <span className="font-medium text-neutral-900 dark:text-neutral-100">
+                                                {rowCount?.toLocaleString()}
+                                            </span>{' '}
+                                            {resourceName(true)} are selected.{' '}
+                                            <button
+                                                type="button"
+                                                className="font-medium text-primary hover:underline"
+                                                onClick={() => {
+                                                    onSelectAllPages?.(false);
+                                                    onSelectionChange?.([]);
+                                                }}
+                                            >
+                                                Clear selection
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            All {data.length}{' '}
+                                            {resourceName(data.length !== 1)} on
+                                            this page are selected.{' '}
+                                            <button
+                                                type="button"
+                                                className="font-medium text-primary hover:underline"
+                                                onClick={() =>
+                                                    onSelectAllPages?.(true)
+                                                }
+                                            >
+                                                Select all{' '}
+                                                {rowCount?.toLocaleString()}{' '}
+                                                {resourceName(true)}
+                                            </button>
+                                        </>
+                                    )}
+                                </td>
+                            </tr>
+                        )}
                         {tableData.map((row, rowIndex) => {
                             const rowId = getRowIdValue(row, rowIndex);
 
@@ -159,7 +233,8 @@ export function DataTable<T>({
                                     isClickable={isClickable}
                                     isSelected={
                                         selectable &&
-                                        selectedIds.includes(rowId)
+                                        (selectAllPages ||
+                                            selectedIds.includes(rowId))
                                     }
                                     isSelectable={
                                         isRowSelectable?.(row) ?? true

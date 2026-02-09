@@ -81,11 +81,24 @@ export function AdminDataTable<T extends Record<string, any>>({
         useState<ColumnConfig[]>(initialColumnConfigs);
 
     const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
+    const [selectAllPages, setSelectAllPages] = useState(false);
     const [prevData, setPrevData] = useState(data);
+    const [prevFilters, setPrevFilters] = useState(tableConfig.currentFilters);
 
-    if (prevData !== data) {
-        setPrevData(data);
-        setSelectedIds([]);
+    const filtersChanged = prevFilters !== tableConfig.currentFilters;
+    const dataChanged = prevData !== data;
+
+    if (filtersChanged || dataChanged) {
+        if (filtersChanged) {
+            setPrevFilters(tableConfig.currentFilters);
+            setSelectAllPages(false);
+        }
+        if (dataChanged) {
+            setPrevData(data);
+        }
+        if (filtersChanged || !selectAllPages) {
+            setSelectedIds([]);
+        }
     }
 
     const bulkActions = tableConfig.bulkActions ?? [];
@@ -226,7 +239,18 @@ export function AdminDataTable<T extends Record<string, any>>({
         [rowActions],
     );
 
+    const handleSelectionChange = useCallback(
+        (ids: (string | number)[]) => {
+            if (selectAllPages) {
+                setSelectAllPages(false);
+            }
+            setSelectedIds(ids);
+        },
+        [selectAllPages],
+    );
+
     const handleClearSelection = useCallback(() => {
+        setSelectAllPages(false);
         setSelectedIds([]);
     }, []);
 
@@ -316,8 +340,10 @@ export function AdminDataTable<T extends Record<string, any>>({
                 rowActions={rowActions ? renderRowActions : undefined}
                 selectable={isSelectable}
                 selectedIds={selectedIds}
-                onSelectionChange={setSelectedIds}
+                onSelectionChange={handleSelectionChange}
                 isRowSelectable={isRowSelectable}
+                selectAllPages={selectAllPages}
+                onSelectAllPages={setSelectAllPages}
             />
 
             {isSelectable && (
@@ -327,6 +353,8 @@ export function AdminDataTable<T extends Record<string, any>>({
                     onClearSelection={handleClearSelection}
                     resourceName={selectedIds.length === 1 ? singular : plural}
                     onAction={onBulkAction}
+                    selectAllPages={selectAllPages}
+                    totalCount={data.total}
                 />
             )}
         </div>

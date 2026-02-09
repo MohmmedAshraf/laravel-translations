@@ -8,9 +8,10 @@ use Outhebox\Translations\Services\Importer\TranslationImporter;
 
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\info;
+use function Laravel\Prompts\spin;
 use function Laravel\Prompts\warning;
 
-class ImportTranslationsCommand extends Command
+class ImportCommand extends Command
 {
     use DisplayHelper;
 
@@ -37,13 +38,14 @@ class ImportTranslationsCommand extends Command
             }
         }
 
-        info('Importing translations...');
-
-        $result = $importer->import([
-            'fresh' => $fresh,
-            'overwrite' => $overwrite,
-            'source' => 'cli',
-        ]);
+        $result = spin(
+            callback: fn () => $importer->import([
+                'fresh' => $fresh,
+                'overwrite' => $overwrite,
+                'source' => 'cli',
+            ]),
+            message: 'Importing translations...',
+        );
 
         $durationSec = round($result->durationMs / 1000, 2);
 

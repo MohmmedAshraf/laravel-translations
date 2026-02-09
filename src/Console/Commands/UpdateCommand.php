@@ -13,7 +13,7 @@ class UpdateCommand extends Command
 
     protected $signature = 'translations:update';
 
-    protected $description = 'Re-publish the translations UI assets after a package update';
+    protected $description = 'Re-publish assets and run migrations after a package update';
 
     public function handle(): int
     {
@@ -22,10 +22,26 @@ class UpdateCommand extends Command
         $this->call('vendor:publish', [
             '--tag' => 'translations-assets',
             '--force' => true,
+            '--no-interaction' => true,
         ]);
 
-        info('Translations assets updated.');
+        if ($this->proIsInstalled()) {
+            $this->call('vendor:publish', [
+                '--tag' => 'translations-pro-assets',
+                '--force' => true,
+                '--no-interaction' => true,
+            ]);
+        }
+
+        $this->call('migrate', ['--no-interaction' => true]);
+
+        info('Translations updated successfully.');
 
         return self::SUCCESS;
+    }
+
+    private function proIsInstalled(): bool
+    {
+        return class_exists(\Outhebox\TranslationsPro\Providers\TranslationsProServiceProvider::class);
     }
 }

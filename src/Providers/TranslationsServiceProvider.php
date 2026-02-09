@@ -5,11 +5,12 @@ namespace Outhebox\Translations\Providers;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Outhebox\Translations\Console\Commands\CreateUserCommand;
-use Outhebox\Translations\Console\Commands\ExportTranslationsCommand;
-use Outhebox\Translations\Console\Commands\ImportTranslationsCommand;
+use Outhebox\Translations\Console\Commands\ExportCommand;
+use Outhebox\Translations\Console\Commands\ImportCommand;
 use Outhebox\Translations\Console\Commands\InstallCommand;
 use Outhebox\Translations\Console\Commands\StatusCommand;
 use Outhebox\Translations\Console\Commands\UpdateCommand;
+use Outhebox\Translations\Console\Commands\UpgradeCommand;
 use Outhebox\Translations\Enums\AuthDriver;
 use Outhebox\Translations\Http\Middleware\ShareTranslationsData;
 use Outhebox\Translations\Http\Middleware\TranslationsAuth;
@@ -129,11 +130,12 @@ class TranslationsServiceProvider extends ServiceProvider
 
         $this->commands([
             CreateUserCommand::class,
-            ImportTranslationsCommand::class,
-            ExportTranslationsCommand::class,
+            ImportCommand::class,
+            ExportCommand::class,
             InstallCommand::class,
             StatusCommand::class,
             UpdateCommand::class,
+            UpgradeCommand::class,
         ]);
     }
 }

@@ -26,6 +26,8 @@ class InstallCommand extends Command
     {
         $this->displayHeader('Install');
 
+        $this->publishAssets();
+
         $this->call('migrate', ['--no-interaction' => true]);
 
         $this->call('db:seed', ['--class' => LanguageSeeder::class, '--no-interaction' => true]);
@@ -41,6 +43,38 @@ class InstallCommand extends Command
         info('Translations installed successfully!');
 
         return self::SUCCESS;
+    }
+
+    private function publishAssets(): void
+    {
+        $this->call('vendor:publish', [
+            '--tag' => 'translations-config',
+            '--no-interaction' => true,
+        ]);
+
+        $this->call('vendor:publish', [
+            '--tag' => 'translations-assets',
+            '--force' => true,
+            '--no-interaction' => true,
+        ]);
+
+        if ($this->proIsInstalled()) {
+            $this->call('vendor:publish', [
+                '--tag' => 'translations-pro-config',
+                '--no-interaction' => true,
+            ]);
+
+            $this->call('vendor:publish', [
+                '--tag' => 'translations-pro-assets',
+                '--force' => true,
+                '--no-interaction' => true,
+            ]);
+        }
+    }
+
+    private function proIsInstalled(): bool
+    {
+        return class_exists(\Outhebox\TranslationsPro\Providers\TranslationsProServiceProvider::class);
     }
 
     private function createFirstContributor(): void

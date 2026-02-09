@@ -21,6 +21,8 @@ interface DataTableBulkActionsProps {
     onClearSelection: () => void;
     resourceName: string;
     onAction?: (name: string, ids: (string | number)[]) => void;
+    selectAllPages?: boolean;
+    totalCount?: number;
 }
 
 export function DataTableBulkActions({
@@ -29,13 +31,17 @@ export function DataTableBulkActions({
     onClearSelection,
     resourceName,
     onAction,
+    selectAllPages = false,
+    totalCount = 0,
 }: DataTableBulkActionsProps) {
     const [confirmAction, setConfirmAction] = useState<BulkActionConfig | null>(
         null,
     );
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const isVisible = selectedIds.length > 0 && actions.length > 0;
+    const isVisible =
+        (selectedIds.length > 0 || selectAllPages) && actions.length > 0;
+    const displayCount = selectAllPages ? totalCount : selectedIds.length;
 
     const handleAction = (action: BulkActionConfig) => {
         if (action.confirm) {
@@ -43,6 +49,19 @@ export function DataTableBulkActions({
         } else {
             executeAction(action);
         }
+    };
+
+    const buildActionUrl = (url: string): string => {
+        if (!selectAllPages) return url;
+        const queryString = window.location.search;
+        return queryString ? `${url}${queryString}` : url;
+    };
+
+    const buildPayload = () => {
+        if (selectAllPages) {
+            return { select_all: true };
+        }
+        return { ids: selectedIds };
     };
 
     const executeAction = (action: BulkActionConfig) => {
@@ -58,7 +77,7 @@ export function DataTableBulkActions({
         if (action.download) {
             const form = document.createElement('form');
             form.method = 'POST';
-            form.action = action.url;
+            form.action = buildActionUrl(action.url);
             form.style.display = 'none';
 
             const csrfToken = document.querySelector<HTMLMetaElement>(
@@ -72,19 +91,27 @@ export function DataTableBulkActions({
                 form.appendChild(csrfInput);
             }
 
-            selectedIds.forEach((id) => {
+            if (selectAllPages) {
                 const input = document.createElement('input');
                 input.type = 'hidden';
-                input.name = 'ids[]';
-                input.value = String(id);
+                input.name = 'select_all';
+                input.value = '1';
                 form.appendChild(input);
-            });
+            } else {
+                selectedIds.forEach((id) => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'ids[]';
+                    input.value = String(id);
+                    form.appendChild(input);
+                });
+            }
 
             document.body.appendChild(form);
             form.submit();
             document.body.removeChild(form);
 
-            toast.success(`Exporting ${selectedIds.length} ${resourceName}...`);
+            toast.success(`Exporting ${displayCount} ${resourceName}...`);
             onClearSelection();
             setConfirmAction(null);
             return;
@@ -92,20 +119,16 @@ export function DataTableBulkActions({
 
         setIsSubmitting(true);
 
-        router.post(
-            action.url,
-            { ids: selectedIds },
-            {
-                preserveScroll: true,
-                onSuccess: () => {
-                    onClearSelection();
-                    setConfirmAction(null);
-                },
-                onFinish: () => {
-                    setIsSubmitting(false);
-                },
+        router.post(buildActionUrl(action.url), buildPayload(), {
+            preserveScroll: true,
+            onSuccess: () => {
+                onClearSelection();
+                setConfirmAction(null);
             },
-        );
+            onFinish: () => {
+                setIsSubmitting(false);
+            },
+        });
     };
 
     return (
@@ -120,8 +143,8 @@ export function DataTableBulkActions({
             >
                 <div className="flex items-center gap-1.5 rounded-xl border border-neutral-700 bg-neutral-900 px-3 py-2 shadow-2xl dark:border-neutral-600 dark:bg-neutral-800">
                     <div className="flex items-center gap-2 pr-1.5">
-                        <span className="flex size-6 items-center justify-center rounded-md bg-white text-xs font-semibold text-neutral-900 dark:bg-neutral-100">
-                            {selectedIds.length}
+                        <span className="flex h-6 min-w-6 items-center justify-center rounded-md bg-white px-1.5 text-xs font-semibold text-neutral-900 tabular-nums dark:bg-neutral-100">
+                            {displayCount.toLocaleString()}
                         </span>
                         <span className="text-sm font-medium text-neutral-300">
                             selected
@@ -188,7 +211,7 @@ export function DataTableBulkActions({
                             <p className="text-sm text-neutral-600 dark:text-neutral-400">
                                 This will affect{' '}
                                 <span className="font-medium text-neutral-900 dark:text-neutral-100">
-                                    {selectedIds.length} {resourceName}
+                                    {displayCount} {resourceName}
                                 </span>
                                 .
                             </p>

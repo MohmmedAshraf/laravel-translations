@@ -276,7 +276,14 @@ trait HasDataTable
             abort(404, "Bulk action [{$action}] not found.");
         }
 
-        $ids = $request->input('ids', []);
+        if ($request->boolean('select_all')) {
+            $model = $this->tableModel();
+            $keyName = (new $model)->getKeyName();
+            $ids = $this->tableQuery($request)->pluck($keyName)->all();
+        } else {
+            $ids = $request->input('ids', []);
+        }
+
         $records = $this->resolveBulkActionRecords($ids);
 
         return ($bulkAction->getHandler())($records, $request);

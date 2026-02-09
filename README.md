@@ -118,7 +118,7 @@ composer require outhebox/laravel-translations:^2.0
 2. **Run the upgrade command** to migrate your v1 data:
 
 ```bash
-php artisan translations:upgrade-v2
+php artisan translations:upgrade
 ```
 
 This will detect your v1 tables, migrate languages, groups, keys, and translations to the new structure.
@@ -126,7 +126,7 @@ This will detect your v1 tables, migrate languages, groups, keys, and translatio
 3. **Clean up old tables** (optional):
 
 ```bash
-php artisan translations:upgrade-v2 --cleanup
+php artisan translations:upgrade --cleanup
 ```
 
 4. **Publish the new assets:**

@@ -34,3 +34,4 @@ testbench.yaml
 resources/js/actions
 resources/js/routes
 resources/js/wayfinder
+/workbench/lang

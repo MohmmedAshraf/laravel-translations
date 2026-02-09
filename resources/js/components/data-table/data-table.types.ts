@@ -51,4 +51,6 @@ export interface DataTableProps<T> {
     selectedIds?: (string | number)[];
     onSelectionChange?: (ids: (string | number)[]) => void;
     isRowSelectable?: (row: T) => boolean;
+    selectAllPages?: boolean;
+    onSelectAllPages?: (value: boolean) => void;
 }

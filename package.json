@@ -3,7 +3,7 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "vite build",
+        "build": "vite build && php vendor/bin/testbench vendor:publish --tag=translations-assets --force --no-interaction",
         "dev": "vite",
         "format": "prettier --write resources/",
         "lint": "eslint . --fix",
