@@ -1,129 +1,75 @@
-# CONTRIBUTING
+# Contributing
 
-## Introduction
+Thanks for considering contributing to Laravel Translations!
 
-Hi there! We're thrilled that you'd like to contribute to this project. Your help is essential for keeping it great.
+## Setup
 
-### 💻 Code Contribution
+1. Fork the repo on GitHub, then clone your fork:
 
-Please follow the steps below to contribute with code.
-
-## Steps
-
-### 📌 Step 1
-
-Fork this repository and enter its directory.
-
-Replace the placeholder `<YOUR-USERNAME>` with your GitHub username and run the command:
-
-```shell
-git clone https://github.com/<YOUR-USERNAME>/laravel-translations.git && cd laravel-translations
+```bash
+git clone git@github.com:MohmmedAshraf/laravel-translations.git && cd laravel-translations
 ```
 
-### 📌 Step 2
+2. Install dependencies:
 
-Install all PHP dependencies using Composer, run the command:
-
-```shell
+```bash
 composer install
-```
-
-Once finished, proceed to install Node dependencies. Run the command:
-
-```shell
 npm install
 ```
-or
-```shell
-yarn install
+
+3. Create a branch:
+
+```bash
+git checkout -b feature/your-feature-name
 ```
 
-### 📌 Step 3
+## Development
 
-Create a new branch for your code. You may call it `feature-` / `fix-` / `enhancement-` followed by the name of what you are developing.
+If you're working on frontend changes, run Vite in dev mode:
 
-For example:
-
-```shell
-git checkout -b feature/feature-name
+```bash
+npm run dev
 ```
 
-Now, you can work on this newly created branch.
+## Before Submitting
 
-> 💡 Tip: While developing, you may run the command `vite` to automatically rebuild any CSS and JavaScript files.
+1. Format your code:
 
-
-### 📌 Step 4
-
-After you are done coding, please run Laravel Pint for code formatting:
-
-```Shell
+```bash
 composer format
 ```
 
-Finally, run the Pest PHP for tests:
+2. Run tests:
 
-```Shell
+```bash
 composer test
 ```
 
-### 📌 Step 5
+3. If you changed frontend files, build assets:
 
-You may want to install your modified version of Laravel Translations UI inside a Laravel application, and test if it performs as expected.
+```bash
+npm run build
+```
 
-In your Laravel application, modify the `composer.json` adding a `repositories` key with the `path` of Laravel Translations UI on your machine.
+## Testing Locally
 
-This will instruct composer to install Laravel Translations UI from your local folder instead of using the version on the official repository.
-
-Example: `composer.json`
+You can test your local copy in a Laravel app by adding a path repository to the app's `composer.json`:
 
 ```json
 {
-    "require": {
-        "outhebox/laravel-translations": "*"
-    },
     "repositories": [
         {
             "type": "path",
-            "url": "/home/myuser/projects/laravel-translations"
+            "url": "/path/to/your/laravel-translations"
         }
-    ],
-    "minimum-stability": "dev"
+    ]
 }
 ```
 
-Proceed with `composer update`.
+Then run `composer update`.
 
-### 📌 Step 6
+## Pull Requests
 
-If you changed any CSS or JavaScript files, you must build the assets for production before committing.
-
-Run the command:
-
-```shell
-vite build
-```
-
-### 📌 Step 7
-
-Commit your changes. Please send short and descriptive commits.
-
-For example:
-
-```Shell
-git commit -m "adds route for feature X"
-```
-
-### 📌 Step 8
-
-If all tests are ✅ passing, you may push your code and submit a Pull Request.
-
-Please write a summary of your contribution, detailing what you are changing/fixing/proposing.
-
-When necessary, please provide usage examples, code snippets and screenshots. You may also include links related to Issues or other Pull Requests.
-
-Once submitted, your Pull Request will be marked for review and people will send questions, comments and eventually request changes.
-
----
-
-🙏 Thank you for your contribution!
+- Write clear, descriptive commit messages
+- Include context on what and why in the PR description
+- Keep PRs focused — one feature or fix per PR

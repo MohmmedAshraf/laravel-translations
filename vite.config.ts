@@ -1,0 +1,75 @@
+import { wayfinder } from '@laravel/vite-plugin-wayfinder';
+import tailwindcss from '@tailwindcss/vite';
+import react from '@vitejs/plugin-react';
+import fs from 'fs';
+import { resolve } from 'path';
+import { defineConfig } from 'vite';
+
+const hotFiles = [
+    resolve(__dirname, 'public/hot-translations'),
+    resolve(__dirname, 'vendor/orchestra/testbench-core/laravel/public/hot-translations'),
+];
+
+export default defineConfig({
+    plugins: [
+        react(),
+        tailwindcss(),
+        wayfinder({
+            command: 'php vendor/bin/testbench wayfinder:generate',
+            path: 'resources/js',
+            formVariants: true,
+            patterns: ['routes/**/*.php', 'src/**/Http/**/*.php'],
+        }),
+        {
+            name: 'translations-hot-file',
+            configureServer(server) {
+                const protocol = server.config.server.https ? 'https' : 'http';
+                const host = server.config.server.host || 'localhost';
+                const port = server.config.server.port || 5173;
+
+                server.httpServer?.once('listening', () => {
+                    const address = `${protocol}://${typeof host === 'string' ? host : 'localhost'}:${port}`;
+                    for (const hotFile of hotFiles) {
+                        fs.mkdirSync(resolve(hotFile, '..'), { recursive: true });
+                        fs.writeFileSync(hotFile, address);
+                    }
+                });
+            },
+            buildEnd() {
+                for (const hotFile of hotFiles) {
+                    if (fs.existsSync(hotFile)) {
+                        fs.unlinkSync(hotFile);
+                    }
+                }
+            },
+        },
+    ],
+    server: {
+        cors: true,
+    },
+    build: {
+        outDir: 'dist',
+        emptyOutDir: true,
+        manifest: true,
+        rollupOptions: {
+            input: {
+                app: resolve(__dirname, 'resources/js/app.tsx'),
+            },
+            output: {
+                entryFileNames: 'js/app.js',
+                chunkFileNames: 'js/[name]-[hash].js',
+                assetFileNames: (assetInfo) => {
+                    if (assetInfo.name?.endsWith('.css')) {
+                        return 'css/app.css';
+                    }
+                    return 'assets/[name]-[hash][extname]';
+                },
+            },
+        },
+    },
+    resolve: {
+        alias: {
+            '@': resolve(__dirname, 'resources/js'),
+        },
+    },
+});

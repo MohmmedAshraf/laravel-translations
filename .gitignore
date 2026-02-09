@@ -1,16 +1,36 @@
-.idea
-.env
-.phpunit.result.cache
-build
+# Composer
 composer.lock
-coverage
-docs
+/vendor
+
+# Frontend
+/node_modules
+package-lock.json
+yarn.lock
+
+# Caches
+.phpunit.cache
+.phpunit.result.cache
+
+# IDE
+/.idea
+/.fleet
+/.vscode
+
+# AI Tools
+/.claude
+/.codex
+/.junie
+
+# Misc
+.DS_Store
+.env
 phpunit.xml
 phpstan.neon
 testbench.yaml
-vendor
-node_modules
-resources/dist/hot
-.DS_Store
-.phpunit.cache
-tests/Commandslang_test
+/coverage
+/public/hot-translations
+
+# Generated
+resources/js/actions
+resources/js/routes
+resources/js/wayfinder

@@ -1,6 +1,6 @@
 {
     "name": "outhebox/laravel-translations",
-    "description": "Laravel Translations UI provides a simple way to manage your translations in your Laravel application. It allows you to add, edit, delete and export translations, and it also provides a search functionality to find translations.",
+    "description": "Manage your Laravel translations with a beautiful UI. Add, edit, delete, import, and export translations with ease.",
     "keywords": [
         "laravel",
         "laravel-translations",
@@ -8,7 +8,8 @@
         "localization",
         "inertiajs",
         "inertia",
-        "translation-manager"
+        "translation-manager",
+        "i18n"
     ],
     "homepage": "https://github.com/MohmmedAshraf/laravel-translations",
     "license": "MIT",
@@ -20,45 +21,61 @@
         }
     ],
     "require": {
-        "php": "^8.2|^8.3",
-        "brick/varexporter": "^0.6.0",
+        "php": "^8.2",
+        "illuminate/contracts": "^11.0||^12.0",
+        "illuminate/support": "^11.0||^12.0",
         "inertiajs/inertia-laravel": "^2.0",
-        "spatie/laravel-package-tools": "^1.0",
-        "stichoza/google-translate-php": "^5.0",
-        "tightenco/ziggy": "^2.5",
-        "ext-zip": "*"
+        "spatie/laravel-query-builder": "^6.0||^7.0"
     },
     "require-dev": {
+        "laravel/boost": "^2.1",
         "laravel/pint": "^1.0",
+        "laravel/wayfinder": "^0.1",
         "nunomaduro/collision": "^8.0",
-        "orchestra/testbench": "^9.0|^10.0",
-        "pestphp/pest": "^3.0",
-        "pestphp/pest-plugin-faker": "^3.0",
-        "pestphp/pest-plugin-laravel": "^3.0"
+        "orchestra/testbench": "^10.0",
+        "orchestra/workbench": "^10.0",
+        "pestphp/pest": "^4.0",
+        "pestphp/pest-plugin-laravel": "^4.0"
     },
     "autoload": {
         "psr-4": {
-            "Outhebox\\TranslationsUI\\": "src",
-            "Outhebox\\TranslationsUI\\Database\\Factories\\": "database/factories",
-            "Outhebox\\TranslationsUI\\Database\\Seeders\\": "database/seeders"
-        },
-        "files": [
-            "src/helpers.php"
-        ]
+            "Outhebox\\Translations\\": "src/",
+            "Outhebox\\Translations\\Database\\Factories\\": "database/factories/",
+            "Outhebox\\Translations\\Database\\Seeders\\": "database/seeders/"
+        }
     },
     "autoload-dev": {
         "psr-4": {
-            "Outhebox\\TranslationsUI\\Tests\\": "tests"
+            "Outhebox\\Translations\\Tests\\": "tests/",
+            "Workbench\\App\\": "workbench/app/",
+            "Workbench\\Database\\Factories\\": "workbench/database/factories/",
+            "Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
         }
     },
     "scripts": {
-        "post-autoload-dump": "@php ./vendor/bin/testbench package:discover --ansi",
-        "analyse": "vendor/bin/phpstan analyse",
+        "post-autoload-dump": [
+            "@clear",
+            "@prepare",
+            "@php ./vendor/bin/testbench package:discover --ansi"
+        ],
         "test": "vendor/bin/pest",
         "test-coverage": "vendor/bin/pest --coverage",
-        "format": "vendor/bin/pint"
+        "format": "vendor/bin/pint",
+        "clear": "@php vendor/bin/testbench package:purge-skeleton --ansi",
+        "prepare": "@php vendor/bin/testbench package:discover --ansi",
+        "build": "@php vendor/bin/testbench workbench:build --ansi",
+        "serve": [
+            "Composer\\Config::disableProcessTimeout",
+            "@build",
+            "@php vendor/bin/testbench serve --ansi"
+        ],
+        "lint": [
+            "@php vendor/bin/pint --ansi"
+        ],
+        "generate-routes": "@php vendor/bin/testbench wayfinder:generate --path=resources/js --with-form --ansi"
     },
     "config": {
+        "sort-packages": true,
         "allow-plugins": {
             "pestphp/pest-plugin": true
         }
@@ -66,13 +83,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Outhebox\\TranslationsUI\\TranslationsUIServiceProvider"
-            ],
-            "aliases": {
-                "TranslationsUI": "Outhebox\\TranslationsUI\\Facades\\TranslationsUI"
-            }
+                "Outhebox\\Translations\\Providers\\TranslationsServiceProvider"
+            ]
         }
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "prefer-stable": true
 }
