@@ -67,8 +67,8 @@ function saveSections(state: Record<string, boolean>): void {
 
 export default function TranslationKeySidebar({
     translationKey,
-    status,
-    showPrioritySelect = false,
+    status: _status,
+    showPrioritySelect: _showPrioritySelect = false,
 }: TranslationKeySidebarProps) {
     const isMobile = useIsMobile();
 
@@ -90,7 +90,7 @@ export default function TranslationKeySidebar({
         [],
     );
 
-    const [sections, setSections] =
+    const [_sections, setSections] =
         useState<Record<string, boolean>>(getSavedSections);
 
     const toggleSidebar = useCallback(() => {
@@ -105,7 +105,7 @@ export default function TranslationKeySidebar({
         });
     }, []);
 
-    const toggleSection = useCallback((id: string) => {
+    const _toggleSection = useCallback((id: string) => {
         setSections((prev) => {
             const next = { ...prev, [id]: !prev[id] };
             saveSections(next);
@@ -130,7 +130,7 @@ export default function TranslationKeySidebar({
         return () => document.removeEventListener('keydown', handleKeyDown);
     }, [isMobile, toggleSidebar]);
 
-    function handlePriorityChange(value: string): void {
+    function _handlePriorityChange(value: string): void {
         router.put(
             update.url({ translationKey: translationKey.id }),
             { priority: value },
@@ -140,14 +140,7 @@ export default function TranslationKeySidebar({
 
     const sidebarContent = (
         <SidebarContent className="gap-0">
-            <SidebarDetailsSection
-                translationKey={translationKey}
-                status={status}
-                showPrioritySelect={showPrioritySelect}
-                isOpen={sections.details}
-                onToggle={() => toggleSection('details')}
-                onPriorityChange={handlePriorityChange}
-            />
+            <SidebarDetailsSection translationKey={translationKey} />
         </SidebarContent>
     );
 
