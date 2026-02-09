@@ -20,7 +20,6 @@ it('shows the phrases index for a non-source language', function () {
         'translation_key_id' => $key->id,
         'language_id' => $this->language->id,
         'value' => 'Se connecter',
-        'status' => 'translated',
     ]);
 
     $this->actingAs($this->contributor, 'translations')
@@ -72,7 +71,6 @@ it('includes source translations in mapped data', function () {
         'translation_key_id' => $key->id,
         'language_id' => $this->language->id,
         'value' => 'Se connecter',
-        'status' => 'translated',
     ]);
 
     $this->actingAs($this->contributor, 'translations')
@@ -92,7 +90,6 @@ it('filters by status', function () {
     Translation::factory()->create([
         'translation_key_id' => $key1->id,
         'language_id' => $this->language->id,
-        'status' => 'translated',
     ]);
     Translation::factory()->untranslated()->create([
         'translation_key_id' => $key2->id,
@@ -143,7 +140,6 @@ it('rejects translation missing required parameters', function () {
         'translation_key_id' => $key->id,
         'language_id' => $this->language->id,
         'value' => 'Old value with :attribute',
-        'status' => 'translated',
     ]);
 
     $this->actingAs($this->contributor, 'translations')
@@ -225,19 +221,16 @@ it('filters by missing params', function () {
         'translation_key_id' => $keyWithParams->id,
         'language_id' => $this->language->id,
         'value' => 'Missing the param completely',
-        'status' => 'translated',
     ]);
     Translation::factory()->create([
         'translation_key_id' => $keyWithoutParams->id,
         'language_id' => $this->language->id,
         'value' => 'No params needed',
-        'status' => 'translated',
     ]);
     Translation::factory()->create([
         'translation_key_id' => $keyParamsComplete->id,
         'language_id' => $this->language->id,
         'value' => ':attribute must be at least :min',
-        'status' => 'translated',
     ]);
 
     $this->actingAs($this->contributor, 'translations')
@@ -246,18 +239,6 @@ it('filters by missing params', function () {
         ->assertInertia(fn ($page) => $page
             ->where('data.total', 1)
             ->where('data.data.0.key', 'validation.required')
-        );
-});
-
-it('includes missing_params in tableConfig filters', function () {
-    TranslationKey::factory()->create();
-
-    $this->actingAs($this->contributor, 'translations')
-        ->get(route('ltu.phrases.index', $this->language))
-        ->assertOk()
-        ->assertInertia(fn ($page) => $page
-            ->has('tableConfig.filters', 3)
-            ->where('tableConfig.filters.2.key', 'missing_params')
         );
 });
 
@@ -270,6 +251,61 @@ it('includes flattened group_name in row data', function () {
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->where('data.data.0.group_name', 'messages')
+        );
+});
+
+it('includes similarKeys in edit page props', function () {
+    $group = Group::factory()->create(['name' => 'auth']);
+    $key = TranslationKey::factory()->create(['group_id' => $group->id, 'key' => 'login']);
+    $similarKey = TranslationKey::factory()->create(['group_id' => $group->id, 'key' => 'login_button']);
+    Translation::factory()->create([
+        'translation_key_id' => $similarKey->id,
+        'language_id' => $this->sourceLanguage->id,
+        'value' => 'Login Button',
+    ]);
+    Translation::factory()->create([
+        'translation_key_id' => $similarKey->id,
+        'language_id' => $this->language->id,
+        'value' => 'Bouton de connexion',
+    ]);
+
+    $this->actingAs($this->contributor, 'translations')
+        ->get(route('ltu.phrases.edit', ['language' => $this->language, 'translationKey' => $key]))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->has('similarKeys', 1)
+            ->where('similarKeys.0.key', 'auth.login_button')
+            ->where('similarKeys.0.source', 'Login Button')
+            ->where('similarKeys.0.translation', 'Bouton de connexion')
+        );
+});
+
+it('excludes the current key from similarKeys', function () {
+    $group = Group::factory()->create(['name' => 'auth']);
+    $key = TranslationKey::factory()->create(['group_id' => $group->id, 'key' => 'login']);
+    TranslationKey::factory()->create(['group_id' => $group->id, 'key' => 'login_button']);
+
+    $this->actingAs($this->contributor, 'translations')
+        ->get(route('ltu.phrases.edit', ['language' => $this->language, 'translationKey' => $key]))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->has('similarKeys', 1)
+            ->where('similarKeys.0.key', 'auth.login_button')
+        );
+});
+
+it('returns empty similarKeys when no matches exist', function () {
+    $group = Group::factory()->create(['name' => 'auth']);
+    $key = TranslationKey::factory()->create(['group_id' => $group->id, 'key' => 'login']);
+
+    $otherGroup = Group::factory()->create(['name' => 'dashboard']);
+    TranslationKey::factory()->create(['group_id' => $otherGroup->id, 'key' => 'welcome']);
+
+    $this->actingAs($this->contributor, 'translations')
+        ->get(route('ltu.phrases.edit', ['language' => $this->language, 'translationKey' => $key]))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('similarKeys', [])
         );
 });
 
@@ -290,7 +326,6 @@ it('passes translationIsEmpty as false when translation has a value', function (
         'translation_key_id' => $key->id,
         'language_id' => $this->language->id,
         'value' => 'Some translation',
-        'status' => 'translated',
     ]);
 
     $this->actingAs($this->contributor, 'translations')
