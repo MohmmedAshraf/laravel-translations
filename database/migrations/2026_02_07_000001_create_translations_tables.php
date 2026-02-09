@@ -75,6 +75,9 @@ return new class extends Migration
             $table->string('password')->nullable();
             $table->string('role')->default('translator');
             $table->boolean('is_active')->default(true);
+            $table->string('invite_token')->nullable()->unique();
+            $table->timestamp('invite_expires_at')->nullable();
+            $table->timestamp('last_active_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Outhebox\Translations\Http\Controllers\ContributorController;
 use Outhebox\Translations\Http\Controllers\GroupController;
 use Outhebox\Translations\Http\Controllers\ImportExportController;
 use Outhebox\Translations\Http\Controllers\LanguageController;
@@ -39,5 +40,11 @@ Route::middleware(['translations.auth'])->group(function () {
         Route::post('/export', [ImportExportController::class, 'export'])->name('ltu.export');
         Route::get('/import/status', [ImportExportController::class, 'importStatus'])->name('ltu.import.status');
         Route::get('/export/status', [ImportExportController::class, 'exportStatus'])->name('ltu.export.status');
+
+        Route::get('/contributors', [ContributorController::class, 'index'])->name('ltu.contributors.index');
+        Route::post('/contributors', [ContributorController::class, 'store'])->name('ltu.contributors.store');
+        Route::put('/contributors/{contributor}', [ContributorController::class, 'update'])->name('ltu.contributors.update');
+        Route::post('/contributors/{contributor}/toggle-active', [ContributorController::class, 'toggleActive'])->name('ltu.contributors.toggle-active');
+        Route::delete('/contributors/{contributor}', [ContributorController::class, 'destroy'])->name('ltu.contributors.destroy');
     });
 });
