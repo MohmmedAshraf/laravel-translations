@@ -22,7 +22,7 @@ Laravel Translations provides a beautiful UI for managing your application's tra
 
 ### Requirements
 
-- PHP 8.2+
+- PHP 8.3+
 - Laravel 11.x or 12.x
 
 ## Installation

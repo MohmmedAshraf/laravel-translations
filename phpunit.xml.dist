@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.3/phpunit.xsd"
+    backupGlobals="false"
+    bootstrap="vendor/autoload.php"
+    colors="true"
+    processIsolation="false"
+    stopOnFailure="false"
+    executionOrder="random"
+    failOnWarning="true"
+    failOnRisky="true"
+    failOnEmptyTestSuite="true"
+    beStrictAboutOutputDuringTests="true"
+    cacheDirectory=".phpunit.cache"
+    backupStaticProperties="false"
+>
+    <testsuites>
+        <testsuite name="Tests">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory>src</directory>
+        </include>
+    </source>
+    <php>
+        <env name="DB_CONNECTION" value="sqlite"/>
+        <env name="DB_DATABASE" value=":memory:"/>
+    </php>
+</phpunit>
