@@ -10,5 +10,6 @@ export type SharedData = {
     auth: Auth;
     sidebarOpen: boolean;
     environment: string;
+    isContributorMode: boolean;
     [key: string]: unknown;
 };

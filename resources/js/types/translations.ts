@@ -56,6 +56,13 @@ export type SourceTranslation = {
     value: string | null;
 };
 
+export type SimilarKey = {
+    id: number;
+    key: string;
+    source: string | null;
+    translation: string | null;
+};
+
 export type TranslationComment = {
     id: number;
     userName: string;

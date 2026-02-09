@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 use Outhebox\Translations\Concerns\HasDataTable;
@@ -36,11 +37,6 @@ class PhraseController extends Controller
     protected function tableModel(): string
     {
         return TranslationKey::class;
-    }
-
-    protected function tableBaseQuery(): string|Builder
-    {
-        return TranslationKey::query();
     }
 
     protected function tableColumns(): array
@@ -138,7 +134,7 @@ class PhraseController extends Controller
 
         $tableData = $this->paginatedTableData($request);
 
-        $keyIds = collect($tableData['data'])->pluck('id')->filter()->all();
+        $keyIds = collect($tableData['data'])->pluck('id')->all();
 
         $sourceTranslations = $this->sourceLanguage
             ? Translation::query()
@@ -197,6 +193,7 @@ class PhraseController extends Controller
             'previousKey' => TranslationKey::query()->where('group_id', $translationKey->group_id)->where('key', '<', $translationKey->key)->orderByDesc('key')->value('id'),
             'nextKey' => TranslationKey::query()->where('group_id', $translationKey->group_id)->where('key', '>', $translationKey->key)->orderBy('key')->value('id'),
             'workflow' => $this->buildWorkflowData(),
+            'similarKeys' => $this->buildSimilarKeys($translationKey, $language, $sourceLanguage),
         ];
     }
 
@@ -248,6 +245,41 @@ class PhraseController extends Controller
         }
 
         return TranslationStatus::NeedsReview;
+    }
+
+    protected function buildSimilarKeys(TranslationKey $translationKey, Language $language, ?Language $sourceLanguage): array
+    {
+        $prefix = Str::before($translationKey->key, '_');
+        if ($prefix === $translationKey->key) {
+            $prefix = Str::before($translationKey->key, '.');
+        }
+
+        if (! $prefix || mb_strlen($prefix) < 2) {
+            return [];
+        }
+
+        $languageIds = collect([$language->id, $sourceLanguage?->id])->filter()->values()->all();
+
+        $similarKeys = TranslationKey::query()
+            ->where('id', '!=', $translationKey->id)
+            ->where('group_id', $translationKey->group_id)
+            ->where('key', 'like', $prefix.'%')
+            ->with(['group', 'translations' => fn ($q) => $q->whereIn('language_id', $languageIds)])
+            ->limit(20)
+            ->get();
+
+        return $similarKeys->map(function (TranslationKey $key) use ($language, $sourceLanguage) {
+            $groupName = $key->group?->name ?? '';
+
+            return [
+                'id' => $key->id,
+                'key' => $groupName ? $groupName.'.'.$key->key : $key->key,
+                'source' => $sourceLanguage
+                    ? $key->translations->firstWhere('language_id', $sourceLanguage->id)?->value
+                    : null,
+                'translation' => $key->translations->firstWhere('language_id', $language->id)?->value,
+            ];
+        })->values()->all();
     }
 
     protected function buildWorkflowData(): array

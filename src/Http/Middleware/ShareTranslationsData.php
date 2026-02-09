@@ -23,6 +23,7 @@ class ShareTranslationsData
             ],
             'environment' => fn () => app()->environment(),
             'translationsNav' => fn () => $this->navigationItems(),
+            'isContributorMode' => fn () => $auth->isContributorMode(),
         ]);
 
         return $next($request);

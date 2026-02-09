@@ -2,6 +2,7 @@ import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { useCallback, useRef } from 'react';
 import { EditorFooter } from '@/components/translations/editor-footer';
 import { EditorHeader } from '@/components/translations/editor-header';
+import { EditorToolsPanel } from '@/components/translations/editor-tools-panel';
 import { LanguageBar } from '@/components/translations/language-bar';
 import { SourcePanel } from '@/components/translations/source-panel';
 import TranslationKeySidebar from '@/components/translations/translation-key-sidebar';
@@ -16,6 +17,7 @@ import { edit, index as phrasesIndex, update } from '@/routes/ltu/phrases';
 import type {
     BreadcrumbItem,
     Language,
+    SimilarKey,
     SourceTranslation,
     TranslationKey,
 } from '@/types';
@@ -42,6 +44,7 @@ interface PageProps {
     translationIsEmpty: boolean;
     qualityIssues?: QualityIssue[];
     qualityChecks?: QualityCheck[];
+    similarKeys: SimilarKey[];
     previousKey: number | null;
     nextKey: number | null;
     [key: string]: unknown;
@@ -56,6 +59,7 @@ export default function EditPhrase() {
         translationIsEmpty,
         qualityIssues,
         qualityChecks,
+        similarKeys,
         previousKey,
         nextKey,
     } = usePage<PageProps>().props;
@@ -186,6 +190,11 @@ export default function EditPhrase() {
                             />
                         </div>
                     </div>
+
+                    <EditorToolsPanel
+                        similarKeys={similarKeys}
+                        onApplyTranslation={(text) => setData('value', text)}
+                    />
                 </div>
 
                 <TranslationKeySidebar
