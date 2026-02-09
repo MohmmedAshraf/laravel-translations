@@ -32,8 +32,8 @@
         "laravel/pint": "^1.0",
         "laravel/wayfinder": "^0.1",
         "nunomaduro/collision": "^8.0",
-        "orchestra/testbench": "^10.0",
-        "orchestra/workbench": "^10.0",
+        "orchestra/testbench": "^9.0||^10.0",
+        "orchestra/workbench": "^9.0||^10.0",
         "pestphp/pest": "^4.0",
         "pestphp/pest-plugin-laravel": "^4.0"
     },
