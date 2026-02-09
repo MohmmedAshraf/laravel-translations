@@ -30,6 +30,13 @@
 
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
+        @if (file_exists(public_path('hot-translations')))
+            @php($hotUrl = trim(file_get_contents(public_path('hot-translations'))))
+            <link rel="icon" href="{{ $hotUrl }}/dist/favicon.svg" type="image/svg+xml">
+        @else
+            <link rel="icon" href="{{ asset('vendor/translations/favicon.svg') }}" type="image/svg+xml">
+        @endif
+
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
 

@@ -3,7 +3,19 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import fs from 'fs';
 import { resolve } from 'path';
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
+
+function copyStaticAssets(): Plugin {
+    return {
+        name: 'copy-static-assets',
+        closeBundle() {
+            fs.copyFileSync(
+                resolve(__dirname, 'resources/images/favicon.svg'),
+                resolve(__dirname, 'dist/favicon.svg'),
+            );
+        },
+    };
+}
 
 const hotFiles = [
     resolve(__dirname, 'public/hot-translations'),
@@ -41,6 +53,7 @@ export default defineConfig({
                 process.on('SIGTERM', () => process.exit());
             },
         },
+        copyStaticAssets(),
     ],
     server: {
         cors: true,
