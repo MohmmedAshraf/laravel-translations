@@ -77,7 +77,7 @@ export function AppSidebar() {
                         </a>
 
                         <a
-                            href="https://github.com/MohmmedAshraf/laravel-translations"
+                            href="https://translations.io/pro"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="group/pro relative block overflow-hidden rounded-xl bg-gradient-to-r from-indigo-300 via-violet-300 to-purple-300 p-[1px] shadow-sm transition-all hover:shadow-lg hover:shadow-indigo-300/30 dark:from-indigo-400 dark:via-violet-400 dark:to-purple-400 dark:hover:shadow-indigo-400/15"
@@ -128,7 +128,7 @@ export function AppSidebar() {
                         </a>
 
                         <a
-                            href="https://github.com/MohmmedAshraf/laravel-translations"
+                            href="https://outhebox.dev/products/translations-pro?utm_source=app_sidebar&utm_medium=link&utm_campaign=upgrade_to_pro"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="group/pro relative block overflow-hidden rounded-lg bg-gradient-to-r from-indigo-300 via-violet-300 to-purple-300 p-[1px] transition-shadow hover:shadow-lg hover:shadow-indigo-300/30 dark:from-indigo-400 dark:via-violet-400 dark:to-purple-400 dark:hover:shadow-indigo-400/15"

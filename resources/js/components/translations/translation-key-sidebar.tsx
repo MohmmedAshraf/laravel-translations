@@ -1,7 +1,6 @@
 import { router } from '@inertiajs/react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { SidebarCodeSection } from '@/components/translations/sidebar-code-section';
 import { SidebarDetailsSection } from '@/components/translations/sidebar-details-section';
 import {
     Sheet,
@@ -46,7 +45,6 @@ const SIDEBAR_KEY = 'ltu-right-sidebar';
 const DEFAULT_OPEN: Record<string, boolean> = {
     details: true,
     quality: true,
-    code: false,
     history: false,
 };
 
@@ -149,11 +147,6 @@ export default function TranslationKeySidebar({
                 isOpen={sections.details}
                 onToggle={() => toggleSection('details')}
                 onPriorityChange={handlePriorityChange}
-            />
-            <SidebarCodeSection
-                translationKeyId={translationKey.id}
-                isOpen={sections.code}
-                onToggle={() => toggleSection('code')}
             />
         </SidebarContent>
     );

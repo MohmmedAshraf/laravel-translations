@@ -131,7 +131,7 @@ export function SidebarDetailsSection({
                                         variant="outline"
                                         className="font-mono"
                                     >
-                                        :{param}
+                                        {param}
                                     </Badge>
                                 ))}
                             </div>

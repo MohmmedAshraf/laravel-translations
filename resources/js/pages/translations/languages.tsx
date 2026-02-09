@@ -10,7 +10,6 @@ import {
     AddLanguageDialog,
     type AvailableLanguage,
 } from '@/components/translations/add-language-dialog';
-import { BatchTranslateLanguagesDialog } from '@/components/translations/batch-translate-languages-dialog';
 import { RemoveLanguageDialog } from '@/components/translations/remove-language-dialog';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
@@ -142,24 +141,6 @@ export default function Languages() {
         null,
     );
     const [importing, setImporting] = React.useState(false);
-    const [batchLanguages, setBatchLanguages] = React.useState<Language[]>([]);
-    const [batchDialogOpen, setBatchDialogOpen] = React.useState(false);
-
-    const handleBulkAction = React.useCallback(
-        (name: string, ids: (string | number)[]) => {
-            if (name === 'translate') {
-                const selected = data.data.filter((l) => ids.includes(l.id));
-                setBatchLanguages(selected);
-                setBatchDialogOpen(true);
-            }
-        },
-        [data.data],
-    );
-
-    const handleBatchComplete = React.useCallback(() => {
-        router.reload({ only: ['data', 'tableConfig'] });
-    }, []);
-
     const handleImport = React.useCallback(() => {
         setImporting(true);
         router.post(
@@ -241,7 +222,6 @@ export default function Languages() {
                     compactToolbar
                     columnStorageKey="ltu-languages-columns"
                     isRowSelectable={(row) => !row.is_source}
-                    onBulkAction={handleBulkAction}
                 />
             </div>
 
@@ -254,16 +234,6 @@ export default function Languages() {
                     }}
                 />
             )}
-
-            <BatchTranslateLanguagesDialog
-                languages={batchLanguages.map((l) => ({
-                    code: l.code,
-                    name: l.name,
-                }))}
-                open={batchDialogOpen}
-                onOpenChange={setBatchDialogOpen}
-                onComplete={handleBatchComplete}
-            />
         </AppLayout>
     );
 }

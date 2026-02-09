@@ -1,17 +1,13 @@
 import { Head, router, usePage } from '@inertiajs/react';
-import { useCallback, useState } from 'react';
 import {
     AdminDataTable,
     type PaginatedData,
     type RowAction,
     type TableConfig,
 } from '@/components/data-table';
-import { BatchTranslateDialog } from '@/components/translations/batch-translate-dialog';
 import HighlightedText from '@/components/translations/highlighted-text';
-import { TranslateAllDialog } from '@/components/translations/translate-all-dialog';
-import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
-import { DocumentText, Pen2, Stars } from '@/lib/icons';
+import { DocumentText, Pen2 } from '@/lib/icons';
 import { index as languagesIndex } from '@/routes/ltu/languages';
 import { index, edit } from '@/routes/ltu/phrases';
 import type { BreadcrumbItem, Language } from '@/types';
@@ -75,9 +71,6 @@ const PLACEHOLDER_DATA: PhraseRow[] = [
 
 export default function Phrases() {
     const { data, tableConfig, language } = usePage<PageProps>().props;
-    const [batchKeyIds, setBatchKeyIds] = useState<number[]>([]);
-    const [batchDialogOpen, setBatchDialogOpen] = useState(false);
-    const [translateAllOpen, setTranslateAllOpen] = useState(false);
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Translations', href: languagesIndex().url },
@@ -97,20 +90,6 @@ export default function Phrases() {
                 ),
         },
     ];
-
-    const handleBulkAction = useCallback(
-        (name: string, ids: (string | number)[]) => {
-            if (name === 'translate') {
-                setBatchKeyIds(ids.map(Number));
-                setBatchDialogOpen(true);
-            }
-        },
-        [],
-    );
-
-    const handleBatchComplete = useCallback(() => {
-        router.reload({ only: ['data', 'tableConfig'] });
-    }, []);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -157,34 +136,8 @@ export default function Phrases() {
                     compactToolbar
                     columnStorageKey="ltu-phrases-columns"
                     exportFilename={`${language.code}-phrases`}
-                    onBulkAction={handleBulkAction}
-                    toolbarActions={
-                        <Button
-                            size="lg"
-                            onClick={() => setTranslateAllOpen(true)}
-                        >
-                            <Stars className="size-4" />
-                            Translate All Missing
-                        </Button>
-                    }
                 />
             </div>
-
-            <BatchTranslateDialog
-                keyIds={batchKeyIds}
-                targetLocale={language.code}
-                open={batchDialogOpen}
-                onOpenChange={setBatchDialogOpen}
-                onComplete={handleBatchComplete}
-            />
-
-            <TranslateAllDialog
-                locale={language.code}
-                languageName={language.name}
-                open={translateAllOpen}
-                onOpenChange={setTranslateAllOpen}
-                onComplete={handleBatchComplete}
-            />
         </AppLayout>
     );
 }

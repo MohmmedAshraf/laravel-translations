@@ -186,13 +186,6 @@ export default function EditPhrase() {
                             />
                         </div>
                     </div>
-
-                    <div className="flex min-h-0 flex-1 items-center justify-center text-sm text-muted-foreground">
-                        <p>
-                            Upgrade to Pro for AI translation, glossary,
-                            comments, and more.
-                        </p>
-                    </div>
                 </div>
 
                 <TranslationKeySidebar
