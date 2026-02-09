@@ -5,8 +5,9 @@ import {
     DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { UserInfo } from '@/components/user-info';
+import { useSettingsDialog } from '@/contexts/settings-dialog-context';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
-import { Logout2 } from '@/lib/icons';
+import { Logout2, Settings } from '@/lib/icons';
 import { logout } from '@/routes/ltu';
 import type { User } from '@/types';
 
@@ -16,6 +17,12 @@ type Props = {
 
 export function UserMenuContent({ user }: Props) {
     const cleanup = useMobileNavigation();
+    const { open: openSettings } = useSettingsDialog();
+
+    const handleOpenSettings = () => {
+        cleanup();
+        openSettings();
+    };
 
     const handleLogout = () => {
         cleanup();
@@ -30,6 +37,10 @@ export function UserMenuContent({ user }: Props) {
                 </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleOpenSettings}>
+                <Settings className="mr-2" />
+                Settings
+            </DropdownMenuItem>
             <DropdownMenuItem asChild>
                 <Link
                     className="block w-full cursor-pointer"
