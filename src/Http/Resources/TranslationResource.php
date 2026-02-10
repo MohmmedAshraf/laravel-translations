@@ -24,14 +24,15 @@ class TranslationResource extends JsonResource
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
             'progress' => $this->formatProgress(),
-            'phrases_count' => $this->phrases_count,
+            'phrases_count' => $this->whenCounted('phrases'),
         ];
     }
 
     private function formatProgress(): string
     {
-        if ($this->progress > 0) {
-            return "{$this->progress}%";
+        $progress = $this->resource->hasAttribute('progress') ? $this->resource->getAttribute('progress') : null;
+        if ($progress > 0) {
+            return "{$progress}%";
         }
 
         return '0%';
