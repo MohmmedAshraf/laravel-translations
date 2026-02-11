@@ -13,7 +13,7 @@ class TranslationSaved
     public function __construct(
         public Translation $translation,
         public ?string $oldValue = null,
-        public mixed $changeType = null,
+        public ?string $changeType = null,
         public ?string $changedBy = null,
         public ?array $metadata = null,
     ) {}

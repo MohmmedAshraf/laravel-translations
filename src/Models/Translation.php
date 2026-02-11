@@ -72,7 +72,7 @@ class Translation extends Model
         return $query->where('status', TranslationStatus::NeedsReview);
     }
 
-    public static function withRevisionContext(mixed $changeType, ?string $changedBy = null, ?array $metadata = null): void
+    public static function withRevisionContext(?string $changeType, ?string $changedBy = null, ?array $metadata = null): void
     {
         static::$revisionContext = [
             'changeType' => $changeType,
@@ -117,13 +117,10 @@ class Translation extends Model
 
     protected static function handleSaved(Translation $translation): void
     {
-        $key = $translation->id ?? spl_object_id($translation);
-        $oldValue = static::$pendingOldValues[$key] ?? null;
-        unset(static::$pendingOldValues[$key]);
-
-        if ($translation->wasRecentlyCreated) {
-            unset(static::$pendingOldValues[spl_object_id($translation)]);
-        }
+        $objectKey = spl_object_id($translation);
+        $idKey = $translation->id;
+        $oldValue = static::$pendingOldValues[$idKey] ?? static::$pendingOldValues[$objectKey] ?? null;
+        unset(static::$pendingOldValues[$idKey], static::$pendingOldValues[$objectKey]);
 
         $valueChanged = $translation->wasChanged('value')
             || ($translation->wasRecentlyCreated && $translation->value !== null);

@@ -17,6 +17,7 @@ use Outhebox\Translations\Http\Middleware\TranslationsAuth;
 use Outhebox\Translations\Http\Middleware\TranslationsInertia;
 use Outhebox\Translations\Http\Middleware\TranslationsRole;
 use Outhebox\Translations\Models\Contributor;
+use Outhebox\Translations\Models\Translation;
 use Outhebox\Translations\Services\TranslationAuth as TranslationAuthService;
 
 class TranslationsServiceProvider extends ServiceProvider
@@ -41,6 +42,12 @@ class TranslationsServiceProvider extends ServiceProvider
         $this->configureMigrations();
         $this->configureViews();
         $this->configureCommands();
+
+        $this->app->afterResolving('events', function ($events): void {
+            if (class_exists(\Laravel\Octane\Events\RequestTerminated::class)) {
+                $events->listen(\Laravel\Octane\Events\RequestTerminated::class, fn () => Translation::resetStaticState());
+            }
+        });
     }
 
     protected function configureAuth(): void
