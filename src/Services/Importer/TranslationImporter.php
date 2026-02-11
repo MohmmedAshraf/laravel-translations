@@ -11,6 +11,7 @@ use Outhebox\Translations\Models\Language;
 use Outhebox\Translations\Models\Translation;
 use Outhebox\Translations\Models\TranslationKey;
 use Outhebox\Translations\Services\KeyReplicator;
+use Outhebox\Translations\Support\LanguageDataProvider;
 
 class TranslationImporter
 {
@@ -222,19 +223,25 @@ class TranslationImporter
 
     private function ensureLanguage(string $code): Language
     {
-        $language = Language::query()->firstOrCreate(
-            ['code' => $code],
-            [
-                'name' => $code,
-                'active' => true,
-                'is_source' => $code === config('translations.source_language', 'en'),
-            ],
-        );
+        $language = Language::query()->where('code', $code)->first();
 
-        if (! $language->active) {
-            $language->update(['active' => true]);
+        if ($language) {
+            if (! $language->active) {
+                $language->update(['active' => true]);
+            }
+
+            return $language;
         }
 
-        return $language;
+        $knownLanguage = LanguageDataProvider::findByCode($code);
+
+        return Language::query()->create([
+            'code' => $code,
+            'name' => $knownLanguage['name'] ?? $code,
+            'native_name' => $knownLanguage['native_name'] ?? $code,
+            'rtl' => $knownLanguage['rtl'] ?? false,
+            'active' => true,
+            'is_source' => $code === config('translations.source_language', 'en'),
+        ]);
     }
 }
