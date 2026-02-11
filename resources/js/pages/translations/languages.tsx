@@ -19,8 +19,9 @@ import {
     DownloadMinimalistic,
     Languages as LanguagesIcon,
     TrashBin2,
+    Upload,
 } from '@/lib/icons';
-import { importMethod } from '@/routes/ltu';
+import { importMethod, exportMethod } from '@/routes/ltu';
 import { index } from '@/routes/ltu/languages';
 import { index as phrasesIndex } from '@/routes/ltu/phrases';
 import { index as sourceIndex } from '@/routes/ltu/source';
@@ -141,6 +142,7 @@ export default function Languages() {
         null,
     );
     const [importing, setImporting] = React.useState(false);
+    const [exporting, setExporting] = React.useState(false);
     const handleImport = React.useCallback(() => {
         setImporting(true);
         router.post(
@@ -148,6 +150,16 @@ export default function Languages() {
             {},
             {
                 onFinish: () => setImporting(false),
+            },
+        );
+    }, []);
+    const handleExport = React.useCallback(() => {
+        setExporting(true);
+        router.post(
+            exportMethod.url(),
+            {},
+            {
+                onFinish: () => setExporting(false),
             },
         );
     }, []);
@@ -197,27 +209,44 @@ export default function Languages() {
                         ),
                     }}
                     toolbarActions={
-                        data.data.some((l) => l.is_source) ? (
-                            <AddLanguageDialog
-                                availableLanguages={availableLanguages}
-                                totalKeys={totalKeys}
-                                trigger={
-                                    <Button size="lg">
-                                        <AddCircle className="size-4" />
-                                        Add Language
-                                    </Button>
-                                }
-                            />
-                        ) : (
-                            <Button
-                                size="lg"
-                                disabled
-                                title="Import translations first to add languages"
-                            >
-                                <AddCircle className="size-4" />
-                                Add Language
-                            </Button>
-                        )
+                        <>
+                            {data.data.length > 0 && (
+                                <Button
+                                    size="lg"
+                                    variant="outline"
+                                    onClick={handleExport}
+                                    disabled={exporting}
+                                >
+                                    {exporting ? (
+                                        <Spinner />
+                                    ) : (
+                                        <Upload className="size-4" />
+                                    )}
+                                    Export
+                                </Button>
+                            )}
+                            {data.data.some((l) => l.is_source) ? (
+                                <AddLanguageDialog
+                                    availableLanguages={availableLanguages}
+                                    totalKeys={totalKeys}
+                                    trigger={
+                                        <Button size="lg">
+                                            <AddCircle className="size-4" />
+                                            Add Language
+                                        </Button>
+                                    }
+                                />
+                            ) : (
+                                <Button
+                                    size="lg"
+                                    disabled
+                                    title="Import translations first to add languages"
+                                >
+                                    <AddCircle className="size-4" />
+                                    Add Language
+                                </Button>
+                            )}
+                        </>
                     }
                     compactToolbar
                     columnStorageKey="ltu-languages-columns"

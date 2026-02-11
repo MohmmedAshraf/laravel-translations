@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import {
@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/sidebar';
 import {
     Contributor,
+    DocumentText,
     Languages,
     Library,
     SquareArrowRightUp,
@@ -21,6 +22,8 @@ import {
 import { index as contributorsIndex } from '@/routes/ltu/contributors';
 import { index as groupsIndex } from '@/routes/ltu/groups';
 import { index as languagesIndex } from '@/routes/ltu/languages';
+import { index as sourceIndex } from '@/routes/ltu/source';
+import type { SharedData } from '@/types';
 import type { NavItem } from '@/types';
 import AppLogo from './app-logo';
 import { ReportBugLink } from './report-bug-link';
@@ -28,6 +31,8 @@ import { ReportBugLink } from './report-bug-link';
 export function AppSidebar() {
     const { state } = useSidebar();
     const isCollapsed = state === 'collapsed';
+    const { auth } = usePage<SharedData>().props;
+    const canManageContributors = ['owner', 'admin'].includes(auth.role ?? '');
 
     const mainNavItems: NavItem[] = [
         {
@@ -36,15 +41,24 @@ export function AppSidebar() {
             icon: Languages,
         },
         {
+            title: 'Source Language',
+            href: sourceIndex().url,
+            icon: DocumentText,
+        },
+        {
             title: 'Groups',
             href: groupsIndex().url,
             icon: Library,
         },
-        {
-            title: 'Contributors',
-            href: contributorsIndex().url,
-            icon: Contributor,
-        },
+        ...(canManageContributors
+            ? [
+                  {
+                      title: 'Contributors',
+                      href: contributorsIndex().url,
+                      icon: Contributor,
+                  },
+              ]
+            : []),
     ];
 
     return (

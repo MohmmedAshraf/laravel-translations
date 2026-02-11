@@ -100,7 +100,7 @@ export function GroupCard({ group, updateUrl, deleteUrl }: GroupCardProps) {
                 onOpenChange={setDeleteOpen}
                 onConfirm={() => router.delete(deleteUrl)}
                 title="Delete Group"
-                description={`Delete "${displayGroupName(group)}" and all its translation keys? This action cannot be undone.`}
+                description={`Delete "${displayGroupName(group)}" and all ${keyCount} translation ${keyCount === 1 ? 'key' : 'keys'} with their translations? This action cannot be undone.`}
                 confirmLabel="Delete"
             />
         </>
