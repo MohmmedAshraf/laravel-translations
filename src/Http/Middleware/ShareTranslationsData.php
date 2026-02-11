@@ -14,7 +14,10 @@ class ShareTranslationsData
         $auth = app('translations.auth');
 
         Inertia::share([
-            'auth' => ['user' => fn () => $auth->check() ? $auth->user() : null],
+            'auth' => [
+                'user' => fn () => $auth->check() ? $auth->user() : null,
+                'role' => fn () => $auth->role()?->value,
+            ],
             'flash' => fn () => [
                 'success' => $request->session()->get('success'),
                 'error' => $request->session()->get('error'),

@@ -5,7 +5,7 @@ namespace Outhebox\Translations\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreGroupRequest extends FormRequest
+class UpdateGroupRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -19,7 +19,7 @@ class StoreGroupRequest extends FormRequest
         return [
             'name' => [
                 'required', 'string', 'max:255',
-                Rule::unique('ltu_groups')->where('namespace', $this->namespace),
+                Rule::unique('ltu_groups')->where('namespace', $this->namespace)->ignore($this->route('group')),
             ],
             'namespace' => ['nullable', 'string', 'max:255'],
         ];

@@ -19,11 +19,7 @@ class TranslationAuth
 
     public function user(): ?TranslatableUser
     {
-        if ($this->isContributorMode()) {
-            return $this->app['auth']->guard('translations')->user();
-        }
-
-        $user = $this->app['auth']->guard(config('translations.auth.guard', 'web'))->user();
+        $user = $this->app['auth']->guard($this->guardName())->user();
 
         if ($user instanceof TranslatableUser) {
             return $user;
@@ -44,16 +40,14 @@ class TranslationAuth
 
     public function role(): ?ContributorRole
     {
-        return ContributorRole::tryFrom($this->user()?->getTranslationRole() ?? '');
+        $roleValue = $this->user()?->getTranslationRole();
+
+        return $roleValue ? ContributorRole::tryFrom($roleValue) : null;
     }
 
     public function check(): bool
     {
-        if ($this->isContributorMode()) {
-            return $this->app['auth']->guard('translations')->check();
-        }
-
-        return $this->app['auth']->guard(config('translations.auth.guard', 'web'))->check();
+        return $this->app['auth']->guard($this->guardName())->check();
     }
 
     public function isContributorMode(): bool
@@ -74,13 +68,9 @@ class TranslationAuth
 
         $user = $this->user();
 
-        if ($user instanceof Contributor) {
-            $this->cachedLanguageIds = $user->languages()->pluck('ltu_languages.id');
-        } else {
-            $this->cachedLanguageIds = collect();
-        }
-
-        return $this->cachedLanguageIds;
+        return $this->cachedLanguageIds = $user instanceof Contributor
+            ? $user->languages()->pluck('ltu_languages.id')
+            : collect();
     }
 
     public function isAssignedToLanguage(int $languageId): bool
@@ -91,7 +81,7 @@ class TranslationAuth
             return false;
         }
 
-        if ($role !== ContributorRole::Translator) {
+        if ($role->isAtLeast(ContributorRole::Admin)) {
             return true;
         }
 

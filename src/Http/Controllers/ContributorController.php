@@ -17,7 +17,6 @@ use Outhebox\Translations\Http\Requests\StoreContributorRequest;
 use Outhebox\Translations\Http\Requests\UpdateContributorRequest;
 use Outhebox\Translations\Models\Contributor;
 use Outhebox\Translations\Models\Language;
-use Outhebox\Translations\Services\TranslationAuth;
 use Outhebox\Translations\Support\DataTable\Column;
 use Outhebox\Translations\Support\DataTable\Filter;
 
@@ -85,7 +84,7 @@ class ContributorController extends Controller
             $data = $item instanceof Contributor ? $item->toArray() : (array) $item;
             $data['languages_list'] = collect($data['languages'] ?? [])
                 ->pluck('code')
-                ->map(fn ($code) => strtoupper($code))
+                ->map(strtoupper(...))
                 ->implode(', ') ?: 'All';
 
             $data['status'] = match (true) {
@@ -113,7 +112,7 @@ class ContributorController extends Controller
 
     public function store(StoreContributorRequest $request): RedirectResponse
     {
-        $auth = app(TranslationAuth::class);
+        $auth = app('translations.auth');
         $validated = $request->validated();
 
         $role = ContributorRole::from($validated['role']);
@@ -143,7 +142,7 @@ class ContributorController extends Controller
 
     public function update(UpdateContributorRequest $request, Contributor $contributor): RedirectResponse
     {
-        $auth = app(TranslationAuth::class);
+        $auth = app('translations.auth');
         $validated = $request->validated();
 
         $newRole = ContributorRole::from($validated['role']);
@@ -172,7 +171,7 @@ class ContributorController extends Controller
 
     public function toggleActive(Contributor $contributor): RedirectResponse
     {
-        $auth = app(TranslationAuth::class);
+        $auth = app('translations.auth');
 
         if ($contributor->id === $auth->id()) {
             return redirect()->back()->with('error', 'You cannot change your own status.');
@@ -191,18 +190,20 @@ class ContributorController extends Controller
 
     public function destroy(Contributor $contributor): RedirectResponse
     {
-        $auth = app(TranslationAuth::class);
+        $auth = app('translations.auth');
 
-        if ($contributor->isLastActiveOwner()) {
-            return redirect()->back()->with('error', 'Cannot deactivate the last owner.');
+        if ($contributor->role === ContributorRole::Owner && $contributor->isLastActiveOwner()) {
+            return redirect()->back()->with('error', 'Cannot delete the last owner.');
         }
 
         if ($contributor->id === $auth->id()) {
-            return redirect()->back()->with('error', 'You cannot deactivate yourself.');
+            return redirect()->back()->with('error', 'You cannot delete yourself.');
         }
 
-        $contributor->update(['is_active' => false]);
+        $name = $contributor->name;
+        $contributor->languages()->detach();
+        $contributor->delete();
 
-        return redirect()->back()->with('success', "Contributor '{$contributor->name}' deactivated.");
+        return redirect()->back()->with('success', "Contributor '{$name}' deleted.");
     }
 }

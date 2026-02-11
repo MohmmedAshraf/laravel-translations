@@ -24,6 +24,7 @@ class UpdatePhraseRequest extends FormRequest
         return [
             'value' => ['nullable', 'string', new TranslationParametersRule($translationKey), new TranslationPluralRule($translationKey)],
             'status' => ['sometimes', Rule::enum(TranslationStatus::class)],
+            'reviewer_feedback' => ['nullable', 'string', 'max:1000'],
         ];
     }
 }

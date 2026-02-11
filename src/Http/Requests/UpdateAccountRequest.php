@@ -4,20 +4,19 @@ namespace Outhebox\Translations\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Outhebox\Translations\Services\TranslationAuth;
 
 class UpdateAccountRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        $auth = app(TranslationAuth::class);
+        $auth = app('translations.auth');
 
         return $auth->isContributorMode() && $auth->user() !== null;
     }
 
     public function rules(): array
     {
-        $user = app(TranslationAuth::class)->user();
+        $user = app('translations.auth')->user();
 
         return [
             'name' => ['required', 'string', 'max:255'],

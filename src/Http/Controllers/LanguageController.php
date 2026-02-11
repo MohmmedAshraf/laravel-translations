@@ -20,7 +20,6 @@ use Outhebox\Translations\Http\Requests\StoreLanguageRequest;
 use Outhebox\Translations\Models\Language;
 use Outhebox\Translations\Models\TranslationKey;
 use Outhebox\Translations\Services\KeyReplicator;
-use Outhebox\Translations\Services\TranslationAuth;
 use Outhebox\Translations\Support\DataTable\BulkAction;
 use Outhebox\Translations\Support\DataTable\Column;
 use Outhebox\Translations\Support\DataTable\Filter;
@@ -38,10 +37,10 @@ class LanguageController extends Controller
     {
         $query = Language::query()->active();
 
-        $auth = app(TranslationAuth::class);
+        $auth = app('translations.auth');
         $role = $auth->role();
 
-        if ($role && in_array($role, [ContributorRole::Translator, ContributorRole::Reviewer])) {
+        if ($role && ! $role->isAtLeast(ContributorRole::Admin)) {
             $assignedIds = $auth->assignedLanguageIds();
 
             if ($assignedIds->isNotEmpty()) {
@@ -262,14 +261,18 @@ class LanguageController extends Controller
 
     public function storeCustom(StoreCustomLanguageRequest $request, KeyReplicator $replicator): RedirectResponse
     {
-        $language = Language::query()->create([
-            ...$request->validated(),
-            'active' => true,
-            'is_source' => false,
-        ]);
+        $language = DB::transaction(function () use ($request, $replicator) {
+            $language = Language::query()->create([
+                ...$request->validated(),
+                'active' => true,
+                'is_source' => false,
+            ]);
 
-        $replicator->replicateForLanguage($language);
-        LanguageAdded::dispatch($language);
+            $replicator->replicateForLanguage($language);
+            LanguageAdded::dispatch($language);
+
+            return $language;
+        });
 
         return redirect()->route('ltu.languages.index')
             ->with('success', "Language '{$language->name}' created.");

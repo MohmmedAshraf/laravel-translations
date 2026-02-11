@@ -11,6 +11,7 @@ use Outhebox\Translations\Jobs\ExportTranslationsJob;
 use Outhebox\Translations\Jobs\ImportTranslationsJob;
 use Outhebox\Translations\Services\Exporter\TranslationExporter;
 use Outhebox\Translations\Services\Importer\TranslationImporter;
+use Throwable;
 
 class ImportExportController extends Controller
 {
@@ -26,12 +27,18 @@ class ImportExportController extends Controller
             return redirect()->back()->with('success', 'Import queued. Check status for progress.');
         }
 
-        $result = $importer->import([
-            'fresh' => $fresh,
-            'overwrite' => $overwrite,
-            'triggered_by' => $triggeredBy,
-            'source' => 'ui',
-        ]);
+        try {
+            $result = $importer->import([
+                'fresh' => $fresh,
+                'overwrite' => $overwrite,
+                'triggered_by' => $triggeredBy,
+                'source' => 'ui',
+            ]);
+        } catch (Throwable $e) {
+            report($e);
+
+            return redirect()->back()->with('error', 'Import failed: '.$e->getMessage());
+        }
 
         return redirect()->back()->with('success', "Import completed: {$result->newCount} new keys, {$result->updatedCount} updated.");
     }
@@ -48,12 +55,18 @@ class ImportExportController extends Controller
             return redirect()->back()->with('success', 'Export queued. Check status for progress.');
         }
 
-        $result = $exporter->export([
-            'locale' => $locale,
-            'group' => $group,
-            'triggered_by' => $triggeredBy,
-            'source' => 'ui',
-        ]);
+        try {
+            $result = $exporter->export([
+                'locale' => $locale,
+                'group' => $group,
+                'triggered_by' => $triggeredBy,
+                'source' => 'ui',
+            ]);
+        } catch (Throwable $e) {
+            report($e);
+
+            return redirect()->back()->with('error', 'Export failed: '.$e->getMessage());
+        }
 
         return redirect()->back()->with('success', "Export completed: {$result->fileCount} files written.");
     }
@@ -70,7 +83,13 @@ class ImportExportController extends Controller
 
     private function isQueueEnabled(): bool
     {
-        return config('translations.queue.connection') !== null;
+        $connection = config('translations.queue.connection');
+
+        if ($connection === null) {
+            return false;
+        }
+
+        return config("queue.connections.{$connection}") !== null;
     }
 
     private function operationStatus(string $operation): JsonResponse

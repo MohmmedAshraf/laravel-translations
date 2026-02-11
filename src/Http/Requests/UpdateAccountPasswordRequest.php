@@ -4,13 +4,12 @@ namespace Outhebox\Translations\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
-use Outhebox\Translations\Services\TranslationAuth;
 
 class UpdateAccountPasswordRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        $auth = app(TranslationAuth::class);
+        $auth = app('translations.auth');
 
         return $auth->isContributorMode() && $auth->user() !== null;
     }

@@ -10,7 +10,9 @@ class StoreContributorRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        $role = app('translations.auth')->role();
+
+        return $role && $role->canManageContributors();
     }
 
     public function rules(): array

@@ -17,7 +17,6 @@ use Outhebox\Translations\Models\Language;
 use Outhebox\Translations\Models\Translation;
 use Outhebox\Translations\Models\TranslationKey;
 use Outhebox\Translations\Rules\TranslationParametersRule;
-use Outhebox\Translations\Services\TranslationAuth;
 use Outhebox\Translations\Support\DataTable\Column;
 use Outhebox\Translations\Support\DataTable\Filter;
 
@@ -28,11 +27,6 @@ class PhraseController extends Controller
     private ?Language $language = null;
 
     private ?Language $sourceLanguage = null;
-
-    private function auth(): TranslationAuth
-    {
-        return app(TranslationAuth::class);
-    }
 
     protected function tableModel(): string
     {
@@ -122,7 +116,7 @@ class PhraseController extends Controller
     public function index(Request $request, Language $language): Response
     {
         abort_if($language->isSource(), 404);
-        abort_unless($this->auth()->canAccessLanguage($language->id), 403);
+        abort_unless(app('translations.auth')->canAccessLanguage($language->id), 403);
 
         return Inertia::render('translations/phrases/index', $this->buildIndexData($request, $language));
     }
@@ -171,7 +165,7 @@ class PhraseController extends Controller
     public function edit(Language $language, TranslationKey $translationKey): Response
     {
         abort_if($language->isSource(), 404);
-        abort_unless($this->auth()->canAccessLanguage($language->id), 403);
+        abort_unless(app('translations.auth')->canAccessLanguage($language->id), 403);
 
         return Inertia::render('translations/phrases/edit', $this->buildEditData($language, $translationKey));
     }
@@ -199,13 +193,13 @@ class PhraseController extends Controller
 
     public function update(UpdatePhraseRequest $request, Language $language, TranslationKey $translationKey): RedirectResponse
     {
-        abort_unless($this->auth()->canAccessLanguage($language->id), 403);
+        abort_unless(app('translations.auth')->canAccessLanguage($language->id), 403);
 
         $validated = $request->validated();
         $hasValue = array_key_exists('value', $validated) && $validated['value'] !== null;
 
         if ($hasValue) {
-            $validated['translated_by'] = $this->auth()->id();
+            $validated['translated_by'] = app('translations.auth')->id();
 
             if (! isset($validated['status'])) {
                 $validated['status'] = $this->resolveStatusForSave();
@@ -238,7 +232,7 @@ class PhraseController extends Controller
             return TranslationStatus::Translated;
         }
 
-        $role = $this->auth()->role();
+        $role = app('translations.auth')->role();
 
         if ($role?->canApproveTranslations()) {
             return TranslationStatus::Approved;
@@ -249,9 +243,11 @@ class PhraseController extends Controller
 
     protected function buildSimilarKeys(TranslationKey $translationKey, Language $language, ?Language $sourceLanguage): array
     {
-        $prefix = Str::before($translationKey->key, '_');
-        if ($prefix === $translationKey->key) {
-            $prefix = Str::before($translationKey->key, '.');
+        $key = $translationKey->key;
+        $prefix = Str::before($key, '_');
+
+        if ($prefix === $key) {
+            $prefix = Str::before($key, '.');
         }
 
         if (! $prefix || mb_strlen($prefix) < 2) {
@@ -284,7 +280,7 @@ class PhraseController extends Controller
 
     protected function buildWorkflowData(): array
     {
-        $role = $this->auth()->role();
+        $role = app('translations.auth')->role();
 
         return [
             'enabled' => (bool) config('translations.approval_workflow', true),
