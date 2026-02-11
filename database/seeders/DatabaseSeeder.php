@@ -1,6 +1,6 @@
 <?php
 
-namespace Workbench\Database\Seeders;
+namespace Outhebox\Translations\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 
@@ -9,7 +9,8 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            // ContributorSeeder::class,
+            LanguageSeeder::class,
+            ContributorSeeder::class,
         ]);
     }
 }
