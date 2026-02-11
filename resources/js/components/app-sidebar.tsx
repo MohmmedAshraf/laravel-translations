@@ -31,7 +31,7 @@ import { ReportBugLink } from './report-bug-link';
 export function AppSidebar() {
     const { state } = useSidebar();
     const isCollapsed = state === 'collapsed';
-    const { auth } = usePage<SharedData>().props;
+    const { auth, hasSourceLanguage } = usePage<SharedData>().props;
     const canManageContributors = ['owner', 'admin'].includes(auth.role ?? '');
 
     const mainNavItems: NavItem[] = [
@@ -40,11 +40,15 @@ export function AppSidebar() {
             href: languagesIndex().url,
             icon: Languages,
         },
-        {
-            title: 'Source Language',
-            href: sourceIndex().url,
-            icon: DocumentText,
-        },
+        ...(hasSourceLanguage
+            ? [
+                  {
+                      title: 'Source Language',
+                      href: sourceIndex().url,
+                      icon: DocumentText,
+                  },
+              ]
+            : []),
         {
             title: 'Groups',
             href: groupsIndex().url,
@@ -85,7 +89,7 @@ export function AppSidebar() {
                         <ReportBugLink />
 
                         <a
-                            href="https://outhebox.dev/products/translations-pro?utm_source=app_sidebar&utm_medium=link&utm_campaign=upgrade_to_pro"
+                            href="https://outhebox.dev/products/laravel-translations-ui-pro?utm_source=app_sidebar&utm_medium=link&utm_campaign=upgrade_to_pro"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="group/pro relative block overflow-hidden rounded-xl bg-linear-to-r from-indigo-300 via-violet-300 to-purple-300 p-px shadow-sm transition-all hover:shadow-lg hover:shadow-indigo-300/30 dark:from-indigo-400 dark:via-violet-400 dark:to-purple-400 dark:hover:shadow-indigo-400/15"
@@ -128,7 +132,7 @@ export function AppSidebar() {
                         <ReportBugLink />
 
                         <a
-                            href="https://outhebox.dev/products/translations-pro?utm_source=app_sidebar&utm_medium=link&utm_campaign=upgrade_to_pro"
+                            href="https://outhebox.dev/products/laravel-translations-ui-pro?utm_source=app_sidebar&utm_medium=link&utm_campaign=upgrade_to_pro"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="group/pro relative block overflow-hidden rounded-lg bg-linear-to-r from-indigo-300 via-violet-300 to-purple-300 p-px transition-shadow hover:shadow-lg hover:shadow-indigo-300/30 dark:from-indigo-400 dark:via-violet-400 dark:to-purple-400 dark:hover:shadow-indigo-400/15"

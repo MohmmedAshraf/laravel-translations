@@ -161,15 +161,41 @@ it('excludes configured files', function () {
         ->and(Group::query()->where('name', 'secret')->exists())->toBeFalse();
 });
 
-it('reactivates an inactive language on import', function () {
-    Language::factory()->create(['code' => 'en', 'active' => false]);
+it('reactivates an inactive language and sets is_source on import', function () {
+    Language::factory()->create(['code' => 'en', 'active' => false, 'is_source' => false]);
 
     mkdir($this->langPath.'/en', 0755, true);
     file_put_contents($this->langPath.'/en/messages.php', "<?php\nreturn ['welcome' => 'Welcome'];");
 
     $this->importer->import();
 
-    expect(Language::query()->where('code', 'en')->first()->active)->toBeTrue();
+    $en = Language::query()->where('code', 'en')->first();
+    expect($en->active)->toBeTrue()
+        ->and($en->is_source)->toBeTrue();
+});
+
+it('sets is_source on newly created source language', function () {
+    config(['translations.source_language' => 'en']);
+
+    mkdir($this->langPath.'/en', 0755, true);
+    file_put_contents($this->langPath.'/en/messages.php', "<?php\nreturn ['welcome' => 'Welcome'];");
+
+    $this->importer->import();
+
+    $en = Language::query()->where('code', 'en')->first();
+    expect($en->is_source)->toBeTrue();
+});
+
+it('does not set is_source on non-source languages', function () {
+    config(['translations.source_language' => 'en']);
+
+    mkdir($this->langPath.'/fr', 0755, true);
+    file_put_contents($this->langPath.'/fr/messages.php', "<?php\nreturn ['welcome' => 'Bienvenue'];");
+
+    $this->importer->import();
+
+    $fr = Language::query()->where('code', 'fr')->first();
+    expect($fr->is_source)->toBeFalse();
 });
 
 it('measures duration', function () {

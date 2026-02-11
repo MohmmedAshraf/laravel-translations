@@ -40,17 +40,22 @@ it('imports translations via HTTP', function () {
     expect(ImportLog::query()->count())->toBe(1);
 });
 
-it('activates pre-existing inactive languages on import via HTTP', function () {
-    Language::factory()->create(['code' => 'en', 'active' => false, 'is_source' => true]);
-    Language::factory()->create(['code' => 'fr', 'active' => false]);
+it('activates pre-existing inactive languages and sets is_source on import via HTTP', function () {
+    Language::factory()->create(['code' => 'en', 'active' => false, 'is_source' => false]);
+    Language::factory()->create(['code' => 'fr', 'active' => false, 'is_source' => false]);
 
     $this->actingAs($this->contributor, 'translations')
         ->post(route('ltu.import'))
         ->assertRedirect()
         ->assertSessionHas('success');
 
-    expect(Language::query()->where('code', 'en')->first()->active)->toBeTrue();
-    expect(Language::query()->where('code', 'fr')->first()->active)->toBeTrue();
+    $en = Language::query()->where('code', 'en')->first();
+    $fr = Language::query()->where('code', 'fr')->first();
+
+    expect($en->active)->toBeTrue()
+        ->and($en->is_source)->toBeTrue()
+        ->and($fr->active)->toBeTrue()
+        ->and($fr->is_source)->toBeFalse();
 });
 
 it('imports with fresh option', function () {

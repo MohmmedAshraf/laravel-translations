@@ -33,7 +33,6 @@ interface PageProps {
     data: PaginatedData<Language>;
     tableConfig: TableConfig;
     availableLanguages: AvailableLanguage[];
-    totalKeys: number;
     [key: string]: unknown;
 }
 
@@ -135,7 +134,7 @@ function languageHref(language: Language): string {
 }
 
 export default function Languages() {
-    const { data, tableConfig, availableLanguages, totalKeys } =
+    const { data, tableConfig, availableLanguages } =
         usePage<PageProps>().props;
 
     const [removeLanguage, setRemoveLanguage] = React.useState<Language | null>(
@@ -228,7 +227,6 @@ export default function Languages() {
                             {data.data.some((l) => l.is_source) ? (
                                 <AddLanguageDialog
                                     availableLanguages={availableLanguages}
-                                    totalKeys={totalKeys}
                                     trigger={
                                         <Button size="lg">
                                             <AddCircle className="size-4" />

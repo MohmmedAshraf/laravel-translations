@@ -117,17 +117,19 @@ it('excludes files listed in exclude_files config', function () {
     @rmdir($tempDir);
 });
 
-it('activates an inactive language during import', function () {
-    Language::factory()->create(['code' => 'en', 'active' => false]);
+it('activates an inactive language and sets is_source during import', function () {
+    Language::factory()->create(['code' => 'en', 'active' => false, 'is_source' => false]);
 
     $importer = app(TranslationImporter::class);
     $importer->import(['fresh' => true]);
 
-    expect(Language::query()->where('code', 'en')->first()->active)->toBeTrue();
+    $en = Language::query()->where('code', 'en')->first();
+    expect($en->active)->toBeTrue()
+        ->and($en->is_source)->toBeTrue();
 });
 
 it('updates existing source key metadata on re-import', function () {
-    $en = Language::factory()->create(['code' => 'en', 'is_source' => true, 'active' => true]);
+    $en = Language::factory()->create(['code' => 'en', 'is_source' => false, 'active' => true]);
 
     $importer = app(TranslationImporter::class);
     $importer->import();

@@ -15,7 +15,7 @@ import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Flag } from '@/components/ui/flag';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AddCircle, Global, Magnifer, Stars } from '@/lib/icons';
+import { AddCircle, Global, Magnifer } from '@/lib/icons';
 import { store, storeCustom } from '@/routes/ltu/languages';
 
 export interface AvailableLanguage {
@@ -28,11 +28,9 @@ export interface AvailableLanguage {
 
 export function AddLanguageDialog({
     availableLanguages,
-    totalKeys,
     trigger,
 }: {
     availableLanguages: AvailableLanguage[];
-    totalKeys: number;
     trigger: React.ReactNode;
 }) {
     const [open, setOpen] = React.useState(false);
@@ -40,7 +38,6 @@ export function AddLanguageDialog({
     const [selected, setSelected] = React.useState<Set<number>>(new Set());
     const [tab, setTab] = React.useState('browse');
 
-    const [autoTranslate, setAutoTranslate] = React.useState(false);
     const browseForm = useForm({ language_ids: [] as number[] });
     const customForm = useForm({
         code: '',
@@ -76,7 +73,6 @@ export function AddLanguageDialog({
         setSearch('');
         setSelected(new Set());
         setTab('browse');
-        setAutoTranslate(false);
         browseForm.reset();
         customForm.reset();
         customForm.clearErrors();
@@ -93,7 +89,6 @@ export function AddLanguageDialog({
         e.preventDefault();
         browseForm.transform(() => ({
             language_ids: Array.from(selected),
-            auto_translate: autoTranslate,
         }));
         browseForm.post(store.url(), {
             onSuccess: () => {
@@ -105,10 +100,6 @@ export function AddLanguageDialog({
 
     const handleCustomSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        customForm.transform((data) => ({
-            ...data,
-            auto_translate: autoTranslate,
-        }));
         customForm.post(storeCustom.url(), {
             onSuccess: () => {
                 resetState();
@@ -224,12 +215,6 @@ export function AddLanguageDialog({
                                 )}
                             </div>
 
-                            <AutoTranslateCard
-                                checked={autoTranslate}
-                                onCheckedChange={setAutoTranslate}
-                                totalKeys={totalKeys}
-                            />
-
                             <Button
                                 type="submit"
                                 className="w-full"
@@ -321,12 +306,6 @@ export function AddLanguageDialog({
                                 </span>
                             </label>
 
-                            <AutoTranslateCard
-                                checked={autoTranslate}
-                                onCheckedChange={setAutoTranslate}
-                                totalKeys={totalKeys}
-                            />
-
                             <div className="mt-auto">
                                 <Button
                                     type="submit"
@@ -343,46 +322,5 @@ export function AddLanguageDialog({
                 </Tabs>
             </DialogContent>
         </Dialog>
-    );
-}
-
-function AutoTranslateCard({
-    checked,
-    onCheckedChange,
-    totalKeys,
-}: {
-    checked: boolean;
-    onCheckedChange: (checked: boolean) => void;
-    totalKeys: number;
-}) {
-    return (
-        <label
-            className={`flex cursor-pointer gap-3 rounded-lg border p-3 transition-colors ${
-                checked
-                    ? 'border-primary/50 bg-primary/5 dark:border-primary/40 dark:bg-primary/10'
-                    : 'border-neutral-200 hover:border-neutral-300 dark:border-neutral-800 dark:hover:border-neutral-700'
-            }`}
-        >
-            <Checkbox
-                checked={checked}
-                onCheckedChange={(v) => onCheckedChange(v === true)}
-                className="sr-only mt-0.5"
-            />
-            <div className="flex flex-1 items-center gap-3">
-                <Stars className="size-8 text-primary" />
-                <div className="flex-col">
-                    <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium">
-                            Auto-translate with AI
-                        </span>
-                    </div>
-                    <p className="mt-0.5 text-sm text-muted-foreground">
-                        {checked && totalKeys > 0
-                            ? `${totalKeys.toLocaleString()} keys per language will be translated.`
-                            : 'Automatically translate all keys from source language.'}
-                    </p>
-                </div>
-            </div>
-        </label>
     );
 }

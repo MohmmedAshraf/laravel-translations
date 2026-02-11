@@ -11,5 +11,6 @@ export type SharedData = {
     sidebarOpen: boolean;
     environment: string;
     isContributorMode: boolean;
+    hasSourceLanguage: boolean;
     [key: string]: unknown;
 };

@@ -9,6 +9,7 @@ use Outhebox\Translations\Models\Language;
 use Outhebox\Translations\Models\Translation;
 use Outhebox\Translations\Models\TranslationKey;
 use Outhebox\Translations\Services\Exporter\TranslationExporter;
+use Outhebox\Translations\Services\Importer\TranslationImporter;
 
 beforeEach(function () {
     $this->exporter = app(TranslationExporter::class);
@@ -19,7 +20,7 @@ beforeEach(function () {
 
 afterEach(function () {
     $files = new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator($this->langPath, RecursiveDirectoryIterator::SKIP_DOTS),
+        new RecursiveDirectoryIterator($this->langPath, FilesystemIterator::SKIP_DOTS),
         RecursiveIteratorIterator::CHILD_FIRST
     );
     foreach ($files as $file) {
@@ -191,4 +192,29 @@ it('measures duration', function () {
     $result = $this->exporter->export();
 
     expect($result->durationMs)->toBeGreaterThanOrEqual(0);
+});
+
+it('round-trips imported translations back to matching files', function () {
+    $fixturesPath = __DIR__.'/../../Fixtures/lang';
+    config(['translations.lang_path' => $fixturesPath]);
+    config(['translations.source_language' => 'en']);
+
+    $importer = app(TranslationImporter::class);
+    $importer->import();
+
+    config(['translations.lang_path' => $this->langPath]);
+    $this->exporter->export();
+
+    $exportedAuth = include $this->langPath.'/fr/auth.php';
+    $originalAuth = include $fixturesPath.'/fr/auth.php';
+
+    expect($exportedAuth)->toBe($originalAuth);
+
+    $exportedJson = json_decode(file_get_contents($this->langPath.'/fr.json'), true);
+    $originalJson = json_decode(file_get_contents($fixturesPath.'/fr.json'), true);
+
+    ksort($exportedJson);
+    ksort($originalJson);
+
+    expect($exportedJson)->toBe($originalJson);
 });

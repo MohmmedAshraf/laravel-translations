@@ -208,15 +208,62 @@ it('creates multiple import logs for successive imports', function () {
     expect(ImportLog::query()->count())->toBe(2);
 });
 
-it('activates pre-existing inactive languages on import', function () {
-    Language::factory()->create(['code' => 'en', 'active' => false, 'is_source' => true]);
-    Language::factory()->create(['code' => 'fr', 'active' => false]);
+it('activates pre-existing inactive languages and sets is_source on import', function () {
+    Language::factory()->create(['code' => 'en', 'active' => false, 'is_source' => false]);
+    Language::factory()->create(['code' => 'fr', 'active' => false, 'is_source' => false]);
 
     $this->artisan('translations:import', ['--no-interaction' => true])
         ->assertSuccessful();
 
-    expect(Language::query()->where('code', 'en')->first()->active)->toBeTrue();
-    expect(Language::query()->where('code', 'fr')->first()->active)->toBeTrue();
+    $en = Language::query()->where('code', 'en')->first();
+    $fr = Language::query()->where('code', 'fr')->first();
+
+    expect($en->active)->toBeTrue()
+        ->and($en->is_source)->toBeTrue()
+        ->and($fr->active)->toBeTrue()
+        ->and($fr->is_source)->toBeFalse();
+});
+
+it('marks pre-seeded source language as source on import', function () {
+    config(['translations.source_language' => 'en']);
+
+    Language::factory()->create(['code' => 'en', 'active' => false, 'is_source' => false]);
+
+    $this->artisan('translations:import', ['--no-interaction' => true])
+        ->assertSuccessful();
+
+    $en = Language::query()->where('code', 'en')->first();
+    expect($en->is_source)->toBeTrue()
+        ->and($en->active)->toBeTrue();
+});
+
+it('respects non-en source language config', function () {
+    config(['translations.source_language' => 'fr']);
+
+    $this->artisan('translations:import', ['--no-interaction' => true])
+        ->assertSuccessful();
+
+    $fr = Language::query()->where('code', 'fr')->first();
+    $en = Language::query()->where('code', 'en')->first();
+
+    expect($fr->is_source)->toBeTrue()
+        ->and($en->is_source)->toBeFalse();
+});
+
+it('corrects is_source on wrongly marked non-source language', function () {
+    config(['translations.source_language' => 'en']);
+
+    Language::factory()->create(['code' => 'en', 'active' => true, 'is_source' => false]);
+    Language::factory()->create(['code' => 'fr', 'active' => true, 'is_source' => true]);
+
+    $this->artisan('translations:import', ['--no-interaction' => true])
+        ->assertSuccessful();
+
+    $en = Language::query()->where('code', 'en')->first();
+    $fr = Language::query()->where('code', 'fr')->first();
+
+    expect($en->is_source)->toBeTrue()
+        ->and($fr->is_source)->toBeFalse();
 });
 
 it('handles both PHP and JSON for same locale', function () {

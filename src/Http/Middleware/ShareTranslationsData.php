@@ -5,6 +5,7 @@ namespace Outhebox\Translations\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Outhebox\Translations\Models\Language;
 use Symfony\Component\HttpFoundation\Response;
 
 class ShareTranslationsData
@@ -27,6 +28,7 @@ class ShareTranslationsData
             'environment' => fn () => app()->environment(),
             'translationsNav' => fn () => $this->navigationItems(),
             'isContributorMode' => fn () => $auth->isContributorMode(),
+            'hasSourceLanguage' => fn () => Language::query()->source()->exists(),
         ]);
 
         return $next($request);

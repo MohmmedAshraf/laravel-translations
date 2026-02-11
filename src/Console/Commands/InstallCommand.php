@@ -3,15 +3,20 @@
 namespace Outhebox\Translations\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Schema;
+use Laravel\Prompts\Prompt;
 use Outhebox\Translations\Concerns\DisplayHelper;
 use Outhebox\Translations\Database\Seeders\LanguageSeeder;
 use Outhebox\Translations\Enums\AuthDriver;
 use Outhebox\Translations\Enums\ContributorRole;
 use Outhebox\Translations\Models\Contributor;
 
+use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\password;
 use function Laravel\Prompts\text;
+use function Laravel\Prompts\warning;
 
 class InstallCommand extends Command
 {
@@ -26,18 +31,44 @@ class InstallCommand extends Command
     {
         $this->displayHeader('Install');
 
-        $this->publishAssets();
+        if ($this->isV1Schema()) {
+            return $this->handleV1Detected();
+        }
 
-        $this->call('migrate', ['--no-interaction' => true]);
+        $interactive = $this->input->isInteractive();
 
-        $this->call('db:seed', ['--class' => LanguageSeeder::class, '--no-interaction' => true]);
+        if (! $interactive || confirm('Publish configuration file?', default: true)) {
+            $this->publishConfig();
+        }
+
+        if (! $interactive || confirm('Publish frontend assets?', default: true)) {
+            $this->publishAssets();
+        }
+
+        if (! $interactive || confirm('Run database migrations?', default: true)) {
+            $this->callSubCommand('migrate', ['--no-interaction' => true]);
+        }
+
+        if (! $interactive || confirm('Seed default languages?', default: true)) {
+            $this->callSubCommand('db:seed', ['--class' => LanguageSeeder::class, '--no-interaction' => true]);
+        }
+
+        if (! File::isDirectory(lang_path())) {
+            if (! $interactive || confirm('Lang folder not found. Publish default language files?', default: true)) {
+                $this->callSubCommand('lang:publish', ['--no-interaction' => true]);
+            }
+        }
 
         if (config('translations.auth.driver') === AuthDriver::Contributors->value) {
-            $this->createFirstContributor();
+            if (! $interactive || confirm('Create first contributor?', default: true)) {
+                $this->createFirstContributor();
+            }
         }
 
         if ($this->option('import')) {
-            $this->call('translations:import', ['--no-interaction' => true]);
+            if (! $interactive || confirm('Import existing translation files?', default: true)) {
+                $this->callSubCommand('translations:import', ['--no-interaction' => true]);
+            }
         }
 
         info('Translations installed successfully!');
@@ -45,31 +76,74 @@ class InstallCommand extends Command
         return self::SUCCESS;
     }
 
-    private function publishAssets(): void
+    private function isV1Schema(): bool
     {
-        $this->call('vendor:publish', [
+        $connection = config('translations.database_connection');
+
+        return Schema::connection($connection)->hasTable('ltu_phrases')
+            && Schema::connection($connection)->hasTable('ltu_translation_files')
+            && ! Schema::connection($connection)->hasTable('ltu_translation_keys');
+    }
+
+    private function handleV1Detected(): int
+    {
+        warning('v1 schema detected — you need to upgrade before installing v2.');
+
+        if (! $this->input->isInteractive()) {
+            $this->callSubCommand('translations:upgrade', ['--force' => true]);
+
+            return self::SUCCESS;
+        }
+
+        if (confirm('Run translations:upgrade now?', default: true)) {
+            $this->callSubCommand('translations:upgrade');
+
+            return self::SUCCESS;
+        }
+
+        warning('Upgrade cancelled. Please run translations:upgrade manually before installing.');
+
+        return self::FAILURE;
+    }
+
+    private function publishConfig(): void
+    {
+        $this->callSubCommand('vendor:publish', [
             '--tag' => 'translations-config',
             '--no-interaction' => true,
         ]);
 
-        $this->call('vendor:publish', [
+        if ($this->proIsInstalled()) {
+            $this->callSubCommand('vendor:publish', [
+                '--tag' => 'translations-pro-config',
+                '--no-interaction' => true,
+            ]);
+        }
+    }
+
+    private function publishAssets(): void
+    {
+        $this->callSubCommand('vendor:publish', [
             '--tag' => 'translations-assets',
             '--force' => true,
             '--no-interaction' => true,
         ]);
 
         if ($this->proIsInstalled()) {
-            $this->call('vendor:publish', [
-                '--tag' => 'translations-pro-config',
-                '--no-interaction' => true,
-            ]);
-
-            $this->call('vendor:publish', [
+            $this->callSubCommand('vendor:publish', [
                 '--tag' => 'translations-pro-assets',
                 '--force' => true,
                 '--no-interaction' => true,
             ]);
         }
+    }
+
+    private function callSubCommand(string $command, array $arguments = []): int
+    {
+        $result = $this->call($command, $arguments);
+        Prompt::interactive($this->input->isInteractive());
+
+        return $result;
     }
 
     private function proIsInstalled(): bool
@@ -100,13 +174,11 @@ class InstallCommand extends Command
 
         $name = text(
             label: 'What is the contributor\'s name?',
-            default: 'Admin',
             required: true,
         );
 
         $email = text(
             label: 'What is the contributor\'s email?',
-            default: 'admin@translations.local',
             required: true,
             validate: function (string $value): ?string {
                 if (! filter_var($value, FILTER_VALIDATE_EMAIL)) {

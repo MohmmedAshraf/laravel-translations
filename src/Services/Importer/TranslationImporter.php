@@ -226,8 +226,10 @@ class TranslationImporter
         $language = Language::query()->where('code', $code)->first();
 
         if ($language) {
-            if (! $language->active) {
-                $language->update(['active' => true]);
+            $isSource = $code === config('translations.source_language', 'en');
+
+            if (! $language->active || $language->is_source !== $isSource) {
+                $language->update(['active' => true, 'is_source' => $isSource]);
             }
 
             return $language;
