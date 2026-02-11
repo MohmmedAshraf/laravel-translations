@@ -134,7 +134,7 @@ it('prevents admin from promoting to owner', function () {
         ->assertSessionHasErrors('role');
 });
 
-it('deactivates contributor', function () {
+it('deletes contributor', function () {
     $owner = Contributor::factory()->owner()->create();
     $translator = Contributor::factory()->translator()->create();
 
@@ -142,7 +142,7 @@ it('deactivates contributor', function () {
         ->delete(route('ltu.contributors.destroy', $translator))
         ->assertRedirect();
 
-    expect($translator->fresh()->is_active)->toBeFalse();
+    $this->assertDatabaseMissing('ltu_contributors', ['id' => $translator->id]);
 });
 
 it('shows invited status for pending invites', function () {

@@ -51,16 +51,16 @@ it('denies translator with no assignments from updating', function () {
     $translator = Contributor::factory()->translator()->create();
     Auth::guard('translations')->login($translator);
 
-    expect($this->policy->update($this->arabicTranslation))->toBeFalse();
-    expect($this->policy->update($this->frenchTranslation))->toBeFalse();
+    expect($this->policy->update($this->arabicTranslation))->toBeFalse()
+        ->and($this->policy->update($this->frenchTranslation))->toBeFalse();
 });
 
 it('allows admin to update any language', function () {
     $admin = Contributor::factory()->admin()->create();
     Auth::guard('translations')->login($admin);
 
-    expect($this->policy->update($this->arabicTranslation))->toBeTrue();
-    expect($this->policy->update($this->frenchTranslation))->toBeTrue();
+    expect($this->policy->update($this->arabicTranslation))->toBeTrue()
+        ->and($this->policy->update($this->frenchTranslation))->toBeTrue();
 });
 
 it('allows reviewer to approve', function () {

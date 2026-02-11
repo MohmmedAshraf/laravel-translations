@@ -1,5 +1,5 @@
 {
-    "Hello": "Hello",
     "Goodbye": "Goodbye",
+    "Hello": "Hello",
     "Welcome, :name": "Welcome, :name"
 }

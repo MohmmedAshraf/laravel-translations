@@ -43,3 +43,19 @@ it('denies translator from deleting keys', function () {
     Auth::guard('translations')->login(Contributor::factory()->translator()->create());
     expect($this->policy->delete())->toBeFalse();
 });
+
+it('allows admin to update keys', function () {
+    Auth::guard('translations')->login(Contributor::factory()->admin()->create());
+    expect($this->policy->update())->toBeTrue();
+});
+
+it('denies translator from updating keys', function () {
+    Auth::guard('translations')->login(Contributor::factory()->translator()->create());
+    expect($this->policy->update())->toBeFalse();
+});
+
+it('denies unauthenticated user from all actions', function () {
+    expect($this->policy->create())->toBeFalse()
+        ->and($this->policy->update())->toBeFalse()
+        ->and($this->policy->delete())->toBeFalse();
+});
