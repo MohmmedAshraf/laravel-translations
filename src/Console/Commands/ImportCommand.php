@@ -38,14 +38,15 @@ class ImportCommand extends Command
             }
         }
 
-        $result = spin(
-            callback: fn () => $importer->import([
-                'fresh' => $fresh,
-                'overwrite' => $overwrite,
-                'source' => 'cli',
-            ]),
-            message: 'Importing translations...',
-        );
+        $callback = fn () => $importer->import([
+            'fresh' => $fresh,
+            'overwrite' => $overwrite,
+            'source' => 'cli',
+        ]);
+
+        $result = $this->input->isInteractive()
+            ? spin(callback: $callback, message: 'Importing translations...')
+            : $callback();
 
         $durationSec = round($result->durationMs / 1000, 2);
 

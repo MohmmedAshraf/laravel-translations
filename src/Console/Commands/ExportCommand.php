@@ -23,14 +23,15 @@ class ExportCommand extends Command
     {
         $this->displayHeader('Export');
 
-        $result = spin(
-            callback: fn () => $exporter->export([
-                'locale' => $this->option('locale'),
-                'group' => $this->option('group'),
-                'source' => 'cli',
-            ]),
-            message: 'Exporting translations...',
-        );
+        $callback = fn () => $exporter->export([
+            'locale' => $this->option('locale'),
+            'group' => $this->option('group'),
+            'source' => 'cli',
+        ]);
+
+        $result = $this->input->isInteractive()
+            ? spin(callback: $callback, message: 'Exporting translations...')
+            : $callback();
 
         $durationSec = round($result->durationMs / 1000, 2);
 

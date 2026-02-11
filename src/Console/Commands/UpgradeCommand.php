@@ -75,12 +75,13 @@ class UpgradeCommand extends Command
         }
 
         try {
-            spin(
-                callback: fn () => $this->db()->transaction(function () {
-                    $this->migrateData();
-                }),
-                message: 'Migrating data to v2 schema...',
-            );
+            $callback = fn () => $this->db()->transaction(function () {
+                $this->migrateData();
+            });
+
+            $this->input->isInteractive()
+                ? spin(callback: $callback, message: 'Migrating data to v2 schema...')
+                : $callback();
         } catch (Throwable $e) {
             error('Upgrade failed: '.$e->getMessage());
 
