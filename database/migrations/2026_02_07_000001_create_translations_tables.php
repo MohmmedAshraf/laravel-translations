@@ -23,6 +23,8 @@ return new class extends Migration
             $table->string('tone')->default('neutral');
             $table->boolean('active')->default(false);
             $table->timestamps();
+
+            $table->index('active');
         });
 
         Schema::connection($this->getConnection())->create('ltu_groups', function (Blueprint $table) {
@@ -44,6 +46,7 @@ return new class extends Migration
             $table->json('parameters')->nullable();
             $table->boolean('is_html')->default(false);
             $table->boolean('is_plural')->default(false);
+            $table->string('priority')->nullable();
             $table->json('metadata')->nullable();
             $table->timestamps();
 
@@ -66,6 +69,7 @@ return new class extends Migration
             $table->unique(['translation_key_id', 'language_id']);
             $table->index('status');
             $table->index('language_id');
+            $table->index('translated_by');
         });
 
         Schema::connection($this->getConnection())->create('ltu_contributors', function (Blueprint $table) {

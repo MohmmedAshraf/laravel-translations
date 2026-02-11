@@ -23,6 +23,7 @@ class TranslationKey extends Model
         'parameters',
         'is_html',
         'is_plural',
+        'priority',
         'metadata',
     ];
 

@@ -131,15 +131,13 @@ return [
     |--------------------------------------------------------------------------
     |
     | These options control how translations are exported back to language
-    | files. You may sort keys alphabetically, exclude empty translations,
-    | and optionally create backups of existing files before overwriting.
+    | files. You may sort keys alphabetically and exclude empty translations.
     |
     */
 
     'export' => [
         'sort_keys' => true,
         'exclude_empty' => true,
-        'backup' => false,
         'require_approval' => env('TRANSLATIONS_REQUIRE_APPROVAL', false),
     ],
 
