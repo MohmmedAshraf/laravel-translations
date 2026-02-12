@@ -1,4 +1,3 @@
-import { router } from '@inertiajs/react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { SidebarDetailsSection } from '@/components/translations/sidebar-details-section';
@@ -25,8 +24,12 @@ import type {
     QualityCheck,
     QualityIssue,
 } from '@/pages/translations/phrases/edit';
-import { update } from '@/routes/ltu/source';
 import type { TranslationKey } from '@/types';
+
+export interface SidebarSectionState {
+    sections: Record<string, boolean>;
+    toggleSection: (id: string) => void;
+}
 
 interface TranslationKeySidebarProps {
     translationKey: TranslationKey;
@@ -35,6 +38,7 @@ interface TranslationKeySidebarProps {
     qualityIssues?: QualityIssue[];
     qualityChecks?: QualityCheck[];
     translationIsEmpty?: boolean;
+    extraSections?: (state: SidebarSectionState) => React.ReactNode;
 }
 
 const SIDEBAR_WIDTH = 420;
@@ -69,6 +73,7 @@ export default function TranslationKeySidebar({
     translationKey,
     status: _status,
     showPrioritySelect: _showPrioritySelect = false,
+    extraSections,
 }: TranslationKeySidebarProps) {
     const isMobile = useIsMobile();
 
@@ -90,7 +95,7 @@ export default function TranslationKeySidebar({
         [],
     );
 
-    const [_sections, setSections] =
+    const [sections, setSections] =
         useState<Record<string, boolean>>(getSavedSections);
 
     const toggleSidebar = useCallback(() => {
@@ -105,7 +110,7 @@ export default function TranslationKeySidebar({
         });
     }, []);
 
-    const _toggleSection = useCallback((id: string) => {
+    const toggleSection = useCallback((id: string) => {
         setSections((prev) => {
             const next = { ...prev, [id]: !prev[id] };
             saveSections(next);
@@ -130,17 +135,10 @@ export default function TranslationKeySidebar({
         return () => document.removeEventListener('keydown', handleKeyDown);
     }, [isMobile, toggleSidebar]);
 
-    function _handlePriorityChange(value: string): void {
-        router.put(
-            update.url({ translationKey: translationKey.id }),
-            { priority: value },
-            { preserveScroll: true },
-        );
-    }
-
     const sidebarContent = (
         <SidebarContent className="gap-0">
             <SidebarDetailsSection translationKey={translationKey} />
+            {extraSections?.({ sections, toggleSection })}
         </SidebarContent>
     );
 

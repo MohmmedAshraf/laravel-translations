@@ -26,13 +26,32 @@ export interface AvailableLanguage {
     rtl: boolean;
 }
 
+interface AddLanguageDialogProps {
+    availableLanguages: AvailableLanguage[];
+    trigger: React.ReactNode;
+    extraBrowseContent?: React.ReactNode;
+    extraCustomContent?: React.ReactNode;
+    onBrowseTransform?: (data: {
+        language_ids: number[];
+    }) => Record<string, unknown>;
+    onCustomTransform?: (data: {
+        code: string;
+        name: string;
+        native_name: string;
+        rtl: boolean;
+    }) => Record<string, unknown>;
+    onReset?: () => void;
+}
+
 export function AddLanguageDialog({
     availableLanguages,
     trigger,
-}: {
-    availableLanguages: AvailableLanguage[];
-    trigger: React.ReactNode;
-}) {
+    extraBrowseContent,
+    extraCustomContent,
+    onBrowseTransform,
+    onCustomTransform,
+    onReset,
+}: AddLanguageDialogProps) {
     const [open, setOpen] = React.useState(false);
     const [search, setSearch] = React.useState('');
     const [selected, setSelected] = React.useState<Set<number>>(new Set());
@@ -76,6 +95,7 @@ export function AddLanguageDialog({
         browseForm.reset();
         customForm.reset();
         customForm.clearErrors();
+        onReset?.();
     };
 
     const handleOpenChange = (value: boolean) => {
@@ -87,9 +107,12 @@ export function AddLanguageDialog({
 
     const handleBrowseSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        browseForm.transform(() => ({
-            language_ids: Array.from(selected),
-        }));
+        browseForm.transform(() => {
+            const data = { language_ids: Array.from(selected) };
+            return onBrowseTransform
+                ? { ...data, ...onBrowseTransform(data) }
+                : data;
+        });
         browseForm.post(store.url(), {
             onSuccess: () => {
                 resetState();
@@ -100,6 +123,12 @@ export function AddLanguageDialog({
 
     const handleCustomSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        if (onCustomTransform) {
+            customForm.transform((data) => ({
+                ...data,
+                ...onCustomTransform(data),
+            }));
+        }
         customForm.post(storeCustom.url(), {
             onSuccess: () => {
                 resetState();
@@ -215,6 +244,8 @@ export function AddLanguageDialog({
                                 )}
                             </div>
 
+                            {extraBrowseContent}
+
                             <Button
                                 type="submit"
                                 className="w-full"
@@ -305,6 +336,8 @@ export function AddLanguageDialog({
                                     Right-to-left (RTL)
                                 </span>
                             </label>
+
+                            {extraCustomContent}
 
                             <div className="mt-auto">
                                 <Button

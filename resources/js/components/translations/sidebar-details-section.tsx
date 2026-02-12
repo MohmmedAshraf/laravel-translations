@@ -7,11 +7,8 @@ import type { TranslationKey } from '@/types';
 
 interface SidebarDetailsSectionProps {
     translationKey: TranslationKey;
-    status?: string;
-    showPrioritySelect?: boolean;
-    isOpen?: boolean;
-    onToggle?: () => void;
-    onPriorityChange?: (value: string) => void;
+    extraDetailsBefore?: React.ReactNode;
+    extraDetailsAfter?: React.ReactNode;
 }
 
 function formatDate(dateString?: string): string {
@@ -44,6 +41,8 @@ export { DetailRow, formatDate };
 
 export function SidebarDetailsSection({
     translationKey,
+    extraDetailsBefore,
+    extraDetailsAfter,
 }: SidebarDetailsSectionProps) {
     const hasFormat = translationKey.is_html || translationKey.is_plural;
 
@@ -52,6 +51,8 @@ export function SidebarDetailsSection({
             <SidebarGroup className="p-0">
                 <SidebarGroupContent className="px-4 py-3">
                     <div className="space-y-2.5">
+                        {extraDetailsBefore}
+
                         <DetailRow label="Format">
                             {hasFormat ? (
                                 <div className="flex items-center gap-1">
@@ -72,6 +73,8 @@ export function SidebarDetailsSection({
                                 </span>
                             )}
                         </DetailRow>
+
+                        {extraDetailsAfter}
 
                         {translationKey.created_at && (
                             <DetailRow label="Created">
