@@ -4,6 +4,7 @@
     <a href="#installation">Installation</a> |
     <a href="#usage">Usage</a> |
     <a href="#configuration">Configuration</a> |
+    <a href="#updating">Updating</a> |
     <a href="#upgrading-from-v1">Upgrading from v1</a> |
     <a href="#contributing">Contributing</a>
 </p>
@@ -20,12 +21,17 @@
 
 Laravel Translations provides a beautiful UI for managing your application's translations. Import, edit, search, and export translations — all from a clean dashboard. No npm or Vite required in your project.
 
-### Requirements
+<p align="center">
+    <a href="https://outhebox.dev/products/laravel-translations-ui-pro">
+        <img src="art/demo.gif" alt="Laravel Translations Demo" width="100%" />
+    </a>
+</p>
 
-- PHP 8.3+
-- Laravel 11.x or 12.x
+> Looking for AI-powered translations, revision history, and team collaboration? Check out [Laravel Translations Pro](https://outhebox.dev/products/laravel-translations-ui-pro).
 
 ## Installation
+
+**Requirements:** PHP 8.3+ and Laravel 11.x or 12.x
 
 ```bash
 composer require outhebox/laravel-translations
@@ -96,16 +102,15 @@ You can automate this in your `composer.json`:
 ```json
 {
     "scripts": {
-        "post-update-cmd": [
-            "@php artisan translations:update --ansi"
-        ]
+        "post-update-cmd": ["@php artisan translations:update --ansi"]
     }
 }
 ```
 
 ## Upgrading from v1
 
-v2 is a full rewrite with a new frontend (React/Inertia), new database structure, and updated namespace (`Outhebox\Translations`).
+<details>
+<summary>v2 is a full rewrite with a new frontend (React/Inertia), new database structure, and updated namespace. Click to expand upgrade instructions.</summary>
 
 ### Steps
 
@@ -141,6 +146,8 @@ php artisan translations:install
 - **Frontend:** Vue has been replaced with React (no action needed — assets are pre-compiled)
 - **Database:** New table structure — run the upgrade command above
 - **Config:** New structure — re-publish with `--tag=translations-config`
+
+</details>
 
 ## Contributing
 
