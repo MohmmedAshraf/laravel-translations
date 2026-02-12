@@ -21,14 +21,6 @@
 
 Laravel Translations provides a beautiful UI for managing your application's translations. Import, edit, search, and export translations — all from a clean dashboard. No npm or Vite required in your project.
 
-<p align="center">
-    <a href="https://outhebox.dev/products/laravel-translations-ui-pro">
-        <img src="art/demo.gif" alt="Laravel Translations Demo" width="100%" />
-    </a>
-</p>
-
-> Looking for AI-powered translations, revision history, and team collaboration? Check out [Laravel Translations Pro](https://outhebox.dev/products/laravel-translations-ui-pro).
-
 ## Installation
 
 **Requirements:** PHP 8.3+ and Laravel 11.x or 12.x
@@ -106,6 +98,14 @@ You can automate this in your `composer.json`:
     }
 }
 ```
+
+<p align="center">
+    <a href="https://outhebox.dev/products/laravel-translations-ui-pro">
+        <img src="art/demo.gif" alt="Laravel Translations Demo" width="100%" />
+    </a>
+</p>
+
+> Looking for AI-powered translations, revision history, and team collaboration? Check out [Laravel Translations Pro](https://outhebox.dev/products/laravel-translations-ui-pro).
 
 ## Upgrading from v1
 
