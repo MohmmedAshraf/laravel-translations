@@ -3,7 +3,7 @@
 namespace Outhebox\Translations\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Outhebox\Translations\Enums\ContributorRole;
 use Outhebox\Translations\Models\Contributor;
 
@@ -67,8 +67,9 @@ class ContributorFactory extends Factory
     public function invited(?string $token = null): static
     {
         return $this->state(fn () => [
-            'is_active' => false,
-            'invite_token' => Hash::make($token ?? fake()->uuid()),
+            'is_active' => true,
+            'password' => null,
+            'invite_token' => $token ?? Str::random(64),
             'invite_expires_at' => now()->addDays(7),
         ]);
     }

@@ -20,11 +20,13 @@ import AppLayout from '@/layouts/app-layout';
 import {
     AddCircle,
     CheckCircle,
+    Copy,
     Forbidden,
+    Letter,
     Pen2,
     UsersGroupRounded,
 } from '@/lib/icons';
-import { index, toggleActive } from '@/routes/ltu/contributors';
+import { index, resendInvite, toggleActive } from '@/routes/ltu/contributors';
 import { index as languagesIndex } from '@/routes/ltu/languages';
 import type { BreadcrumbItem } from '@/types';
 
@@ -45,6 +47,8 @@ interface ContributorItem {
     email: string;
     role: string;
     is_active: boolean;
+    status: string;
+    invite_url?: string;
     languages_list: string;
     languages: Language[];
     [key: string]: unknown;
@@ -65,6 +69,7 @@ const PLACEHOLDER_DATA: ContributorItem[] = [
         email: 'jane@example.com',
         role: 'admin',
         is_active: true,
+        status: 'active',
         languages_list: 'ES, FR',
         languages: [],
     },
@@ -74,6 +79,7 @@ const PLACEHOLDER_DATA: ContributorItem[] = [
         email: 'bob@example.com',
         role: 'translator',
         is_active: true,
+        status: 'active',
         languages_list: 'DE',
         languages: [],
     },
@@ -83,6 +89,7 @@ const PLACEHOLDER_DATA: ContributorItem[] = [
         email: 'alice@example.com',
         role: 'reviewer',
         is_active: true,
+        status: 'active',
         languages_list: 'All',
         languages: [],
     },
@@ -130,6 +137,29 @@ export default function ContributorsIndex() {
                 ),
             variant: 'destructive',
             hidden: (row) => !row.is_active,
+        },
+        {
+            label: 'Copy invitation link',
+            icon: Copy,
+            onClick: (row) => {
+                if (row.invite_url) {
+                    navigator.clipboard.writeText(row.invite_url);
+                }
+            },
+            hidden: (row) => row.status !== 'invited',
+        },
+        {
+            label: 'Resend invitation',
+            icon: Letter,
+            onClick: (row) =>
+                router.post(
+                    resendInvite.url(row.id),
+                    {},
+                    {
+                        preserveScroll: true,
+                    },
+                ),
+            hidden: (row) => row.status !== 'invited',
         },
     ];
 

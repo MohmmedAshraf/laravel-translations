@@ -47,6 +47,7 @@ Route::middleware('translations.auth')->group(function () {
         Route::post('/contributors', [ContributorController::class, 'store'])->name('ltu.contributors.store');
         Route::put('/contributors/{contributor}', [ContributorController::class, 'update'])->name('ltu.contributors.update');
         Route::post('/contributors/{contributor}/toggle-active', [ContributorController::class, 'toggleActive'])->name('ltu.contributors.toggle-active');
+        Route::post('/contributors/{contributor}/resend-invite', [ContributorController::class, 'resendInvite'])->name('ltu.contributors.resend-invite');
         Route::delete('/contributors/{contributor}', [ContributorController::class, 'destroy'])->name('ltu.contributors.destroy');
     });
 });

@@ -6,19 +6,22 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 use Outhebox\Translations\Concerns\HasDataTable;
 use Outhebox\Translations\Enums\ContributorRole;
 use Outhebox\Translations\Enums\ContributorStatus;
+use Outhebox\Translations\Events\ContributorInvited;
 use Outhebox\Translations\Http\Requests\StoreContributorRequest;
 use Outhebox\Translations\Http\Requests\UpdateContributorRequest;
+use Outhebox\Translations\Mail\ContributorInviteMail;
 use Outhebox\Translations\Models\Contributor;
 use Outhebox\Translations\Models\Language;
 use Outhebox\Translations\Support\DataTable\Column;
 use Outhebox\Translations\Support\DataTable\Filter;
+use Throwable;
 
 class ContributorController extends Controller
 {
@@ -93,6 +96,10 @@ class ContributorController extends Controller
                 default => 'active',
             };
 
+            if ($hasInviteToken) {
+                $data['invite_url'] = route('ltu.invite.show', $item->invite_token);
+            }
+
             return $data;
         })->all();
 
@@ -121,7 +128,7 @@ class ContributorController extends Controller
             return redirect()->back()->withErrors(['role' => 'Only owners can assign the owner role.']);
         }
 
-        $rawToken = Str::random(64);
+        $token = Str::random(64);
 
         $contributor = Contributor::query()->create([
             'name' => $validated['name'],
@@ -129,7 +136,7 @@ class ContributorController extends Controller
             'password' => null,
             'role' => $role,
             'is_active' => true,
-            'invite_token' => Hash::make($rawToken),
+            'invite_token' => $token,
             'invite_expires_at' => now()->addDays(config('translations.invite.expires_days', 7)),
         ]);
 
@@ -137,7 +144,19 @@ class ContributorController extends Controller
             $contributor->languages()->sync($validated['language_ids']);
         }
 
-        return redirect()->back()->with('success', "Contributor '{$contributor->name}' invited.");
+        $inviteUrl = route('ltu.invite.show', $token);
+
+        try {
+            Mail::to($contributor->email)->send(new ContributorInviteMail($contributor, $inviteUrl));
+        } catch (Throwable) {
+            ContributorInvited::dispatch($contributor, $inviteUrl);
+
+            return redirect()->back()->with('warning', "Contributor '{$contributor->name}' invited, but the email could not be sent. Copy the invitation link from the table actions.");
+        }
+
+        ContributorInvited::dispatch($contributor, $inviteUrl);
+
+        return redirect()->back()->with('success', "Contributor '{$contributor->name}' invited successfully.");
     }
 
     public function update(UpdateContributorRequest $request, Contributor $contributor): RedirectResponse
@@ -186,6 +205,29 @@ class ContributorController extends Controller
         $action = $contributor->is_active ? 'activated' : 'deactivated';
 
         return redirect()->back()->with('success', "Contributor '{$contributor->name}' {$action}.");
+    }
+
+    public function resendInvite(Contributor $contributor): RedirectResponse
+    {
+        if (! $contributor->invite_token) {
+            return redirect()->back()->with('error', 'This contributor has already accepted their invitation.');
+        }
+
+        $contributor->update([
+            'invite_expires_at' => now()->addDays(config('translations.invite.expires_days', 7)),
+        ]);
+
+        $inviteUrl = route('ltu.invite.show', $contributor->invite_token);
+
+        try {
+            Mail::to($contributor->email)->send(new ContributorInviteMail($contributor, $inviteUrl));
+        } catch (Throwable) {
+            return redirect()->back()->with('warning', "Could not send email to '{$contributor->name}'. Copy the invitation link from the table actions.");
+        }
+
+        ContributorInvited::dispatch($contributor, $inviteUrl);
+
+        return redirect()->back()->with('success', "Invitation resent to '{$contributor->name}'.");
     }
 
     public function destroy(Contributor $contributor): RedirectResponse
