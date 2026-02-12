@@ -20,6 +20,7 @@ class UpdateSourcePhraseRequest extends FormRequest
             'key' => ['sometimes', 'string', 'max:1000'],
             'group_id' => ['sometimes', 'integer', 'exists:ltu_groups,id'],
             'context_note' => ['nullable', 'string'],
+            'priority' => ['sometimes', 'string', 'in:low,medium,high,critical'],
         ];
     }
 }

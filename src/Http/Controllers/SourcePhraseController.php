@@ -192,7 +192,7 @@ class SourcePhraseController extends Controller
         $validated = $request->validated();
 
         DB::transaction(function () use ($validated, $translationKey, $sourceLanguage, $extractor): void {
-            $keyUpdates = Arr::only($validated, ['key', 'group_id', 'context_note']);
+            $keyUpdates = Arr::only($validated, ['key', 'group_id', 'context_note', 'priority']);
 
             if ($keyUpdates) {
                 $translationKey->update($keyUpdates);
