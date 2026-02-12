@@ -79,8 +79,12 @@ export default defineConfig({
         },
     },
     resolve: {
+        dedupe: ['react', 'react-dom', '@inertiajs/react'],
         alias: {
             '@': resolve(__dirname, 'resources/js'),
+            '@inertiajs/react': resolve(__dirname, 'node_modules/@inertiajs/react'),
+            'react': resolve(__dirname, 'node_modules/react'),
+            'react-dom': resolve(__dirname, 'node_modules/react-dom'),
         },
     },
 });

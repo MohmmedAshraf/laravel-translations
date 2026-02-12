@@ -73,7 +73,7 @@ export default [
         },
     },
     {
-        ignores: ['vendor', 'node_modules', 'dist', 'workbench', 'vite.config.ts', 'tests/Fixtures'],
+        ignores: ['vendor', 'node_modules', 'dist', 'workbench', 'vite.config.ts', 'tests/Fixtures', 'resources/js/routes', 'resources/js/actions'],
     },
     prettier,
 ];
