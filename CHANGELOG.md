@@ -2,6 +2,18 @@
 
 All notable changes to `laravel-translations` will be documented in this file.
 
+## 1.4.4 - 2026-02-12
+
+### What's Changed
+
+* fix: TranslationResource has error on Model::shouldBeStrict by @faytecCD in https://github.com/MohmmedAshraf/laravel-translations/pull/176
+
+### New Contributors
+
+* @faytecCD made their first contribution in https://github.com/MohmmedAshraf/laravel-translations/pull/176
+
+**Full Changelog**: https://github.com/MohmmedAshraf/laravel-translations/compare/1.4.3...1.4.4
+
 ## v1.4.3 - 2026-02-06
 
 ### What's Changed
@@ -346,11 +358,13 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
      
      
      
+     
      ```
    - Alternatively, manually uninstall using:
      
      ```bash
      composer remove outhebox/laravel-translations
+     
      
      
      
@@ -385,6 +399,7 @@ After months of thorough beta testing, presenting Version 1.0 of the package, lo
    
      ```bash
      composer require outhebox/laravel-translations
+   
    
    
    
