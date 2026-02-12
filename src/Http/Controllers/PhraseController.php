@@ -1,158 +1,292 @@
 <?php
 
-namespace Outhebox\TranslationsUI\Http\Controllers;
+namespace Outhebox\Translations\Http\Controllers;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
-use Outhebox\TranslationsUI\Http\Resources\PhraseResource;
-use Outhebox\TranslationsUI\Http\Resources\TranslationFileResource;
-use Outhebox\TranslationsUI\Http\Resources\TranslationResource;
-use Outhebox\TranslationsUI\Models\Phrase;
-use Outhebox\TranslationsUI\Models\Translation;
-use Outhebox\TranslationsUI\Models\TranslationFile;
-use Stichoza\GoogleTranslate\Exceptions\LargeTextException;
-use Stichoza\GoogleTranslate\Exceptions\RateLimitException;
-use Stichoza\GoogleTranslate\Exceptions\TranslationRequestException;
-use Stichoza\GoogleTranslate\GoogleTranslate;
+use Outhebox\Translations\Concerns\HasDataTable;
+use Outhebox\Translations\Enums\TranslationStatus;
+use Outhebox\Translations\Http\Requests\UpdatePhraseRequest;
+use Outhebox\Translations\Models\Group;
+use Outhebox\Translations\Models\Language;
+use Outhebox\Translations\Models\Translation;
+use Outhebox\Translations\Models\TranslationKey;
+use Outhebox\Translations\Rules\TranslationParametersRule;
+use Outhebox\Translations\Support\DataTable\Column;
+use Outhebox\Translations\Support\DataTable\Filter;
 
-class PhraseController extends BaseController
+class PhraseController extends Controller
 {
-    public function index(Translation $translation, Request $request): Response|RedirectResponse
+    use HasDataTable;
+
+    private ?Language $language = null;
+
+    private ?Language $sourceLanguage = null;
+
+    protected function tableModel(): string
     {
-        if ($translation->source) {
-            return redirect()->route('ltu.source_translation');
-        }
-
-        $phrases = $translation->phrases()->newQuery();
-
-        $files = [];
-        foreach (collect($phrases->where('translation_id', $translation->id)->get())->unique('translation_file_id') as $value) {
-            $files[] = TranslationFile::where('id', $value->translation_file_id)->first();
-        }
-
-        if ($request->has('filter.keyword')) {
-            $phrases->where(function (Builder $query) use ($request) {
-                $query->where('key', 'LIKE', "%{$request->input('filter.keyword')}%")
-                    ->orWhere('value', 'LIKE', "%{$request->input('filter.keyword')}%");
-            });
-        }
-
-        if ($request->has('filter.translationFile')) {
-            $phrases->where(
-                ! is_null($request->input('filter.translationFile')) || ! empty($request->input('filter.translationFile'))
-                    ? fn (Builder $query) => $query->where('translation_file_id', $request->input('filter.translationFile'))
-                    : fn (Builder $query) => $query->whereNull('translation_file_id')
-            );
-        }
-
-        if ($request->has('filter.status')) {
-            $phrases->where(
-                $request->input('filter.status') === 'translated'
-                    ? fn (Builder $query) => $query->whereNotNull('value')
-                    : fn (Builder $query) => $query->whereNull('value')
-            );
-        }
-
-        $phrases = $phrases
-            ->orderBy('key')
-            ->paginate($request->input('perPage') ?? 12)
-            ->withQueryString();
-
-        $translation = $translation
-            ->withCount('phrases')
-            ->withProgress()
-            ->where('id', $translation->id)
-            ->first();
-
-        return Inertia::render('phrases/index', [
-            'phrases' => PhraseResource::collection($phrases),
-            'translation' => TranslationResource::make($translation),
-            'files' => TranslationFileResource::collection(collect($files)),
-            'filter' => $request->input('filter', collect()),
-        ]);
+        return TranslationKey::class;
     }
 
-    /**
-     * @throws LargeTextException
-     * @throws RateLimitException
-     * @throws TranslationRequestException
-     */
-    public function edit(Translation $translation, Phrase $phrase): RedirectResponse|Response
+    protected function tableColumns(): array
     {
-        if ($phrase->translation->source) {
-            return redirect()->route('ltu.source_translation.edit', $phrase->uuid);
-        }
-
-        $translation = $translation
-            ->withCount('phrases')
-            ->withProgress()
-            ->where('id', $translation->id)
-            ->first();
-
-        return Inertia::render('phrases/edit', [
-            'phrase' => PhraseResource::make($phrase),
-            'translation' => TranslationResource::make($translation),
-            'source' => TranslationResource::make(Translation::isSource()
-                ->withCount('phrases')
-                ->withProgress()?->first()),
-            'similarPhrases' => PhraseResource::collection($phrase->similarPhrases()),
-            'suggestedTranslations' => [
-                'google' => [
-                    'id' => 'google',
-                    'engine' => 'Google Translate',
-                    'value' => (new GoogleTranslate)->preserveParameters()
-                        ->setSource($phrase->source->translation->language->code)
-                        ->setTarget($translation->language->code)
-                        ->translate($phrase->source->value),
-                ],
-            ],
-        ]);
+        return [
+            Column::make('status', 'Status')->statusIcon(TranslationStatus::class)->headerIcon('check-circle')->maxSize(50),
+            Column::make('key', 'Key')->mono()->searchable()->sortable()->fixed()->maxSize(400),
+            Column::make('group_name', 'Group')->maxSize(160),
+            Column::make('source_value', 'Source')->truncate(60)->maxSize(300),
+            Column::make('translation_value', 'Translation')->fill()->truncate(80),
+        ];
     }
 
-    public function update(Translation $translation, Phrase $phrase, Request $request): RedirectResponse
+    protected function tableFilters(): array
     {
-        $request->validate([
-            'phrase' => 'required|string',
-        ]);
+        return [
+            Filter::make('status', TranslationStatus::class)->label('Status')->icon('check-circle'),
+            Filter::make('group_id')->label('Group')->icon('folder')
+                ->fromModel(Group::query()->orderBy('name'), fn (Group $group) => $group->displayName()),
+            Filter::make('missing_params')->label('Missing Params')->icon('alert-triangle')
+                ->options([
+                    ['value' => '1', 'label' => 'Missing params'],
+                ]),
+        ];
+    }
 
-        if (! $translation->source) {
-            if (is_array($phrase->source->parameters)) {
-                foreach ($phrase->source->parameters as $parameter) {
-                    if (! str_contains($request->input('phrase'), ":$parameter")) {
-                        return redirect()->back()->withErrors([
-                            'phrase' => 'Required parameters are missing.',
-                        ]);
-                    }
-                }
+    protected function tableFilterCallbacks(): array
+    {
+        return [
+            'status' => function (Builder $query, $value): void {
+                $query->whereHas('translations', function ($q) use ($value): void {
+                    $q->where('language_id', $this->language->id)
+                        ->where('status', $value);
+                });
+            },
+            'group_id' => fn (Builder $query, $value) => $query->where('group_id', (int) $value),
+            'missing_params' => function (Builder $query): void {
+                $languageId = $this->language->id;
+                $ids = collect();
+
+                TranslationKey::query()
+                    ->whereNotNull('parameters')
+                    ->whereJsonLength('parameters', '>', 0)
+                    ->with(['translations' => fn ($tq) => $tq->where('language_id', $languageId)])
+                    ->chunkById(500, function ($keys) use (&$ids): void {
+                        $filtered = $keys->filter(function (TranslationKey $key): bool {
+                            $value = $key->translations->first()?->value;
+
+                            return ! $value || TranslationParametersRule::findMissing($key, $value) !== [];
+                        });
+                        $ids = $ids->merge($filtered->pluck('id'));
+                    });
+
+                $query->whereIn('ltu_translation_keys.id', $ids);
+            },
+        ];
+    }
+
+    protected function tableRelations(): array
+    {
+        return ['group'];
+    }
+
+    protected function modifyQuery(Builder $query): Builder
+    {
+        if ($this->language) {
+            $query->with(['translations' => fn ($q) => $q->where('language_id', $this->language->id)]);
+        }
+
+        return $query;
+    }
+
+    protected function tableDefaultSort(): string
+    {
+        return 'key';
+    }
+
+    protected function resourceName(): array
+    {
+        return ['phrase', 'phrases'];
+    }
+
+    public function index(Request $request, Language $language): Response
+    {
+        abort_if($language->isSource(), 404);
+        abort_unless(app('translations.auth')->canAccessLanguage($language->id), 403);
+
+        return Inertia::render('translations/phrases/index', $this->buildIndexData($request, $language));
+    }
+
+    protected function buildIndexData(Request $request, Language $language): array
+    {
+        $this->language = $language;
+        $this->sourceLanguage = Language::source();
+
+        $tableData = $this->paginatedTableData($request);
+
+        $keyIds = collect($tableData['data'])->pluck('id')->all();
+
+        $sourceTranslations = $this->sourceLanguage
+            ? Translation::query()
+                ->whereIn('translation_key_id', $keyIds)
+                ->where('language_id', $this->sourceLanguage->id)
+                ->pluck('value', 'translation_key_id')
+            : collect();
+
+        $tableData['data'] = collect($tableData['data'])
+            ->map(function ($item) use ($sourceTranslations) {
+                $data = $item instanceof TranslationKey ? $item->toArray() : (array) $item;
+                $groupName = $data['group']['name'] ?? '';
+                $translation = $data['translations'][0] ?? null;
+
+                return [
+                    ...$data,
+                    'key' => $groupName.'.'.$data['key'],
+                    'source_value' => $sourceTranslations[$data['id']] ?? null,
+                    'translation_value' => $translation['value'] ?? null,
+                    'status' => $translation['status'] ?? 'untranslated',
+                    'group_name' => $groupName ?: null,
+                ];
+            })
+            ->all();
+
+        return [
+            'data' => $tableData,
+            'tableConfig' => $this->tableConfig($request),
+            'language' => $language,
+            'sourceLanguage' => $this->sourceLanguage,
+        ];
+    }
+
+    public function edit(Language $language, TranslationKey $translationKey): Response
+    {
+        abort_if($language->isSource(), 404);
+        abort_unless(app('translations.auth')->canAccessLanguage($language->id), 403);
+
+        return Inertia::render('translations/phrases/edit', $this->buildEditData($language, $translationKey));
+    }
+
+    protected function buildEditData(Language $language, TranslationKey $translationKey): array
+    {
+        $sourceLanguage = Language::source();
+
+        $translationKey->load(['group', 'translations' => fn ($q) => $q->where('language_id', $language->id)]);
+
+        $sourceTranslation = $this->loadSourceTranslation($translationKey, $sourceLanguage);
+
+        return [
+            'language' => $language,
+            'sourceLanguage' => $sourceLanguage,
+            'sourceTranslation' => $sourceTranslation,
+            'translationKey' => $translationKey,
+            'translationIsEmpty' => ! $translationKey->translations->first()?->value,
+            'previousKey' => TranslationKey::query()->where('group_id', $translationKey->group_id)->where('key', '<', $translationKey->key)->orderByDesc('key')->value('id'),
+            'nextKey' => TranslationKey::query()->where('group_id', $translationKey->group_id)->where('key', '>', $translationKey->key)->orderBy('key')->value('id'),
+            'workflow' => $this->buildWorkflowData(),
+            'similarKeys' => $this->buildSimilarKeys($translationKey, $language, $sourceLanguage),
+        ];
+    }
+
+    public function update(UpdatePhraseRequest $request, Language $language, TranslationKey $translationKey): RedirectResponse
+    {
+        abort_unless(app('translations.auth')->canAccessLanguage($language->id), 403);
+
+        $validated = $request->validated();
+        $hasValue = array_key_exists('value', $validated) && $validated['value'] !== null;
+
+        if ($hasValue) {
+            $validated['translated_by'] = app('translations.auth')->id();
+
+            if (! isset($validated['status'])) {
+                $validated['status'] = $this->resolveStatusForSave();
             }
         }
 
-        $phrase->update([
-            'value' => $request->input('phrase'),
-        ]);
+        Translation::query()->updateOrCreate(
+            ['translation_key_id' => $translationKey->id, 'language_id' => $language->id],
+            $validated,
+        );
 
-        $nextPhrase = $translation->phrases()
-            ->where('id', '>', $phrase->id)
-            ->whereNull('value')
-            ->first();
+        return redirect()->back()->with('success', 'Translation updated.');
+    }
 
-        if ($nextPhrase) {
-            return redirect()->route('ltu.phrases.edit', [
-                'translation' => $translation,
-                'phrase' => $nextPhrase,
-            ])->with('notification', [
-                'type' => 'success',
-                'body' => 'Phrase has been updated successfully',
-            ]);
+    protected function loadSourceTranslation(TranslationKey $translationKey, ?Language $sourceLanguage): ?Translation
+    {
+        if (! $sourceLanguage) {
+            return null;
         }
 
-        return redirect()->route('ltu.phrases.index', $translation)->with('notification', [
-            'type' => 'success',
-            'body' => 'Phrase has been updated successfully',
-        ]);
+        return Translation::query()
+            ->where('translation_key_id', $translationKey->id)
+            ->where('language_id', $sourceLanguage->id)
+            ->first();
+    }
+
+    protected function resolveStatusForSave(): TranslationStatus
+    {
+        if (! config('translations.approval_workflow', true)) {
+            return TranslationStatus::Translated;
+        }
+
+        $role = app('translations.auth')->role();
+
+        if ($role?->canApproveTranslations()) {
+            return TranslationStatus::Approved;
+        }
+
+        return TranslationStatus::NeedsReview;
+    }
+
+    protected function buildSimilarKeys(TranslationKey $translationKey, Language $language, ?Language $sourceLanguage): array
+    {
+        $key = $translationKey->key;
+        $prefix = Str::before($key, '_');
+
+        if ($prefix === $key) {
+            $prefix = Str::before($key, '.');
+        }
+
+        if (! $prefix || mb_strlen($prefix) < 2) {
+            return [];
+        }
+
+        $languageIds = collect([$language->id, $sourceLanguage?->id])->filter()->values()->all();
+
+        $similarKeys = TranslationKey::query()
+            ->where('id', '!=', $translationKey->id)
+            ->where('group_id', $translationKey->group_id)
+            ->where('key', 'like', $prefix.'%')
+            ->with(['group', 'translations' => fn ($q) => $q->whereIn('language_id', $languageIds)])
+            ->limit(20)
+            ->get();
+
+        return $similarKeys->map(function (TranslationKey $key) use ($language, $sourceLanguage) {
+            $groupName = $key->group?->name ?? '';
+
+            return [
+                'id' => $key->id,
+                'key' => $groupName ? $groupName.'.'.$key->key : $key->key,
+                'source' => $sourceLanguage
+                    ? $key->translations->firstWhere('language_id', $sourceLanguage->id)?->value
+                    : null,
+                'translation' => $key->translations->firstWhere('language_id', $language->id)?->value,
+            ];
+        })->values()->all();
+    }
+
+    protected function buildWorkflowData(): array
+    {
+        $role = app('translations.auth')->role();
+
+        return [
+            'enabled' => (bool) config('translations.approval_workflow', true),
+            'canApprove' => $role?->canApproveTranslations() ?? false,
+            'canEdit' => $role?->canEditTranslations() ?? false,
+            'saveStatus' => $this->resolveStatusForSave()->value,
+        ];
     }
 }

@@ -1,31 +1,77 @@
 <?php
 
-namespace Outhebox\TranslationsUI\Models;
+namespace Outhebox\Translations\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Outhebox\TranslationsUI\Traits\HasDatabaseConnection;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Outhebox\Translations\Database\Factories\LanguageFactory;
 
 class Language extends Model
 {
-    use HasDatabaseConnection;
     use HasFactory;
-
-    protected $guarded = [];
 
     protected $table = 'ltu_languages';
 
-    public $timestamps = false;
+    protected $fillable = [
+        'code',
+        'name',
+        'native_name',
+        'rtl',
+        'is_source',
+        'tone',
+        'active',
+    ];
 
-    public function translation(): HasOne
+    protected function casts(): array
     {
-        return $this->hasOne(Translation::class);
+        return [
+            'rtl' => 'boolean',
+            'is_source' => 'boolean',
+            'active' => 'boolean',
+        ];
     }
 
-    public function phrases(): HasManyThrough
+    public function getConnectionName(): ?string
     {
-        return $this->hasManyThrough(Phrase::class, Translation::class);
+        return config('translations.database_connection') ?? parent::getConnectionName();
+    }
+
+    public function translations(): HasMany
+    {
+        return $this->hasMany(Translation::class);
+    }
+
+    public function contributors(): BelongsToMany
+    {
+        return $this->belongsToMany(Contributor::class, 'ltu_contributor_language')
+            ->withTimestamps();
+    }
+
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->where('active', true);
+    }
+
+    public function scopeSource(Builder $query): Builder
+    {
+        return $query->where('is_source', true);
+    }
+
+    public function isSource(): bool
+    {
+        return $this->is_source;
+    }
+
+    public static function source(): ?static
+    {
+        return once(fn () => static::query()->source()->first());
+    }
+
+    protected static function newFactory(): LanguageFactory
+    {
+        return LanguageFactory::new();
     }
 }

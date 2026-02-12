@@ -1,9 +1,11 @@
 <?php
 
-namespace Outhebox\TranslationsUI\Database\Factories;
+namespace Outhebox\Translations\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Outhebox\TranslationsUI\Models\Contributor;
+use Illuminate\Support\Str;
+use Outhebox\Translations\Enums\ContributorRole;
+use Outhebox\Translations\Models\Contributor;
 
 class ContributorFactory extends Factory
 {
@@ -12,11 +14,63 @@ class ContributorFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->name(),
-            'email' => $this->faker->unique()->safeEmail(),
-            'role' => $this->faker->randomElement(['admin', 'translator']),
-            'password' => bcrypt('password'),
-            'remember_token' => null,
+            'name' => fake()->name(),
+            'email' => fake()->unique()->safeEmail(),
+            'password' => 'password',
+            'role' => ContributorRole::Translator,
+            'is_active' => true,
         ];
+    }
+
+    public function owner(): static
+    {
+        return $this->state(fn () => [
+            'role' => ContributorRole::Owner,
+        ]);
+    }
+
+    public function admin(): static
+    {
+        return $this->state(fn () => [
+            'role' => ContributorRole::Admin,
+        ]);
+    }
+
+    public function translator(): static
+    {
+        return $this->state(fn () => [
+            'role' => ContributorRole::Translator,
+        ]);
+    }
+
+    public function reviewer(): static
+    {
+        return $this->state(fn () => [
+            'role' => ContributorRole::Reviewer,
+        ]);
+    }
+
+    public function viewer(): static
+    {
+        return $this->state(fn () => [
+            'role' => ContributorRole::Viewer,
+        ]);
+    }
+
+    public function inactive(): static
+    {
+        return $this->state(fn () => [
+            'is_active' => false,
+        ]);
+    }
+
+    public function invited(?string $token = null): static
+    {
+        return $this->state(fn () => [
+            'is_active' => true,
+            'password' => null,
+            'invite_token' => $token ?? Str::random(64),
+            'invite_expires_at' => now()->addDays(7),
+        ]);
     }
 }

@@ -1,0 +1,11 @@
+{
+  "resources/js/app.tsx": {
+    "file": "js/app.js",
+    "name": "app",
+    "src": "resources/js/app.tsx",
+    "isEntry": true,
+    "css": [
+      "css/app.css"
+    ]
+  }
+}

@@ -1,4 +1,1 @@
-auto-imports.d.ts
-components.d.ts
-generated.d.ts
-routes.d.ts
+resources/js/components/ui/*

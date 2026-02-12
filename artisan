@@ -1,0 +1,22 @@
+#!/usr/bin/env php
+<?php
+
+putenv('CACHE_STORE=array');
+$_ENV['CACHE_STORE'] = 'array';
+
+$testbenchPath = __DIR__.'/vendor/bin/testbench';
+
+if (! file_exists($testbenchPath)) {
+    fwrite(STDERR, "Error: vendor/bin/testbench not found. Run 'composer install' first.\n");
+    exit(1);
+}
+
+$args = array_slice($argv, 1);
+
+$command = escapeshellarg($testbenchPath);
+if (! empty($args)) {
+    $command .= ' '.implode(' ', array_map('escapeshellarg', $args));
+}
+
+passthru($command, $exitCode);
+exit($exitCode);

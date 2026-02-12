@@ -1,10 +1,12 @@
 <?php
 
-namespace Outhebox\TranslationsUI\Database\Factories;
+namespace Outhebox\Translations\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Outhebox\TranslationsUI\Models\Language;
-use Outhebox\TranslationsUI\Models\Translation;
+use Outhebox\Translations\Enums\TranslationStatus;
+use Outhebox\Translations\Models\Language;
+use Outhebox\Translations\Models\Translation;
+use Outhebox\Translations\Models\TranslationKey;
 
 class TranslationFactory extends Factory
 {
@@ -13,15 +15,32 @@ class TranslationFactory extends Factory
     public function definition(): array
     {
         return [
-            'source' => false,
+            'translation_key_id' => TranslationKey::factory(),
             'language_id' => Language::factory(),
+            'value' => fake()->sentence(),
+            'status' => TranslationStatus::Translated,
         ];
     }
 
-    public function source(): self
+    public function untranslated(): static
     {
-        return $this->state([
-            'source' => true,
+        return $this->state(fn () => [
+            'value' => null,
+            'status' => TranslationStatus::Untranslated,
+        ]);
+    }
+
+    public function needsReview(): static
+    {
+        return $this->state(fn () => [
+            'status' => TranslationStatus::NeedsReview,
+        ]);
+    }
+
+    public function approved(): static
+    {
+        return $this->state(fn () => [
+            'status' => TranslationStatus::Approved,
         ]);
     }
 }

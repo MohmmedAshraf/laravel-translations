@@ -1,33 +1,55 @@
 <?php
 
-namespace Outhebox\TranslationsUI\Models;
+namespace Outhebox\Translations\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Outhebox\TranslationsUI\Traits\HasDatabaseConnection;
+use Outhebox\Translations\Database\Factories\TranslationFactory;
+use Outhebox\Translations\Enums\TranslationStatus;
+use Outhebox\Translations\Events\TranslationSaved;
 
 class Translation extends Model
 {
-    use HasDatabaseConnection;
     use HasFactory;
-
-    protected $guarded = [];
 
     protected $table = 'ltu_translations';
 
-    protected $casts = [
-        'source' => 'boolean',
+    protected static array $revisionContext = [];
+
+    protected static array $pendingOldValues = [];
+
+    protected $fillable = [
+        'translation_key_id',
+        'language_id',
+        'value',
+        'status',
+        'needs_review',
+        'translated_by',
+        'reviewed_by',
+        'reviewer_feedback',
+        'ai_generated',
+        'ai_provider',
     ];
 
-    protected $with = [
-        'language',
-    ];
-
-    public function phrases(): HasMany
+    protected function casts(): array
     {
-        return $this->hasMany(Phrase::class);
+        return [
+            'status' => TranslationStatus::class,
+            'needs_review' => 'boolean',
+            'ai_generated' => 'boolean',
+        ];
+    }
+
+    public function getConnectionName(): ?string
+    {
+        return config('translations.database_connection') ?? parent::getConnectionName();
+    }
+
+    public function translationKey(): BelongsTo
+    {
+        return $this->belongsTo(TranslationKey::class);
     }
 
     public function language(): BelongsTo
@@ -35,19 +57,93 @@ class Translation extends Model
         return $this->belongsTo(Language::class);
     }
 
-    public function scopeIsSource($query): void
+    public function scopeTranslated(Builder $query): Builder
     {
-        $query->where('source', true);
+        return $query->where('status', TranslationStatus::Translated);
     }
 
-    public function scopeWithProgress($query): void
+    public function scopeUntranslated(Builder $query): Builder
     {
-        $query->addSelect([
-            'progress' => Phrase::selectRaw('AVG(CASE WHEN value IS NOT NULL THEN 1 ELSE 0 END) * 100')
-                ->whereColumn('ltu_phrases.translation_id', 'ltu_translations.id')
-                ->limit(1),
-        ])->withCasts([
-            'progress' => 'decimal:1',
-        ]);
+        return $query->where('status', TranslationStatus::Untranslated);
+    }
+
+    public function scopeNeedsReview(Builder $query): Builder
+    {
+        return $query->where('status', TranslationStatus::NeedsReview);
+    }
+
+    public static function withRevisionContext(?string $changeType, ?string $changedBy = null, ?array $metadata = null): void
+    {
+        static::$revisionContext = [
+            'changeType' => $changeType,
+            'changedBy' => $changedBy,
+            'metadata' => $metadata,
+        ];
+    }
+
+    public static function clearRevisionContext(): void
+    {
+        static::$revisionContext = [];
+    }
+
+    public static function resetStaticState(): void
+    {
+        static::$revisionContext = [];
+        static::$pendingOldValues = [];
+    }
+
+    protected static function booted(): void
+    {
+        static::saving(function (Translation $translation): void {
+            static::captureOldValue($translation);
+        });
+
+        static::saved(function (Translation $translation): void {
+            static::handleSaved($translation);
+        });
+    }
+
+    protected static function captureOldValue(Translation $translation): void
+    {
+        if (count(static::$pendingOldValues) > 1000) {
+            static::$pendingOldValues = [];
+        }
+
+        if ($translation->isDirty('value')) {
+            $key = $translation->id ?? spl_object_id($translation);
+            static::$pendingOldValues[$key] = $translation->getOriginal('value');
+        }
+    }
+
+    protected static function handleSaved(Translation $translation): void
+    {
+        $objectKey = spl_object_id($translation);
+        $idKey = $translation->id;
+        $oldValue = static::$pendingOldValues[$idKey] ?? static::$pendingOldValues[$objectKey] ?? null;
+        unset(static::$pendingOldValues[$idKey], static::$pendingOldValues[$objectKey]);
+
+        $valueChanged = $translation->wasChanged('value')
+            || ($translation->wasRecentlyCreated && $translation->value !== null);
+
+        if (! $valueChanged) {
+            static::clearRevisionContext();
+
+            return;
+        }
+
+        TranslationSaved::dispatch(
+            $translation,
+            $oldValue,
+            static::$revisionContext['changeType'] ?? null,
+            static::$revisionContext['changedBy'] ?? null,
+            static::$revisionContext['metadata'] ?? null,
+        );
+
+        static::clearRevisionContext();
+    }
+
+    protected static function newFactory(): TranslationFactory
+    {
+        return TranslationFactory::new();
     }
 }
