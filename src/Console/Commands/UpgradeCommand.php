@@ -75,9 +75,7 @@ class UpgradeCommand extends Command
         }
 
         try {
-            $callback = fn () => $this->db()->transaction(function () {
-                $this->migrateData();
-            });
+            $callback = fn () => $this->migrateData();
 
             $this->input->isInteractive()
                 ? spin(callback: $callback, message: 'Migrating data to v2 schema...')
@@ -148,11 +146,13 @@ class UpgradeCommand extends Command
         $this->dropSharedV1Tables();
         $this->createV2Tables();
 
-        $languageMap = $this->migrateLanguages($v1Languages, $v1Translations);
-        $groupMap = $this->migrateFiles($v1Files);
-        $this->migratePhrases($v1Phrases, $v1Translations, $groupMap, $languageMap);
-        $this->migrateContributors($v1Contributors);
-        $this->migrateInvites($v1Invites);
+        $this->db()->transaction(function () use ($v1Languages, $v1Translations, $v1Files, $v1Phrases, $v1Contributors, $v1Invites) {
+            $languageMap = $this->migrateLanguages($v1Languages, $v1Translations);
+            $groupMap = $this->migrateFiles($v1Files);
+            $this->migratePhrases($v1Phrases, $v1Translations, $groupMap, $languageMap);
+            $this->migrateContributors($v1Contributors);
+            $this->migrateInvites($v1Invites);
+        });
 
         $this->verifyIntegrity($v1Languages, $v1Files, $v1Phrases, $v1Contributors, $v1Invites);
     }
