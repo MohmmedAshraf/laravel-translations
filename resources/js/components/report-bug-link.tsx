@@ -1,10 +1,11 @@
 import { useSidebar } from '@/components/ui/sidebar';
 import { Bug, SquareArrowRightUp } from '@/lib/icons';
 
-const REPORT_URL =
+const DEFAULT_REPORT_URL =
     'https://github.com/MohmmedAshraf/laravel-translations/issues/new';
 
-export function ReportBugLink() {
+export function ReportBugLink({ url }: { url?: string }) {
+    const REPORT_URL = url ?? DEFAULT_REPORT_URL;
     const { state } = useSidebar();
 
     if (state === 'collapsed') {

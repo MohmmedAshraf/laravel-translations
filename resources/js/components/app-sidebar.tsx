@@ -31,11 +31,13 @@ import { ReportBugLink } from './report-bug-link';
 interface AppSidebarProps {
     extraNavItems?: NavItem[];
     showUpgradeBanner?: boolean;
+    reportBugUrl?: string;
 }
 
 export function AppSidebar({
     extraNavItems = [],
     showUpgradeBanner = true,
+    reportBugUrl,
 }: AppSidebarProps) {
     const { state } = useSidebar();
     const isCollapsed = state === 'collapsed';
@@ -100,10 +102,10 @@ export function AppSidebar({
                     <>
                         {!isCollapsed && (
                             <div className="mx-2 space-y-2">
-                                <ReportBugLink />
+                                <ReportBugLink url={reportBugUrl} />
 
                                 <a
-                                    href="https://outhebox.dev/products/laravel-translations-ui-pro?utm_source=app_sidebar&utm_medium=link&utm_campaign=upgrade_to_pro"
+                                    href="https://dub.sh/transpro"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="group/pro relative block overflow-hidden rounded-xl bg-linear-to-r from-indigo-300 via-violet-300 to-purple-300 p-px shadow-sm transition-all hover:shadow-lg hover:shadow-indigo-300/30 dark:from-indigo-400 dark:via-violet-400 dark:to-purple-400 dark:hover:shadow-indigo-400/15"
@@ -144,10 +146,10 @@ export function AppSidebar({
                         )}
                         {isCollapsed && (
                             <div className="flex flex-col items-center gap-2">
-                                <ReportBugLink />
+                                <ReportBugLink url={reportBugUrl} />
 
                                 <a
-                                    href="https://outhebox.dev/products/laravel-translations-ui-pro?utm_source=app_sidebar&utm_medium=link&utm_campaign=upgrade_to_pro"
+                                    href="https://dub.sh/transpro"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="group/pro relative block overflow-hidden rounded-lg bg-linear-to-r from-indigo-300 via-violet-300 to-purple-300 p-px transition-shadow hover:shadow-lg hover:shadow-indigo-300/30 dark:from-indigo-400 dark:via-violet-400 dark:to-purple-400 dark:hover:shadow-indigo-400/15"
@@ -169,7 +171,7 @@ export function AppSidebar({
                     </>
                 ) : (
                     <div className="mx-auto mb-2 w-full">
-                        <ReportBugLink />
+                        <ReportBugLink url={reportBugUrl} />
                     </div>
                 )}
 
