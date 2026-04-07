@@ -139,8 +139,8 @@ trait HasDataTable
         }
 
         $query = QueryBuilder::for($this->tableBaseQuery())
-            ->allowedFilters($allowedFilters)
-            ->allowedSorts($this->buildAllowedSorts())
+            ->allowedFilters(...$allowedFilters)
+            ->allowedSorts(...$this->buildAllowedSorts())
             ->defaultSort($this->resolveDefaultSort());
 
         if ($relations = $this->tableRelations()) {
