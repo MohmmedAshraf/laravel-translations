@@ -332,7 +332,7 @@ trait HasDataTable
             });
 
             if ($descending) {
-                $sort->defaultDirection(SortDirection::DESCENDING);
+                $sort->defaultDirection(SortDirection::Descending);
             }
 
             return $sort;

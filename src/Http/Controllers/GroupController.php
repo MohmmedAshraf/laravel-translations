@@ -19,15 +19,13 @@ class GroupController extends Controller
     {
         $groups = QueryBuilder::for(Group::class)
             ->withCount('translationKeys')
-            ->allowedFilters([
-                AllowedFilter::callback('search', function ($query, $value): void {
-                    $escaped = str_replace(['%', '_'], ['\%', '\_'], $value);
-                    $query->where(function ($q) use ($escaped): void {
-                        $q->where('name', 'like', "%{$escaped}%")
-                            ->orWhere('namespace', 'like', "%{$escaped}%");
-                    });
-                }),
-            ])
+            ->allowedFilters(AllowedFilter::callback('search', function ($query, $value): void {
+                $escaped = str_replace(['%', '_'], ['\%', '\_'], $value);
+                $query->where(function ($q) use ($escaped): void {
+                    $q->where('name', 'like', "%{$escaped}%")
+                        ->orWhere('namespace', 'like', "%{$escaped}%");
+                });
+            }))
             ->orderBy('name')
             ->get();
 
