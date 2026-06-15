@@ -26,7 +26,7 @@ class TranslationParametersRule implements ValidationRule
     public static function findMissing(TranslationKey $translationKey, string $value): array
     {
         return array_values(array_filter(
-            $translationKey->parameterNames(),
+            $translationKey->getNormalizedParameterNames(),
             fn (string $param) => ! str_contains(strtolower($value), $param),
         ));
     }
