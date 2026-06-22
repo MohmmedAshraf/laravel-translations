@@ -62,15 +62,6 @@ class TranslationKey extends Model
         return $this->parameters ?? [];
     }
 
-    public function getNormalizedParameterNames(): array
-    {
-        $normalizedParameterNames = [];
-        foreach ($this->parameterNames() as $parameterName) {
-            $normalizedParameterNames[] = strtolower($parameterName);
-        }
-        return $normalizedParameterNames;
-    }
-
     public function scopeInGroup(Builder $query, int $groupId): Builder
     {
         return $query->where('group_id', $groupId);
