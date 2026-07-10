@@ -126,6 +126,19 @@ it('passes when param is at end of string', function () {
     expect($validator->passes())->toBeTrue();
 });
 
+it('passes when param casing differs', function () {
+    $key = TranslationKey::factory()->create(['parameters' => [':attribute']]);
+
+    $rule = new TranslationParametersRule($key);
+
+    $validator = $this->app['validator']->make(
+        ['value' => ':Attribute is required'],
+        ['value' => [$rule]],
+    );
+
+    expect($validator->passes())->toBeTrue();
+});
+
 it('findMissing returns missing params', function () {
     $key = TranslationKey::factory()->create(['parameters' => [':attribute', ':max']]);
 
@@ -148,4 +161,20 @@ it('findMissing returns all params when none present', function () {
     $missing = TranslationParametersRule::findMissing($key, 'Invalid field');
 
     expect($missing)->toBe([':attribute', ':max']);
+});
+
+it('findMissing returns empty array when param is found in a different case', function () {
+    $key = TranslationKey::factory()->create(['parameters' => [':attribute']]);
+
+    $missing = TranslationParametersRule::findMissing($key, ':Attribute is required');
+
+    expect($missing)->toBe([]);
+});
+
+it('findMissing preserves case of missing params', function () {
+    $key = TranslationKey::factory()->create(['parameters' => [':Attribute']]);
+
+    $missing = TranslationParametersRule::findMissing($key, 'Hello World !');
+
+    expect($missing)->toBe([':Attribute']);
 });

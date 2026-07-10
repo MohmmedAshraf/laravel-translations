@@ -27,7 +27,7 @@ class TranslationParametersRule implements ValidationRule
     {
         return array_values(array_filter(
             $translationKey->parameterNames(),
-            fn (string $param) => ! str_contains($value, $param),
+            fn (string $param) => ! str_contains(strtolower($value), strtolower($param)),
         ));
     }
 }
