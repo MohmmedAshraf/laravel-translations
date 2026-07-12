@@ -72,6 +72,27 @@ it('resolves status as needs_review for translator role', function () {
     expect($translation->status->value)->toBe('needs_review');
 });
 
+it('forbids translators from setting translation status directly', function () {
+    config(['translations.approval_workflow' => true]);
+
+    $translator = Contributor::factory()->translator()->create();
+    $translator->languages()->attach($this->language);
+
+    $key = TranslationKey::factory()->create();
+
+    $this->actingAs($translator, 'translations')
+        ->put(route('ltu.phrases.update', [$this->language, $key]), [
+            'value' => 'Test translation',
+            'status' => 'approved',
+        ])
+        ->assertSessionHasErrors('status');
+
+    expect(Translation::query()
+        ->where('translation_key_id', $key->id)
+        ->where('language_id', $this->language->id)
+        ->exists())->toBeFalse();
+});
+
 it('allows explicit status to override auto-resolution', function () {
     config(['translations.approval_workflow' => true]);
 
